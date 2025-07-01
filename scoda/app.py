@@ -15,16 +15,16 @@ DATA_DIR: Path = Path(
 DATASET_PATHS: dict[str, Path] = {
     "cori_power_30_sec": Path(DATA_DIR, "Cori_power_30_sec.csv"),
     "hawk_power_15_min": Path(DATA_DIR, "Hawk_power_15_min.csv"),
-    "lumi_power_10_min": Path(DATA_DIR, "Lumi_power_10_min.csv"),
-    "marconi100_power_60_sec": Path(DATA_DIR, "Marconi100_power_60_sec.csv"),
-    "perlmutter_power_60_sec": Path(DATA_DIR, "Perlmutter_power_60_sec.csv"),
-    "lumi_hpcg": Path(DATA_DIR, "lumi_hpcg_data/lumi_hpcg.csv"),
     "hpcg_dpc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpcg_dpc.csv"),
     "hpcg_spc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpcg_spc.csv"),
     "hpcg_uc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpcg_uc.csv"),
     "hpl_dpc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpl_dpc.csv"),
     "hpl_spc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpl_spc.csv"),
     "hpl_uc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpl_uc.csv"),
+    "lumi_hpcg": Path(DATA_DIR, "lumi_hpcg_data/lumi_hpcg.csv"),
+    "lumi_power_10_min": Path(DATA_DIR, "Lumi_power_10_min.csv"),
+    "marconi100_power_60_sec": Path(DATA_DIR, "Marconi100_power_60_sec.csv"),
+    "perlmutter_power_60_sec": Path(DATA_DIR, "Perlmutter_power_60_sec.csv"),
 }
 
 
@@ -99,24 +99,28 @@ def main() -> None:
 
             st.session_state["dataset_dfs"][name] = _df
         st.toast(body="Read datasets into memory")
-
     st.divider()
 
     # 2. Benchmark writing to database
     st.markdown(body="Benchmark writing data to the database")
+    benchmark_iterations: int = st.number_input(
+        label="Number of benchmark iterations",
+        min_value=1,
+    )
+
     if st.button(
-        label="Write data to the database",
+        label="Benchmark database",
         disabled=len(st.session_state["dataset_dfs"].items()) < 1,
     ):
-        st.toast(body="Writing to database")
+        st.toast(body="Starting database benchmark")
 
         progress_value: int = 0
-        progess_text: str = "Writing to database"
+        progess_text: str = "Running benchmark"
         bar = st.progress(value=progress_value, text=progess_text)
 
         data: dict[str, list[float]] = {"time": []}
 
-        for _ in range(5):
+        for _ in range(benchmark_iterations):
             df_name: str
             df: DataFrame
 

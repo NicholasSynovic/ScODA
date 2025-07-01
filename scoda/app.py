@@ -4,6 +4,8 @@ import pandas as pd
 from pandas import DataFrame
 from pathlib import Path
 from collections import defaultdict
+from time import time
+import pickle
 
 DATA_DIR: Path = Path(
     Path(__file__).parent.parent.resolve(),
@@ -18,6 +20,7 @@ DATASET_PATHS: dict[str, Path] = {
     "perlmutter_power_60_sec": Path(DATA_DIR, "Perlmutter_power_60_sec.csv"),
     "lumi_hpcg": Path(DATA_DIR, "lumi_hpcg_data/lumi_hpcg.csv"),
     "hpcg_dpc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpcg_dpc.csv"),
+    "hpcg_spc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpcg_spc.csv"),
     "hpcg_uc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpcg_uc.csv"),
     "hpl_dpc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpl_dpc.csv"),
     "hpl_spc": Path(DATA_DIR, "hlrs_hpl_hpcg_data/hpl_spc.csv"),
@@ -30,6 +33,7 @@ def initialize_state() -> None:
     if "database_uris" not in st.session_state:
         st.session_state["database_uris"] = [
             "postgresql+psycopg2://admin:example@localhost:5432/research",
+            "mysql+pymysql://root:example@localhost:3306/research",
         ]
 
     if "dataset_dfs" not in st.session_state:
@@ -106,17 +110,42 @@ def main() -> None:
     ):
         st.toast(body="Writing to database")
 
-        df_name: str
-        df: DataFrame
-        for df_name, df in st.session_state["dataset_dfs"].items():
-            df.to_sql(
-                name=df_name,
-                con=st.session_state["db"].engine,
-                if_exists="append",
-                index=False,
-            )
+        progress_value: int = 0
+        progess_text: str = "Writing to database"
+        bar = st.progress(value=progress_value, text=progess_text)
+
+        data: dict[str, list[float]] = {"time": []}
+
+        for _ in range(5):
+            df_name: str
+            df: DataFrame
+
+            start_time: float = time()
+            for df_name, df in st.session_state["dataset_dfs"].items():
+                df.to_sql(
+                    name=df_name,
+                    con=st.session_state["db"].engine,
+                    if_exists="append",
+                    index=False,
+                )
+
+            end_time: float = time()
+            data["time"].append(end_time - start_time)
+
+            st.session_state["db"].recreate_tables()
+
+            progress_value += 1
+            bar.progress(value=progress_value, text=progess_text)
+
+        with open("file.pickle", "wb") as fp:
+            pickle.dump(obj=data, file=fp)
+            fp.close()
 
         st.toast(body="Wrote to database")
+    st.divider()
+
+    if st.button(label="Recreate database"):
+        st.session_state["db"].recreate_tables()
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ classifiers = [
     "Programming Language :: SQL",
 ]
 dependencies = [
+    "matplotlib>=3.10.3",
     "pandas>=2.3.0",
     "psycopg2-binary>=2.9.10",
     "pymysql>=1.1.1",

@@ -82,9 +82,18 @@ def main() -> None:
     st.markdown(body="## Read datasets into memory")
     if st.button(label="Read Datasets", disabled=False):
         for name, fp in DATASET_PATHS.items():
-            st.session_state["dataset_dfs"][name] = pd.read_csv(
+            _df: DataFrame = pd.read_csv(
                 filepath_or_buffer=fp,
             )
+
+            _df.columns = _df.columns.str.replace(pat=" ", repl="_")
+
+            try:
+                _df["Time"] = _df["Time"].apply(func=pd.Timestamp)
+            except KeyError:
+                pass
+
+            st.session_state["dataset_dfs"][name] = _df
         st.toast(body="Read datasets into memory")
 
     st.divider()
@@ -99,7 +108,7 @@ def main() -> None:
 
         df_name: str
         df: DataFrame
-        for df_name, df in st.session_state["dataset_dfs"]:
+        for df_name, df in st.session_state["dataset_dfs"].items():
             df.to_sql(
                 name=df_name,
                 con=st.session_state["db"].engine,

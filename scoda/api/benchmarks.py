@@ -47,3 +47,19 @@ def benchmark_per_db_table_write(
             data[key].append(_run(name=name, df=df))
 
     return DataFrame(data=data)
+
+
+def benchmark_max_query(db: DB) -> DataFrame:
+    pass
+
+
+def benchmark_min_query(db: DB) -> DataFrame:
+    pass
+
+
+def benchmark_average_query(db: DB) -> DataFrame:
+    pass
+
+
+def benchmark_query(db: str, sql: str) -> DataFrame:
+    pass

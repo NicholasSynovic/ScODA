@@ -2,28 +2,30 @@ from pandas import DataFrame
 from scoda.api.db import DB
 from collections import defaultdict
 from time import time
+import scoda.api.dataset as scoda_dataset
 
 
-def benchmark_entire_db_write(
+def benchmark_write_all_tables(
     db: DB,
-    db_name: str,
-    dfs: dict[str, DataFrame],
-    iterations: int,
-) -> DataFrame:
+    datasets: list[scoda_dataset.Dataset],
+) -> float:
     def _run() -> None:
-        name: str
-        df: DataFrame
-        for name, df in dfs.items():
-            df.to_sql(name=name, con=db.engine, if_exists="append", index=False)
+        dataset: scoda_dataset.Dataset
+        for dataset in datasets:
+            dataset.data.to_sql(
+                name=dataset.name,
+                con=db.engine,
+                if_exists="append",
+                index=False,
+            )
 
-    data: dict[str, list[float]] = defaultdict(list)
-    for _ in range(iterations):
-        start_time: float = time()
-        _run()
-        end_time: float = time()
-        data[db_name].append(end_time - start_time)
+    start_time: float = time()
+    _run()
+    end_time: float = time()
 
-    return DataFrame(data=data)
+    db.recreate_tables()
+
+    return end_time - start_time
 
 
 def benchmark_per_db_table_write(

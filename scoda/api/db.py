@@ -539,93 +539,100 @@ class BenchmarkResults(SQLite3):
 
     def create_tables(self) -> None:
         _: Table = Table(
-            "cori_power_30_sec",
+            "benchmark_write_all_tables",
             self.metadata,
             Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
+            Column("seconds", Float),
         )
 
-        _: Table = Table(
-            "hawk_power_15_min",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # _: Table = Table(
+        #     "cori_power_30_sec",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        _: Table = Table(
-            "lumi_power_10_min",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # _: Table = Table(
+        #     "hawk_power_15_min",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        _: Table = Table(
-            "marconi100_power_60_sec",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # _: Table = Table(
+        #     "lumi_power_10_min",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        _: Table = Table(
-            "perlmutter_power_60_sec",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # _: Table = Table(
+        #     "marconi100_power_60_sec",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        _: Table = Table(
-            "lumi_hpcg",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # _: Table = Table(
+        #     "perlmutter_power_60_sec",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        # hpcg_dpc
-        _: Table = Table(
-            "hpcg_dpc",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # _: Table = Table(
+        #     "lumi_hpcg",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        # hpcg_spc
-        _: Table = Table(
-            "hpcg_spc",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # # hpcg_dpc
+        # _: Table = Table(
+        #     "hpcg_dpc",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        # hpcg_uc
-        _: Table = Table(
-            "hpcg_uc",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # # hpcg_spc
+        # _: Table = Table(
+        #     "hpcg_spc",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        # hpl_dpc
-        _: Table = Table(
-            "hpl_dpc",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # # hpcg_uc
+        # _: Table = Table(
+        #     "hpcg_uc",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        # hpl_spc
-        _: Table = Table(
-            "hpl_spc",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # # hpl_dpc
+        # _: Table = Table(
+        #     "hpl_dpc",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
-        # hpl_uc
-        _: Table = Table(
-            "hpl_uc",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("whole_table_write_time", Float),
-        )
+        # # hpl_spc
+        # _: Table = Table(
+        #     "hpl_spc",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
+
+        # # hpl_uc
+        # _: Table = Table(
+        #     "hpl_uc",
+        #     self.metadata,
+        #     Column("id", Integer, primary_key=True),
+        #     Column("whole_table_write_time", Float),
+        # )
 
         self.metadata.create_all(bind=self.engine, checkfirst=True)

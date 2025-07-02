@@ -2,6 +2,9 @@ from scoda.cli import CLI
 import scoda.api.db as scoda_db
 import scoda.api.dataset as scoda_dataset
 from pathlib import Path
+from scoda.api.benchmark import *
+from collections import defaultdict
+from progress.bar import Bar
 
 
 def create_db(db_name: str) -> scoda_db.DB | bool:
@@ -37,11 +40,30 @@ def read_datasets(directory: Path) -> list[scoda_dataset.Dataset] | bool:
 
 
 def benchmark_db(
-    datasets: list[scoda_dataset.Dataset],
+    iterations: int,
     db: scoda_db.DB,
-    benchmark_result_db: scoda_db.BenchmarkResults,
-) -> bool:
-    return True
+    datasets: list[scoda_dataset.Dataset],
+    benchmark_results_db: scoda_db.BenchmarkResults,
+) -> None:
+    data: dict[str, list[float]] = defaultdict(list)
+
+    with Bar("Benchmarking writing all tables to DB...", max=iterations) as bar:
+        for _ in range(iterations):
+            data["seconds"].append(
+                benchmark_write_all_tables(
+                    db=db,
+                    datasets=datasets,
+                )
+            )
+            bar.next()
+
+    write_all_tables_data: DataFrame = DataFrame(data=data)
+    write_all_tables_data.to_sql(
+        name="write_all_tables",
+        con=benchmark_results_db.engine,
+        if_exists="append",
+        index=False,
+    )
 
 
 def main() -> int:
@@ -66,6 +88,12 @@ def main() -> int:
         return 2
 
     # 3. Benchmark writing to database
+    benchmark_db(
+        iterations=args["iterations"][0],
+        db=db,
+        datasets=datasets,
+        benchmark_results_db=benchmark_result_db,
+    )
 
     return 0
 

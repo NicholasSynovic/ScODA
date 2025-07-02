@@ -59,7 +59,7 @@ def benchmark_db(
 
     write_all_tables_data: DataFrame = DataFrame(data=data)
     write_all_tables_data.to_sql(
-        name="write_all_tables",
+        name="benchmark_write_all_tables",
         con=benchmark_results_db.engine,
         if_exists="append",
         index=False,
@@ -74,6 +74,9 @@ def main() -> int:
     db: scoda_db.DB | bool = create_db(db_name=args["db"][0])
     if isinstance(db, bool):
         return 1
+
+    # Clear tables even if there is nothing in them
+    db.recreate_tables()
 
     # 1: Connect to benchmark result DB
     benchmark_result_db: scoda_db.BenchmarkResults = scoda_db.BenchmarkResults(

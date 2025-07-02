@@ -11,7 +11,9 @@ class Dataset(ABC):
         self.data: DataFrame = self.read()
 
     def read(self) -> DataFrame:
-        return pd.read_csv(filepath_or_buffer=self.fp)
+        data: DataFrame = pd.read_csv(filepath_or_buffer=self.fp)
+        data.columns = data.columns.str.replace(pat=" ", repl="_")
+        return data
 
 
 class CoriPower(Dataset):

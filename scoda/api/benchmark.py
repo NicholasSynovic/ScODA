@@ -30,25 +30,23 @@ def benchmark_write_all_tables(
 
 def benchmark_per_db_table_write(
     db: DB,
-    db_name: str,
-    dfs: dict[str, DataFrame],
-    iterations: int,
-) -> DataFrame:
-    def _run(name: str, df: DataFrame) -> float:
-        start_time: float = time()
-        df.to_sql(name=name, con=db.engine, if_exists="append", index=False)
-        end_time: float = time()
-        return end_time - start_time
+    dataset: scoda_dataset.Dataset,
+) -> float:
+    def _run() -> None:
+        dataset.data.to_sql(
+            name=dataset.name,
+            con=db.engine,
+            if_exists="append",
+            index=False,
+        )
 
-    data: dict[str, list[float]] = defaultdict(list)
-    for _ in range(iterations):
-        name: str
-        df: DataFrame
-        for name, df in dfs.items():
-            key: str = f"{name}_{db_name}"
-            data[key].append(_run(name=name, df=df))
+    start_time: float = time()
+    _run()
+    end_time: float = time()
 
-    return DataFrame(data=data)
+    db.recreate_tables()
+
+    return end_time - start_time
 
 
 def benchmark_max_query(db: DB) -> DataFrame:

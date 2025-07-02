@@ -171,3 +171,4 @@ LAST/*
 *.pickle
 *.png
 TODO.md
+*.sqlite3

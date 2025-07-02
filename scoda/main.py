@@ -45,8 +45,8 @@ def benchmark_db(
     datasets: list[scoda_dataset.Dataset],
     benchmark_results_db: scoda_db.BenchmarkResults,
 ) -> None:
+    # Write all tables to the DB
     data: dict[str, list[float]] = defaultdict(list)
-
     with Bar("Benchmarking writing all tables to DB...", max=iterations) as bar:
         for _ in range(iterations):
             data["seconds"].append(
@@ -56,10 +56,28 @@ def benchmark_db(
                 )
             )
             bar.next()
-
-    write_all_tables_data: DataFrame = DataFrame(data=data)
-    write_all_tables_data.to_sql(
+    results: DataFrame = DataFrame(data=data)
+    results.to_sql(
         name="benchmark_write_all_tables",
+        con=benchmark_results_db.engine,
+        if_exists="append",
+        index=False,
+    )
+
+    # Benchmark per table writes
+    data: dict[str, list[float]] = defaultdict(list)
+    with Bar("Benchmarking per table writes to DB...", max=iterations) as bar:
+        dataset: scoda_dataset.Dataset
+        for _ in range(iterations):
+            for dataset in datasets:
+                data[f"{dataset.name}_seconds"].append(
+                    benchmark_per_db_table_write(db=db, dataset=dataset),
+                )
+            bar.next()
+
+    results: DataFrame = DataFrame(data=data)
+    results.to_sql(
+        name="benchmark_per_table_write",
         con=benchmark_results_db.engine,
         if_exists="append",
         index=False,

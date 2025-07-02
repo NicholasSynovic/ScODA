@@ -36,22 +36,36 @@ def read_datasets(directory: Path) -> list[scoda_dataset.Dataset] | bool:
     return data
 
 
+def benchmark_db(
+    datasets: list[scoda_dataset.Dataset],
+    db: scoda_db.DB,
+    benchmark_result_db: scoda_db.BenchmarkResults,
+) -> bool:
+    return True
+
+
 def main() -> int:
     cli: CLI = CLI()
     args = cli.parse_args().__dict__
-    print(args)
 
     # 0: Connect to database
     db: scoda_db.DB | bool = create_db(db_name=args["db"][0])
     if isinstance(db, bool):
         return 1
 
-    # 1. Read datasets into memory
-    dfs: list[scoda_dataset.Dataset] | bool = read_datasets(
+    # 1: Connect to benchmark result DB
+    benchmark_result_db: scoda_db.BenchmarkResults = scoda_db.BenchmarkResults(
+        fp=args["output"][0]
+    )
+
+    # 2. Read datasets into memory
+    datasets: list[scoda_dataset.Dataset] | bool = read_datasets(
         directory=args["input_dir"][0]
     )
-    if isinstance(dfs, bool):
+    if isinstance(datasets, bool):
         return 2
+
+    # 3. Benchmark writing to database
 
     return 0
 

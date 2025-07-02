@@ -36,6 +36,14 @@ class CLI:
             help="Path to LLNL/LAST Power Provisioning Dataset",
         )
         self.parser.add_argument(
+            "-o",
+            "--output",
+            nargs=1,
+            type=resolve_path,
+            required=True,
+            help="Path to SQLite3 database to store benchmark results",
+        )
+        self.parser.add_argument(
             "-r",
             "--iterations",
             nargs=1,

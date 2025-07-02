@@ -1,5 +1,15 @@
-from sqlalchemy import Engine, create_engine, MetaData, Table, Integer, Column, DateTime
-from abc import ABC
+from sqlalchemy import (
+    Engine,
+    create_engine,
+    MetaData,
+    Table,
+    Integer,
+    Column,
+    DateTime,
+    Float,
+)
+from abc import ABC, abstractmethod
+from pathlib import Path
 
 
 class DB(ABC):
@@ -515,3 +525,107 @@ class PostgreSQL(DB):
 class MySQL(DB):
     def __init__(self) -> None:
         super().__init__(uri="mysql+pymysql://root:example@localhost:3306/research")
+
+
+class SQLite3(DB):
+    def __init__(self, fp: Path) -> None:
+        self.fp: Path = fp.resolve()
+        super().__init__(uri=f"sqlite:///{self.fp}")
+
+
+class BenchmarkResults(SQLite3):
+    def __init__(self, fp: Path) -> None:
+        super().__init__(fp=fp)
+
+    def create_tables(self) -> None:
+        _: Table = Table(
+            "cori_power_30_sec",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        _: Table = Table(
+            "hawk_power_15_min",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        _: Table = Table(
+            "lumi_power_10_min",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        _: Table = Table(
+            "marconi100_power_60_sec",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        _: Table = Table(
+            "perlmutter_power_60_sec",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        _: Table = Table(
+            "lumi_hpcg",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        # hpcg_dpc
+        _: Table = Table(
+            "hpcg_dpc",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        # hpcg_spc
+        _: Table = Table(
+            "hpcg_spc",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        # hpcg_uc
+        _: Table = Table(
+            "hpcg_uc",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        # hpl_dpc
+        _: Table = Table(
+            "hpl_dpc",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        # hpl_spc
+        _: Table = Table(
+            "hpl_spc",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        # hpl_uc
+        _: Table = Table(
+            "hpl_uc",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("whole_table_write_time", Float),
+        )
+
+        self.metadata.create_all(bind=self.engine, checkfirst=True)

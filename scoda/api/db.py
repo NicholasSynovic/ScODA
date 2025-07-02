@@ -1,7 +1,8 @@
 from sqlalchemy import Engine, create_engine, MetaData, Table, Integer, Column, DateTime
+from abc import ABC
 
 
-class DB:
+class DB(ABC):
     def __init__(self, uri: str) -> None:
         self.uri: str = uri
         self.engine: Engine = create_engine(url=self.uri)
@@ -502,3 +503,15 @@ class DB:
         self.metadata.reflect(bind=self.engine)
         self.metadata.drop_all(bind=self.engine)
         self.metadata.create_all(bind=self.engine, checkfirst=True)
+
+
+class PostgreSQL(DB):
+    def __init__(self) -> None:
+        super().__init__(
+            uri="postgresql+psycopg2://admin:example@localhost:5432/research"
+        )
+
+
+class MySQL(DB):
+    def __init__(self) -> None:
+        super().__init__(uri="mysql+pymysql://root:example@localhost:3306/research")

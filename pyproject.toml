@@ -18,6 +18,7 @@ classifiers = [
 dependencies = [
     "matplotlib>=3.10.3",
     "pandas>=2.3.0",
+    "progress>=1.6.1",
     "psycopg2-binary>=2.9.10",
     "pymysql>=1.1.1",
     "pyspark>=4.0.0,<5",

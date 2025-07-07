@@ -12,36 +12,45 @@ benchmark_results: list[Path] = [
     Path("mysql.sqlite3").resolve(),
 ]
 
-write_all_tables_dfs: list[DataFrame] = [
-    pd.read_sql_table(
-        table_name="benchmark_write_all_tables",
-        con=create_engine(url=f"sqlite:///{br}"),
-        index_col="id",
-    )
-    for br in benchmark_results
-]
 
-write_all_tables_df["postgres"] = write_all_tables_dfs[0]["seconds"]
-write_all_tables_df["mysql"] = write_all_tables_dfs[1]["seconds"]
+def plot_benchmark_1() -> None:
+    dfs: list[DataFrame] = [
+        pd.read_sql_table(
+            table_name="benchmark_write_all_tables",
+            con=create_engine(url=f"sqlite:///{br}"),
+            index_col="id",
+        )
+        for br in benchmark_results
+    ]
 
-# Create a boxplot using Seaborn
-ax = sns.boxplot(data=write_all_tables_df)
+    write_all_tables_df["postgres"] = dfs[0]["seconds"]
+    write_all_tables_df["mysql"] = dfs[1]["seconds"]
 
-# Annotate the boxplot with median values
-for i, column in enumerate(write_all_tables_df.columns):
-    median_value = write_all_tables_df[column].median()
-    ax.annotate(
-        f"{median_value:.5f}",
-        xy=(i, median_value),
-        xytext=(0, -10),
-        textcoords="offset points",
-        ha="center",
-        va="bottom",
-        fontsize=8,
-        color="black",
-    )
+    # Create a boxplot using Seaborn
+    ax = sns.boxplot(data=write_all_tables_df)
 
-plt.title(label="Benchmark: Write All Tables To Database")
-plt.ylabel(ylabel="Seconds")
-plt.xlabel(xlabel="Database")
-plt.savefig("test.png")
+    # Annotate the boxplot with median values
+    for i, column in enumerate(write_all_tables_df.columns):
+        median_value = write_all_tables_df[column].median()
+        ax.annotate(
+            f"{median_value:.5f}",
+            xy=(i, median_value),
+            xytext=(0, -10),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            color="black",
+        )
+
+    plt.title(label="Benchmark: Write All Tables To Database")
+    plt.ylabel(ylabel="Seconds")
+    plt.xlabel(xlabel="Database")
+    plt.tight_layout()
+    plt.savefig("benchmark1_0.png")
+    plt.clf()
+    plt.close(fig="all")
+
+
+def plot_benchmark_2() -> None:
+    pass

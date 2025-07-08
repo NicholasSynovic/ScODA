@@ -5,6 +5,7 @@ from pathlib import Path
 from scoda.api.benchmark import *
 from collections import defaultdict
 from progress.bar import Bar
+from time import time
 
 
 def create_db(db_name: str) -> scoda_db.DB | bool:
@@ -13,6 +14,10 @@ def create_db(db_name: str) -> scoda_db.DB | bool:
             return scoda_db.PostgreSQL()
         case "mysql":
             return scoda_db.MySQL()
+        case "sqlite3":
+            return scoda_db.SQLite3(fp=Path(f"{time()}.sqlite3"))
+        case "sqlite3-memory":
+            return scoda_db.InMemorySQLite3()
         case _:
             return False
 

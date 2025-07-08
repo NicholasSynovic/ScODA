@@ -533,6 +533,11 @@ class SQLite3(DB):
         super().__init__(uri=f"sqlite:///{self.fp}")
 
 
+class InMemorySQLite3(DB):
+    def __init__(self) -> None:
+        super().__init__(uri=f"sqlite:///:memory:")
+
+
 class BenchmarkResults(SQLite3):
     def __init__(self, fp: Path) -> None:
         super().__init__(fp=fp)

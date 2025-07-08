@@ -548,6 +548,54 @@ class InMemorySQLite3(DB):
         super().__init__(uri=f"sqlite:///:memory:")
 
 
+class Redis:
+    # TODO: Implement this
+    ...
+
+
+class Valkey:
+    # TODO: Implement this
+    ...
+
+
+class Derby:
+    # TODO: implement this
+    # https://db.apache.org/derby/
+    ...
+
+
+class Druid:
+    # TODO: implement this
+    # https://projects.apache.org/project.html?druid
+    ...
+
+
+class Phoenix:
+    # TODO: implement this
+    # https://projects.apache.org/project.html?phoenix
+    ...
+
+
+class ElasticSearch:
+    # TODO: implement this
+    ...
+
+
+class InfluxDB:
+    # TODO: implement this
+    ...
+
+
+class MongoDB:
+    # TODO: implement this
+    ...
+
+
+class CouchDB:
+    # TODO: implement this
+    ...
+
+
 class BenchmarkResults(SQLite3):
     def __init__(self, fp: Path) -> None:
         super().__init__(fp=fp)

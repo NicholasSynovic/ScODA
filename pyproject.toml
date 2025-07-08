@@ -16,6 +16,7 @@ classifiers = [
     "Programming Language :: SQL",
 ]
 dependencies = [
+    "cryptography>=45.0.5",
     "matplotlib>=3.10.3",
     "pandas>=2.3.0",
     "progress>=1.6.1",

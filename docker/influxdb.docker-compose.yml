@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+
+  # InfluxDB
+  influxdb:
+    image: influxdb:3.1.0-core
+    container_name: influxdb_3.1.0-core
+    restart: always
+    ports:
+      - 8181:8181
+    volumes:
+      - $PWD/data/influxdb:/var/lib/influxdb3
+    command:
+      - influxdb3
+      - serve
+      - --node-id=node0
+      - --object-store=file
+      - --data-dir=/var/lib/influxdb3
+      - --plugin-dir=/var/lib/influxdb3-plugins

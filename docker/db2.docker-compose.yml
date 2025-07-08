@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+
+  # IBM DB2
+  # Access the service with `docker exec -it ibm_db2 bash -c " su - db2inst1"`
+  ibm_db2:
+    image: icr.io/db2_community/db2
+    container_name: ibm_db2
+    privileged: true
+    restart: always
+    volumes:
+      - $PWD/data/db2:/database
+    ports:
+      - 50000:50000
+    env_file:
+      - db2.env_list

@@ -141,6 +141,33 @@ wheels = [
 ]
 
 [[package]]
+name = "ibm-db"
+version = "3.2.6"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/15/82d8f281347332046a8d68b659427983e2b1275609c5dad02f4220f68974/ibm_db-3.2.6.tar.gz", hash = "sha256:6df13429c21454c46ee0c38355cb435a2c4cc639d747a3d2aee1cbf9562d943c", size = 262531, upload-time = "2025-03-09T15:45:00.661Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/86/1a/2f4778290bcb3406dfb41482de936d9636775de051a170fcd0aee4098001/ibm_db-3.2.6-cp313-cp313-macosx_10_15_x86_64.whl", hash = "sha256:27673e36dd71dd0c121b5b6cdb7a10c0410cff9b516c847f9cc4bec1570b7eaa", size = 24174265, upload-time = "2025-03-09T15:43:51.026Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/6a/ef3de6544c93cd7f326dc77d7a1140db497f3d786b9dfc1ab4c23182552b/ibm_db-3.2.6-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:d2cfadb8187ab9d74d4d6b96aed31adafde3e10266a9493f61360394272d6ac3", size = 20356380, upload-time = "2025-03-09T15:43:53.605Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/83/9c9f37308ea15189d4e3e4e3739b6029c1546aebc587712b5bf81259d868/ibm_db-3.2.6-cp313-cp313-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:bcdb037a11294be754afed321605bae2d8818a11d5694f2712f4fa83c0e9d66b", size = 40491946, upload-time = "2025-03-09T15:43:56.324Z" },
+    { url = "https://files.pythonhosted.org/packages/02/5c/608787c0090393cbb37900f90946f8afba8cf4f0f49c9077ec0e2e3f8fb8/ibm_db-3.2.6-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:553eecefe17174e7b4bd677769ee52c7a015ad09af6ba5fe9a6b8a88b10a2c19", size = 43805531, upload-time = "2025-03-09T15:43:59.602Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/56/1f66afbb4c41cba0cf92e91c0daea873a54a6826ccff47fcd4db61ff6ea6/ibm_db-3.2.6-cp313-cp313-win32.whl", hash = "sha256:b74e262039959199a157af9d40fc30e68292405342817780c0cd2bd92ba5306b", size = 24938754, upload-time = "2025-03-09T15:44:02.615Z" },
+    { url = "https://files.pythonhosted.org/packages/9b/a9/a454d15f109d84d2244042071653dc2eb141ec4cbfcfbac773babf914ab4/ibm_db-3.2.6-cp313-cp313-win_amd64.whl", hash = "sha256:cea856d4e7d43606aec81f2b16af082ad77e206e3342b5e4cc76bfa41ac47bd9", size = 27959246, upload-time = "2025-03-09T15:44:05.687Z" },
+]
+
+[[package]]
+name = "ibm-db-sa"
+version = "0.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "ibm-db" },
+    { name = "sqlalchemy" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/82/8a/91cfbfe92ba444e5b6ca40c17a23645b11aabc7419eea2782e4585f7881a/ibm_db_sa-0.4.2.tar.gz", hash = "sha256:7ebdbf29d34b23870b7d22e3c55aef9b4e90250e3fb163bd6dde670326d6a34f", size = 32991, upload-time = "2025-06-23T11:37:35.147Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a6/92/e9260182a37c5ac06cf31366500f5e2a06cee2163aceba24753a80835d81/ibm_db_sa-0.4.2-py3-none-any.whl", hash = "sha256:284cd29cd493c275d168b79d578021ba1c8aa6205e09cd8d3defb8f59d6587ee", size = 31503, upload-time = "2025-06-23T11:37:33.949Z" },
+]
+
+[[package]]
 name = "kiwisolver"
 version = "1.4.8"
 source = { registry = "https://pypi.org/simple" }
@@ -428,6 +455,8 @@ version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "cryptography" },
+    { name = "ibm-db" },
+    { name = "ibm-db-sa" },
     { name = "matplotlib" },
     { name = "pandas" },
     { name = "progress" },
@@ -441,6 +470,8 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cryptography", specifier = ">=45.0.5" },
+    { name = "ibm-db", specifier = ">=3.2.6" },
+    { name = "ibm-db-sa", specifier = ">=0.4.2" },
     { name = "matplotlib", specifier = ">=3.10.3" },
     { name = "pandas", specifier = ">=2.3.0" },
     { name = "progress", specifier = ">=1.6.1" },

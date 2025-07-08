@@ -20,6 +20,8 @@ def create_db(db_name: str) -> scoda_db.DB | bool:
             return scoda_db.InMemorySQLite3()
         case "mariadb":
             return scoda_db.MariaDB()
+        case "db2":
+            return scoda_db.DB2()
         case _:
             return False
 

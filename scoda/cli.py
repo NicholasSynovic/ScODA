@@ -29,6 +29,7 @@ class CLI:
                 "sqlite3",
                 "sqlite3-memory",
                 "mariadb",
+                "db2",
             ],
             required=True,
             help="Database to benchmark against",

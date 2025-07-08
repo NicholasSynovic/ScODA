@@ -532,6 +532,11 @@ class MariaDB(DB):
         super().__init__(uri="mariadb+pymysql://root:example@localhost:3306/research")
 
 
+class DB2(DB):
+    def __init__(self) -> None:
+        super().__init__(uri="db2+ibm_db://root:example@localhost:50000/research")
+
+
 class SQLite3(DB):
     def __init__(self, fp: Path) -> None:
         self.fp: Path = fp.resolve()

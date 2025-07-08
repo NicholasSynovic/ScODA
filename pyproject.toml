@@ -17,6 +17,8 @@ classifiers = [
 ]
 dependencies = [
     "cryptography>=45.0.5",
+    "ibm-db>=3.2.6",
+    "ibm-db-sa>=0.4.2",
     "matplotlib>=3.10.3",
     "pandas>=2.3.0",
     "progress>=1.6.1",

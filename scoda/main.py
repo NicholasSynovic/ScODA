@@ -18,6 +18,8 @@ def create_db(db_name: str) -> scoda_db.DB | bool:
             return scoda_db.SQLite3(fp=Path(f"{time()}.sqlite3"))
         case "sqlite3-memory":
             return scoda_db.InMemorySQLite3()
+        case "mariadb":
+            return scoda_db.MariaDB()
         case _:
             return False
 

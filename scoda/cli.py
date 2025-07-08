@@ -23,7 +23,13 @@ class CLI:
             "--db",
             nargs=1,
             type=str,
-            choices=["postgres", "mysql", "sqlite3", "sqlite3-memory"],
+            choices=[
+                "postgres",
+                "mysql",
+                "sqlite3",
+                "sqlite3-memory",
+                "mariadb",
+            ],
             required=True,
             help="Database to benchmark against",
         )

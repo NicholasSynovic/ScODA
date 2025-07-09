@@ -8,7 +8,7 @@ from sqlalchemy import (
     DateTime,
     Float,
 )
-from abc import ABC, abstractmethod
+from abc import ABC
 from pathlib import Path
 
 

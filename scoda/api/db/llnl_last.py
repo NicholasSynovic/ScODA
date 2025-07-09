@@ -10,15 +10,12 @@ from sqlalchemy import (
 )
 from abc import ABC
 from pathlib import Path
+from scoda.api.db import DB
 
 
-class DB(ABC):
+class LLNL_LAST(DB):
     def __init__(self, uri: str) -> None:
-        self.uri: str = uri
-        self.engine: Engine = create_engine(url=self.uri)
-        self.metadata: MetaData = MetaData()
-
-        self.create_tables()
+        super().__init__(uri=uri)
 
     def create_tables(self) -> None:
         _: Table = Table(
@@ -509,41 +506,36 @@ class DB(ABC):
 
         self.metadata.create_all(bind=self.engine, checkfirst=True)
 
-    def recreate_tables(self) -> None:
-        self.metadata.reflect(bind=self.engine)
-        self.metadata.drop_all(bind=self.engine)
-        self.metadata.create_all(bind=self.engine, checkfirst=True)
 
-
-class PostgreSQL(DB):
+class PostgreSQL(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(
             uri="postgresql+psycopg2://admin:example@localhost:5432/research"
         )
 
 
-class MySQL(DB):
+class MySQL(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(uri="mysql+pymysql://root:example@localhost:3306/research")
 
 
-class MariaDB(DB):
+class MariaDB(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(uri="mariadb+pymysql://root:example@localhost:3306/research")
 
 
-class DB2(DB):
+class DB2(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(uri="db2+ibm_db://db2inst1:example@localhost:50000/research")
 
 
-class SQLite3(DB):
+class SQLite3(LLNL_LAST):
     def __init__(self, fp: Path) -> None:
         self.fp: Path = fp.resolve()
         super().__init__(uri=f"sqlite:///{self.fp}")
 
 
-class InMemorySQLite3(DB):
+class InMemorySQLite3(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(uri=f"sqlite:///:memory:")
 

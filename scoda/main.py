@@ -1,5 +1,5 @@
 from scoda.cli import CLI
-import scoda.api.db as scoda_db
+from scoda.api.db import llnl_last
 import scoda.api.dataset as scoda_dataset
 from pathlib import Path
 from scoda.api.benchmark import *
@@ -8,20 +8,20 @@ from progress.bar import Bar
 from time import time
 
 
-def create_db(db_name: str) -> scoda_db.DB | bool:
+def create_db(db_name: str) -> llnl_last.DB | bool:
     match db_name:
         case "postgres":
-            return scoda_db.PostgreSQL()
+            return llnl_last.PostgreSQL()
         case "mysql":
-            return scoda_db.MySQL()
+            return llnl_last.MySQL()
         case "sqlite3":
-            return scoda_db.SQLite3(fp=Path(f"{time()}.sqlite3"))
+            return llnl_last.SQLite3(fp=Path(f"{time()}.sqlite3"))
         case "sqlite3-memory":
-            return scoda_db.InMemorySQLite3()
+            return llnl_last.InMemorySQLite3()
         case "mariadb":
-            return scoda_db.MariaDB()
+            return llnl_last.MariaDB()
         case "db2":
-            return scoda_db.DB2()
+            return llnl_last.DB2()
         case _:
             return False
 
@@ -50,9 +50,9 @@ def read_datasets(directory: Path) -> list[scoda_dataset.Dataset] | bool:
 
 def benchmark_db(
     iterations: int,
-    db: scoda_db.DB,
+    db: llnl_last.DB,
     datasets: list[scoda_dataset.Dataset],
-    benchmark_results_db: scoda_db.BenchmarkResults,
+    benchmark_results_db: llnl_last.BenchmarkResults,
 ) -> None:
     # Write all tables to the DB
     data: dict[str, list[float]] = defaultdict(list)
@@ -98,7 +98,7 @@ def main() -> int:
     args = cli.parse_args().__dict__
 
     # 0: Connect to database
-    db: scoda_db.DB | bool = create_db(db_name=args["db"][0])
+    db: llnl_last.DB | bool = create_db(db_name=args["db"][0])
     if isinstance(db, bool):
         return 1
 
@@ -106,7 +106,7 @@ def main() -> int:
     db.recreate_tables()
 
     # 1: Connect to benchmark result DB
-    benchmark_result_db: scoda_db.BenchmarkResults = scoda_db.BenchmarkResults(
+    benchmark_result_db: llnl_last.BenchmarkResults = llnl_last.BenchmarkResults(
         fp=args["output"][0]
     )
 

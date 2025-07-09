@@ -1,5 +1,5 @@
 from scoda.cli import CLI
-from scoda.api.db import llnl_last
+from scoda.api.db import implementations, llnl_last
 import scoda.api.dataset as scoda_dataset
 from pathlib import Path
 from scoda.api.benchmark import *
@@ -11,17 +11,17 @@ from time import time
 def create_db(db_name: str) -> llnl_last.DB | bool:
     match db_name:
         case "postgres":
-            return llnl_last.PostgreSQL()
+            return implementations.PostgreSQL()
         case "mysql":
-            return llnl_last.MySQL()
+            return implementations.MySQL()
         case "sqlite3":
-            return llnl_last.SQLite3(fp=Path(f"{time()}.sqlite3"))
+            return implementations.SQLite3(fp=Path(f"{time()}.sqlite3"))
         case "sqlite3-memory":
-            return llnl_last.InMemorySQLite3()
+            return implementations.InMemorySQLite3()
         case "mariadb":
-            return llnl_last.MariaDB()
+            return implementations.MariaDB()
         case "db2":
-            return llnl_last.DB2()
+            return implementations.DB2()
         case _:
             return False
 
@@ -52,7 +52,7 @@ def benchmark_db(
     iterations: int,
     db: llnl_last.DB,
     datasets: list[scoda_dataset.Dataset],
-    benchmark_results_db: llnl_last.BenchmarkResults,
+    benchmark_results_db: implementations.BenchmarkResults,
 ) -> None:
     # Write all tables to the DB
     data: dict[str, list[float]] = defaultdict(list)
@@ -106,8 +106,8 @@ def main() -> int:
     db.recreate_tables()
 
     # 1: Connect to benchmark result DB
-    benchmark_result_db: llnl_last.BenchmarkResults = llnl_last.BenchmarkResults(
-        fp=args["output"][0]
+    benchmark_result_db: implementations.BenchmarkResults = (
+        implementations.BenchmarkResults(fp=args["output"][0])
     )
 
     # 2. Read datasets into memory

@@ -6,18 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 import seaborn as sns
 
-write_all_tables_df: DataFrame = DataFrame()
 
-benchmark_results: list[Path] = [
-    Path("data/mariadb_10.sqlite3").resolve(),
-    Path("data/mysql_10.sqlite3").resolve(),
-    Path("data/postgres_10.sqlite3").resolve(),
-    Path("data/sqlite3_10.sqlite3").resolve(),
-    Path("data/sqlite3-memory_10.sqlite3").resolve(),
-]
-
-
-def plot_table_size() -> None:
+def plot_llnl_last_table_size() -> None:
     data: dict[str, list[str | int | float]] = {
         "dataset": [],
         "records": [],
@@ -76,7 +66,17 @@ def plot_table_size() -> None:
     pass
 
 
-def plot_benchmark_1() -> None:
+def plot_llnl_last_total_seconds_to_write_llnl_last_tables() -> None:
+    write_all_tables_df: DataFrame = DataFrame()
+
+    benchmark_results: list[Path] = [
+        Path("data/mariadb_10.sqlite3").resolve(),
+        Path("data/mysql_10.sqlite3").resolve(),
+        Path("data/postgres_10.sqlite3").resolve(),
+        Path("data/sqlite3_10.sqlite3").resolve(),
+        Path("data/sqlite3-memory_10.sqlite3").resolve(),
+    ]
+
     dfs: list[DataFrame] = [
         pd.read_sql_table(
             table_name="benchmark_write_all_tables",
@@ -92,12 +92,20 @@ def plot_benchmark_1() -> None:
     write_all_tables_df["SQLite3"] = dfs[3]["seconds"]
     write_all_tables_df["SQLite3 (Memory)"] = dfs[4]["seconds"]
 
+    write_all_tables_df["MariaDB"] = write_all_tables_df["MariaDB"].mean()
+    write_all_tables_df["MySQL"] = write_all_tables_df["MySQL"].mean()
+    write_all_tables_df["PostgreSQL"] = write_all_tables_df["PostgreSQL"].mean()
+    write_all_tables_df["SQLite3"] = write_all_tables_df["SQLite3"].mean()
+    write_all_tables_df["SQLite3 (Memory)"] = write_all_tables_df[
+        "SQLite3 (Memory)"
+    ].mean()
+
     # Create a boxplot using Seaborn
     ax = sns.barplot(data=write_all_tables_df)
 
     # Annotate the boxplot with median values
     for i, column in enumerate(write_all_tables_df.columns):
-        median_value = write_all_tables_df[column].median()
+        median_value = write_all_tables_df[column].mean()
         ax.annotate(
             f"{median_value:.5f}",
             xy=(i, median_value),
@@ -109,11 +117,12 @@ def plot_benchmark_1() -> None:
             color="black",
         )
 
-    plt.title(label="Batch Write Tables To Database", fontsize=16)
-    plt.ylabel(ylabel="Seconds", fontsize=14)
-    plt.xlabel(xlabel="Database", fontsize=14)
+    plt.suptitle(t="Total Seconds To Write All Datasets", fontsize=16)
+    plt.title(label="Mean Value Shown After 10 Iterations", fontsize=14)
+    plt.ylabel(ylabel="Seconds", fontsize=12)
+    plt.xlabel(xlabel="Database", fontsize=12)
     plt.tight_layout()
-    plt.savefig("benchmark1_0.png")
+    plt.savefig("llnl-last-total-seconds-writing-tables.png")
     plt.clf()
     plt.close(fig="all")
 
@@ -122,5 +131,5 @@ def plot_benchmark_2() -> None:
     pass
 
 
-plot_table_size()
-plot_benchmark_1()
+plot_llnl_last_table_size()
+plot_llnl_last_total_seconds_to_write_llnl_last_tables()

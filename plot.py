@@ -44,18 +44,18 @@ def plot_llnl_last_table_size() -> None:
 
     df: DataFrame = DataFrame(data=data)
 
-    axes: list[Axes]
-    _, axes = plt.subplots(nrows=1, ncols=2)
-    sns.barplot(data=df, x="dataset", y="records", ax=axes[0])
-    axes[0].set_title(label="Records per Dataset")
-    axes[0].set_xlabel(xlabel="Dataset")
-    axes[0].set_ylabel(ylabel="Records (log-scaled)")
-    axes[0].set_yscale(value="log")
+    # axes: list[Axes]
+    # _, axes = plt.subplots(nrows=1, ncols=2)
+    sns.barplot(data=df, x="dataset", y="records")
+    plt.title(label="Records per Dataset")
+    plt.xlabel(xlabel="Dataset")
+    plt.ylabel(ylabel="Records (log-scaled)")
+    plt.yscale(value="log")
 
-    sns.barplot(data=df, x="dataset", y="filesize_kb", ax=axes[1])
-    axes[1].set_title(label="File Size per Dataset")
-    axes[1].set_xlabel(xlabel="Dataset")
-    axes[1].set_ylabel(ylabel="File Size (kb)")
+    # sns.barplot(data=df, x="dataset", y="filesize_kb", ax=axes[1])
+    # axes[1].set_title(label="File Size per Dataset")
+    # axes[1].set_xlabel(xlabel="Dataset")
+    # axes[1].set_ylabel(ylabel="File Size (kb)")
 
     plt.suptitle(t="LLNL/LAST Dataset Hueristics", fontsize=16)
     plt.tight_layout()

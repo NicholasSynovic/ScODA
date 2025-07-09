@@ -8,8 +8,11 @@ import seaborn as sns
 write_all_tables_df: DataFrame = DataFrame()
 
 benchmark_results: list[Path] = [
-    Path("postgresql.sqlite3").resolve(),
-    Path("mysql.sqlite3").resolve(),
+    Path("data/mariadb_10.sqlite3").resolve(),
+    Path("data/mysql_10.sqlite3").resolve(),
+    Path("data/postgres_10.sqlite3").resolve(),
+    Path("data/sqlite3_10.sqlite3").resolve(),
+    Path("data/sqlite3-memory_10.sqlite3").resolve(),
 ]
 
 
@@ -23,11 +26,14 @@ def plot_benchmark_1() -> None:
         for br in benchmark_results
     ]
 
-    write_all_tables_df["postgres"] = dfs[0]["seconds"]
-    write_all_tables_df["mysql"] = dfs[1]["seconds"]
+    write_all_tables_df["MariaDB"] = dfs[0]["seconds"]
+    write_all_tables_df["MySQL"] = dfs[1]["seconds"]
+    write_all_tables_df["PostgreSQL"] = dfs[2]["seconds"]
+    write_all_tables_df["SQLite3"] = dfs[3]["seconds"]
+    write_all_tables_df["SQLite3 (Memory)"] = dfs[4]["seconds"]
 
     # Create a boxplot using Seaborn
-    ax = sns.boxplot(data=write_all_tables_df)
+    ax = sns.barplot(data=write_all_tables_df)
 
     # Annotate the boxplot with median values
     for i, column in enumerate(write_all_tables_df.columns):
@@ -35,7 +41,7 @@ def plot_benchmark_1() -> None:
         ax.annotate(
             f"{median_value:.5f}",
             xy=(i, median_value),
-            xytext=(0, -10),
+            xytext=(0, 2),
             textcoords="offset points",
             ha="center",
             va="bottom",
@@ -43,9 +49,9 @@ def plot_benchmark_1() -> None:
             color="black",
         )
 
-    plt.title(label="Benchmark: Write All Tables To Database")
-    plt.ylabel(ylabel="Seconds")
-    plt.xlabel(xlabel="Database")
+    plt.title(label="Batch Write Tables To Database", fontsize=16)
+    plt.ylabel(ylabel="Seconds", fontsize=14)
+    plt.xlabel(xlabel="Database", fontsize=14)
     plt.tight_layout()
     plt.savefig("benchmark1_0.png")
     plt.clf()
@@ -54,3 +60,6 @@ def plot_benchmark_1() -> None:
 
 def plot_benchmark_2() -> None:
     pass
+
+
+plot_benchmark_1()

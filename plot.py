@@ -199,7 +199,7 @@ def plot_writes_per_table() -> None:
         t="Mean Time To Write Specific Datasets to MariaDB", fontsize=SUPTITLE_FONT_SIZE
     )
     plt.title(
-        label="10 Iterations Conducted; Longest 4 Datasets Shown",
+        label="10 Iterations Conducted; Longest 4 Datasets Writes Shown",
         fontsize=TITLE_FONT_SIZE,
     )
     plt.xlabel(xlabel="Datasets", fontsize=X_Y_LABEL_FONT_SIZE)

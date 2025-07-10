@@ -1,5 +1,5 @@
 from scoda.cli import CLI
-from scoda.api.db import implementations, llnl_last
+from scoda.api.db import implementations, llnl_last, theta
 import scoda.api.dataset as scoda_dataset
 from pathlib import Path
 from scoda.api.benchmark import *
@@ -8,10 +8,12 @@ from progress.bar import Bar
 from time import time
 
 
-def create_db(db_name: str) -> llnl_last.DB | bool:
+def create_db(db_name: str) -> llnl_last.LLNL_LAST | theta.Theta | bool:
     match db_name:
         case "postgres":
             return implementations.PostgreSQL()
+        case "postgres-theta":
+            return implementations.PostgreSQL_Theta()
         case "mysql":
             return implementations.MySQL()
         case "sqlite3":

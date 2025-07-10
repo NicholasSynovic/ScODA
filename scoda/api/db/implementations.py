@@ -1,37 +1,71 @@
 from scoda.api.db.llnl_last import LLNL_LAST
+from scoda.api.db.theta import Theta
 from pathlib import Path
 from sqlalchemy import Table, Column, Float, Integer
 
 
-class PostgreSQL(LLNL_LAST):
+class PostgreSQL_LLNL(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(
             uri="postgresql+psycopg2://admin:example@localhost:5432/research"
         )
 
 
-class MySQL(LLNL_LAST):
+class PostgreSQL_Theta(Theta):
+    def __init__(self) -> None:
+        super().__init__(
+            uri="postgresql+psycopg2://admin:example@localhost:5432/research"
+        )
+
+
+class MySQL_LLNL(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(uri="mysql+pymysql://root:example@localhost:3306/research")
 
 
-class MariaDB(LLNL_LAST):
+class MySQL_Theta(Theta):
+    def __init__(self) -> None:
+        super().__init__(uri="mysql+pymysql://root:example@localhost:3306/research")
+
+
+class MariaDB_LLNL(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(uri="mariadb+pymysql://root:example@localhost:3306/research")
 
 
-class DB2(LLNL_LAST):
+class MariaDB_Theta(Theta):
+    def __init__(self) -> None:
+        super().__init__(uri="mariadb+pymysql://root:example@localhost:3306/research")
+
+
+class DB2_LLNL(LLNL_LAST):
     def __init__(self) -> None:
         super().__init__(uri="db2+ibm_db://db2inst1:example@localhost:50000/research")
 
 
-class SQLite3(LLNL_LAST):
+class DB2_Theta(Theta):
+    def __init__(self) -> None:
+        super().__init__(uri="db2+ibm_db://db2inst1:example@localhost:50000/research")
+
+
+class SQLite3_LLNL(LLNL_LAST):
     def __init__(self, fp: Path) -> None:
         self.fp: Path = fp.resolve()
         super().__init__(uri=f"sqlite:///{self.fp}")
 
 
-class InMemorySQLite3(LLNL_LAST):
+class SQLite3_Theta(LLNL_LAST):
+    def __init__(self, fp: Path) -> None:
+        self.fp: Path = fp.resolve()
+        super().__init__(uri=f"sqlite:///{self.fp}")
+
+
+class InMemorySQLite3_LLNL(LLNL_LAST):
+    def __init__(self) -> None:
+        super().__init__(uri=f"sqlite:///:memory:")
+
+
+class InMemorySQLite3_Theta(Theta):
     def __init__(self) -> None:
         super().__init__(uri=f"sqlite:///:memory:")
 
@@ -43,12 +77,6 @@ class Redis:
 
 class Valkey:
     # TODO: Implement this
-    ...
-
-
-class Derby:
-    # TODO: implement this
-    # https://db.apache.org/derby/
     ...
 
 
@@ -84,7 +112,7 @@ class CouchDB:
     ...
 
 
-class BenchmarkResults(SQLite3):
+class BenchmarkResults_LLNL(SQLite3_LLNL):
     def __init__(self, fp: Path) -> None:
         super().__init__(fp=fp)
 

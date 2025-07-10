@@ -1,13 +1,13 @@
 from pandas import DataFrame
 from scoda.api.db import DB
-from collections import defaultdict
 from time import time
 import scoda.api.dataset as scoda_dataset
+from collections.abc import Iterator
 
 
 def benchmark_write_all_tables(
     db: DB,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
 ) -> float:
     def _run() -> None:
         dataset: scoda_dataset.Dataset

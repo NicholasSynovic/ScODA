@@ -6,59 +6,110 @@ from scoda.api.benchmark import *
 from collections import defaultdict
 from progress.bar import Bar
 from time import time
+from collections.abc import Iterator
+from copy import copy
+from typing import Literal
 
 
 def create_db(db_name: str) -> llnl_last.LLNL_LAST | theta.Theta | bool:
     match db_name:
-        case "postgres":
-            return implementations.PostgreSQL()
         case "postgres-theta":
             return implementations.PostgreSQL_Theta()
-        case "mysql":
-            return implementations.MySQL()
-        case "sqlite3":
-            return implementations.SQLite3(fp=Path(f"{time()}.sqlite3"))
-        case "sqlite3-memory":
-            return implementations.InMemorySQLite3()
-        case "mariadb":
-            return implementations.MariaDB()
-        case "db2":
-            return implementations.DB2()
+        case "postgres-llnl":
+            return implementations.PostgreSQL_LLNL()
+        case "mysql-theta":
+            return implementations.MySQL_Theta()
+        case "mysql-llnl":
+            return implementations.MySQL_LLNL()
+        case "sqlite3-theta":
+            return implementations.SQLite3_Theta(fp=Path(f"{time()}_theta.sqlite3"))
+        case "sqlite3-llnl":
+            return implementations.SQLite3_LLNL(fp=Path(f"{time()}_llnl.sqlite3"))
+        case "sqlite3-memory-theta":
+            return implementations.InMemorySQLite3_Theta()
+        case "sqlite3-memory-llnl":
+            return implementations.InMemorySQLite3_LLNL()
+        case "mariadb-theta":
+            return implementations.MariaDB_Theta()
+        case "mariadb-llnl":
+            return implementations.MariaDB_LLNL()
+        case "db2-theta":
+            return implementations.DB2_Theta()
+        case "db2-llnl":
+            return implementations.DB2_LLNL()
         case _:
             return False
 
 
-def read_datasets(directory: Path) -> list[scoda_dataset.Dataset] | bool:
-    data: list[scoda_dataset.Dataset] = []
-
-    try:
-        data.append(scoda_dataset.CoriPower(directory=directory))
-        data.append(scoda_dataset.HawkPower(directory=directory))
-        data.append(scoda_dataset.HPCGDPC(directory=directory))
-        data.append(scoda_dataset.HPCGSPC(directory=directory))
-        data.append(scoda_dataset.HPCGUC(directory=directory))
-        data.append(scoda_dataset.HPLDPC(directory=directory))
-        data.append(scoda_dataset.HPLSPC(directory=directory))
-        data.append(scoda_dataset.HPLUC(directory=directory))
-        data.append(scoda_dataset.LumiHPCG(directory=directory))
-        data.append(scoda_dataset.LumiPower(directory=directory))
-        data.append(scoda_dataset.Marconi100Power(directory=directory))
-        data.append(scoda_dataset.PerlmutterPower(directory=directory))
-    except FileNotFoundError:
-        return False
-
-    return data
-
-
-def benchmark_db(
+def benchmark_db_theta(
     iterations: int,
-    db: llnl_last.DB,
-    datasets: list[scoda_dataset.Dataset],
-    benchmark_results_db: implementations.BenchmarkResults,
+    db: theta.Theta,
+    datasets: Iterator[scoda_dataset.Dataset],
+    benchmark_results_db: implementations.BenchmarkResults_Theta,
 ) -> None:
-    # Write all tables to the DB
-    data: dict[str, list[float]] = defaultdict(list)
-    with Bar("Benchmarking writing all tables to DB...", max=iterations) as bar:
+    results: DataFrame
+    data: dict[str, list[float]]
+    dataset_copy: Iterator[scoda_dataset.Dataset]
+
+    # Write all tables to a database
+    with Bar("Benchmarking writing all tables to database", max=iterations) as bar:
+        dataset_copy = copy(datasets)
+        data = defaultdict(list)
+        for _ in range(iterations):
+            data["seconds"].append(
+                benchmark_write_all_tables(
+                    db=db,
+                    datasets=dataset_copy,
+                )
+            )
+            bar.next()
+
+    results = DataFrame(data=data)
+    results.to_sql(
+        name="benchmark_write_all_tables",
+        con=benchmark_results_db.engine,
+        if_exists="append",
+        index=False,
+    )
+
+    # Write individual tables to a database
+    with Bar(
+        "Benchmarking writing individual tables to database", max=iterations
+    ) as bar:
+        dataset_copy = copy(datasets)
+        data = defaultdict(list)
+        for _ in range(iterations):
+            dataset: scoda_dataset.Dataset
+            for dataset in dataset_copy:
+                data[dataset.name].append(
+                    benchmark_per_db_table_write(
+                        db=db,
+                        dataset=dataset,
+                    )
+                )
+            bar.next()
+
+    results = DataFrame(data=data)
+    results.to_sql(
+        name="benchmark_per_table_write",
+        con=benchmark_results_db.engine,
+        if_exists="append",
+        index=False,
+    )
+
+
+def benchmark_db_llnl(
+    iterations: int,
+    db: llnl_last.LLNL_LAST,
+    datasets: list[scoda_dataset.Dataset],
+    benchmark_results_db: implementations.BenchmarkResults_LLNL,
+) -> None:
+    results: DataFrame
+    data: dict[str, list[float]]
+
+    # Write all tables to a database
+    with Bar("Benchmarking writing all tables to database", max=iterations) as bar:
+        data = defaultdict(list)
         for _ in range(iterations):
             data["seconds"].append(
                 benchmark_write_all_tables(
@@ -67,7 +118,8 @@ def benchmark_db(
                 )
             )
             bar.next()
-    results: DataFrame = DataFrame(data=data)
+
+    results = DataFrame(data=data)
     results.to_sql(
         name="benchmark_write_all_tables",
         con=benchmark_results_db.engine,
@@ -75,18 +127,23 @@ def benchmark_db(
         index=False,
     )
 
-    # Benchmark per table writes
-    data: dict[str, list[float]] = defaultdict(list)
-    with Bar("Benchmarking per table writes to DB...", max=iterations) as bar:
-        dataset: scoda_dataset.Dataset
+    # Write individual tables to a database
+    with Bar(
+        "Benchmarking writing individual tables to database", max=iterations
+    ) as bar:
+        data = defaultdict(list)
         for _ in range(iterations):
+            dataset: scoda_dataset.Dataset
             for dataset in datasets:
-                data[f"{dataset.name}_seconds"].append(
-                    benchmark_per_db_table_write(db=db, dataset=dataset),
+                data[dataset.name].append(
+                    benchmark_per_db_table_write(
+                        db=db,
+                        dataset=dataset,
+                    )
                 )
             bar.next()
 
-    results: DataFrame = DataFrame(data=data)
+    results = DataFrame(data=data)
     results.to_sql(
         name="benchmark_per_table_write",
         con=benchmark_results_db.engine,
@@ -98,34 +155,62 @@ def benchmark_db(
 def main() -> int:
     cli: CLI = CLI()
     args = cli.parse_args().__dict__
+    dataset_type: Literal["llnl", "theta"] = "llnl"
 
     # 0: Connect to database
     db: llnl_last.DB | bool = create_db(db_name=args["db"][0])
     if isinstance(db, bool):
         return 1
-
     # Clear tables even if there is nothing in them
     db.recreate_tables()
 
-    # 1: Connect to benchmark result DB
-    benchmark_result_db: implementations.BenchmarkResults = (
-        implementations.BenchmarkResults(fp=args["output"][0])
+    benchmark_result_db: (
+        implementations.BenchmarkResults_LLNL | implementations.BenchmarkResults_Theta
     )
+    datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset] | bool
+    # 1. Identify what dataset type was choosen
+    if issubclass(db.__class__, llnl_last.LLNL_LAST):
+        dataset_type = "llnl"
+        # Connect to LLNL/LAST benchmark result DB
+        benchmark_result_db = implementations.BenchmarkResults_LLNL(
+            fp=args["output"][0]
+        )
 
-    # 2. Read datasets into memory
-    datasets: list[scoda_dataset.Dataset] | bool = read_datasets(
-        directory=args["input_dir"][0]
-    )
+        # Load LLNL/LAST datasets
+        datasets = scoda_dataset.load_llnl_datasets(
+            directory=args["input_dir"][0],
+        )
+    else:
+        dataset_type = "theta"
+        # Connect to THETA benchmark result DB
+        benchmark_result_db = implementations.BenchmarkResults_Theta(
+            fp=args["output"][0]
+        )
+
+        # Load THETA datasets
+        datasets = scoda_dataset.load_theta_datasets(
+            directory=args["input_dir"][0],
+        )
+
+    # 2. Check if dataset loading failed
     if isinstance(datasets, bool):
         return 2
 
     # 3. Benchmark writing to database
-    benchmark_db(
-        iterations=args["iterations"][0],
-        db=db,
-        datasets=datasets,
-        benchmark_results_db=benchmark_result_db,
-    )
+    if dataset_type == "llnl":
+        benchmark_db_llnl(
+            iterations=args["iterations"][0],
+            db=db,
+            datasets=datasets,
+            benchmark_results_db=benchmark_result_db,
+        )
+    else:
+        benchmark_db_theta(
+            iterations=args["iterations"][0],
+            db=db,
+            datasets=datasets,
+            benchmark_results_db=benchmark_result_db,
+        )
 
     return 0
 

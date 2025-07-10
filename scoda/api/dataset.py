@@ -2,6 +2,8 @@ from pathlib import Path
 from abc import ABC
 from pandas import DataFrame
 import pandas as pd
+from collections.abc import Iterator
+import os
 
 
 class Dataset(ABC):
@@ -11,7 +13,12 @@ class Dataset(ABC):
         self.data: DataFrame = self.read()
 
     def read(self) -> DataFrame:
-        data: DataFrame = pd.read_csv(filepath_or_buffer=self.fp)
+        try:
+            data: DataFrame = pd.read_csv(filepath_or_buffer=self.fp)
+        except pd.errors.ParserError as pe:
+            print(self.name, self.fp, pe)
+            quit(1)
+
         data.columns = data.columns.str.replace(pat=" ", repl="_")
         return data
 
@@ -86,3 +93,37 @@ class PerlmutterPower(Dataset):
     def __init__(self, directory: Path) -> None:
         fp: Path = Path(directory, "Perlmutter_power_60_sec.csv").resolve()
         super().__init__(name="perlmutter_power_60_sec", fp=fp)
+
+
+def load_llnl_datasets(directory: Path) -> list[Dataset] | bool:
+    data: list[Dataset] = []
+
+    try:
+        data.append(CoriPower(directory=directory))
+        data.append(HawkPower(directory=directory))
+        data.append(HPCGDPC(directory=directory))
+        data.append(HPCGSPC(directory=directory))
+        data.append(HPCGUC(directory=directory))
+        data.append(HPLDPC(directory=directory))
+        data.append(HPLSPC(directory=directory))
+        data.append(HPLUC(directory=directory))
+        data.append(LumiHPCG(directory=directory))
+        data.append(LumiPower(directory=directory))
+        data.append(Marconi100Power(directory=directory))
+        data.append(PerlmutterPower(directory=directory))
+    except FileNotFoundError:
+        return False
+
+    return data
+
+
+def load_theta_datasets(directory: Path) -> Iterator[Dataset] | bool:
+    fps: list[Path] = [Path(directory, fp) for fp in os.listdir(path=directory)]
+
+    fp: Path
+    for fp in fps:
+        if fp.is_file() == False:
+            return False
+
+    for fp in fps:
+        yield Dataset(name=fp.stem, fp=fp)

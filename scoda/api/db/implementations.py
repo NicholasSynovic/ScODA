@@ -54,7 +54,7 @@ class SQLite3_LLNL(LLNL_LAST):
         super().__init__(uri=f"sqlite:///{self.fp}")
 
 
-class SQLite3_Theta(LLNL_LAST):
+class SQLite3_Theta(Theta):
     def __init__(self, fp: Path) -> None:
         self.fp: Path = fp.resolve()
         super().__init__(uri=f"sqlite:///{self.fp}")
@@ -110,6 +110,14 @@ class MongoDB:
 class CouchDB:
     # TODO: implement this
     ...
+
+
+class BenchmarkResults_Theta(SQLite3_Theta):
+    def __init__(self, fp: Path) -> None:
+        super().__init__(fp=fp)
+
+    def create_tables(self) -> None:
+        pass
 
 
 class BenchmarkResults_LLNL(SQLite3_LLNL):

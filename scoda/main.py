@@ -44,22 +44,36 @@ def create_db(db_name: str) -> llnl_last.LLNL_LAST | theta.Theta | bool:
 def benchmark_db_theta(
     iterations: int,
     db: theta.Theta,
-    datasets: Iterator[scoda_dataset.Dataset],
+    directory: Path,
     benchmark_results_db: implementations.BenchmarkResults_Theta,
 ) -> None:
     results: DataFrame
     data: dict[str, list[float]]
-    dataset_copy: Iterator[scoda_dataset.Dataset]
+
+    def _getDatasets() -> Iterator[scoda_dataset.Dataset]:
+        datasets: Iterator[scoda_dataset.Dataset] | bool = (
+            scoda_dataset.load_theta_datasets(
+                directory=directory,
+            )
+        )
+
+        if isinstance(datasets, bool):
+            print(
+                "I'm destroying this process right now because you couldn't point me to a directory containing THETA CSV files."
+            )
+            quit(10)
+
+        return datasets
 
     # Write all tables to a database
     with Bar("Benchmarking writing all tables to database", max=iterations) as bar:
-        dataset_copy = copy(datasets)
+        datasets: Iterator[scoda_dataset.Dataset] = _getDatasets()
         data = defaultdict(list)
         for _ in range(iterations):
             data["seconds"].append(
                 benchmark_write_all_tables(
                     db=db,
-                    datasets=dataset_copy,
+                    datasets=datasets,
                 )
             )
             bar.next()
@@ -76,11 +90,11 @@ def benchmark_db_theta(
     with Bar(
         "Benchmarking writing individual tables to database", max=iterations
     ) as bar:
-        dataset_copy = copy(datasets)
+        datasets = _getDatasets()
         data = defaultdict(list)
         for _ in range(iterations):
             dataset: scoda_dataset.Dataset
-            for dataset in dataset_copy:
+            for dataset in datasets:
                 data[dataset.name].append(
                     benchmark_per_db_table_write(
                         db=db,
@@ -167,7 +181,8 @@ def main() -> int:
     benchmark_result_db: (
         implementations.BenchmarkResults_LLNL | implementations.BenchmarkResults_Theta
     )
-    datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset] | bool
+
+    datasets: list[scoda_dataset.Dataset] | bool = None
     # 1. Identify what dataset type was choosen
     if issubclass(db.__class__, llnl_last.LLNL_LAST):
         dataset_type = "llnl"
@@ -177,24 +192,19 @@ def main() -> int:
         )
 
         # Load LLNL/LAST datasets
-        datasets = scoda_dataset.load_llnl_datasets(
+        datasets: list[scoda_dataset.Dataset] | bool = scoda_dataset.load_llnl_datasets(
             directory=args["input_dir"][0],
         )
+
+        # Check if dataset loading failed
+        if isinstance(datasets, bool):
+            return 2
     else:
         dataset_type = "theta"
         # Connect to THETA benchmark result DB
         benchmark_result_db = implementations.BenchmarkResults_Theta(
             fp=args["output"][0]
         )
-
-        # Load THETA datasets
-        datasets = scoda_dataset.load_theta_datasets(
-            directory=args["input_dir"][0],
-        )
-
-    # 2. Check if dataset loading failed
-    if isinstance(datasets, bool):
-        return 2
 
     # 3. Benchmark writing to database
     if dataset_type == "llnl":
@@ -208,7 +218,7 @@ def main() -> int:
         benchmark_db_theta(
             iterations=args["iterations"][0],
             db=db,
-            datasets=datasets,
+            directory=args["input_dir"][0],
             benchmark_results_db=benchmark_result_db,
         )
 

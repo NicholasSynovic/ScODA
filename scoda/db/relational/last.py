@@ -595,36 +595,36 @@ class MongoDB:
     ...
 
 
-class CouchDB(DocumentDB):
-    def __init__(self) -> None:
-        super().__init__(
-            url="http://localhost:5984",
-            username="root",
-            password="example",
-        )
-        self.db_url: str = self.url + "/" + self.database_name
-        self.headers: dict[str, str] = {"Content-Type": "application/json"}
-        self.auth: HTTPBasicAuth = HTTPBasicAuth(
-            username=self.username,
-            password=self.password,
-        )
+# class CouchDB(DocumentDB):
+#     def __init__(self) -> None:
+#         super().__init__(
+#             url="http://localhost:5984",
+#             username="root",
+#             password="example",
+#         )
+#         self.db_url: str = self.url + "/" + self.database_name
+#         self.headers: dict[str, str] = {"Content-Type": "application/json"}
+#         self.auth: HTTPBasicAuth = HTTPBasicAuth(
+#             username=self.username,
+#             password=self.password,
+#         )
 
-    def create_database(self) -> None:
-        if get(url=self.db_url, auth=self.auth).status_code == 200:
-            pass
-        else:
-            put(url=self.db_url, auth=self.auth)
+#     def create_database(self) -> None:
+#         if get(url=self.db_url, auth=self.auth).status_code == 200:
+#             pass
+#         else:
+#             put(url=self.db_url, auth=self.auth)
 
-    def upload(self, data: str) -> Response:
-        return post(
-            url=self.db_url,
-            auth=self.auth,
-            headers=self.headers,
-            json=data,
-        )
+#     def upload(self, data: str) -> Response:
+#         return post(
+#             url=self.db_url,
+#             auth=self.auth,
+#             headers=self.headers,
+#             json=data,
+#         )
 
-    def query_avg_value(self) -> None:
-        pass
+#     def query_avg_value(self) -> None:
+#         pass
 
-    def query_min_value(self) -> None:
-        pass
+#     def query_min_value(self) -> None:
+#         pass

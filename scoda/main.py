@@ -99,13 +99,13 @@ def main() -> int:
     print("Loading datasets...")
     datasets: list[scoda_dataset.Dataset] | bool
     # TODO: Add support for loading `theta` datasets
-    datasets = scoda_dataset.load_llnl_datasets(directory=args["input_dir"][0])
+    datasets = scoda_dataset.load_llnl_datasets(directory=args["last.input"][0])
     if datasets is False:
         return 3
 
     # Run benchmarks
     print("Running benchmarks...")
-    run_benchmarks(test_db=test_db, results_db=results_db, datasets=datasets)
+    run_benchmarks(test_db=test_db, results_db=results_db, datasets=datasets, iterations=args["iterations"][0])
 
     return 0
 

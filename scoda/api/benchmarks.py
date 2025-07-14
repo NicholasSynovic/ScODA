@@ -3,7 +3,6 @@ from scoda.db import DB
 import scoda.db.results as scoda_results
 from time import time
 import scoda.api.dataset as scoda_dataset
-from collections.abc import Iterator
 from progress.bar import Bar
 from collections import defaultdict
 

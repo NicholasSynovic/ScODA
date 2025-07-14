@@ -121,35 +121,8 @@ def benchmark_db_llnl(
     results: DataFrame
     data: dict[str, list[float]]
 
-    benchmark_write_all_tables(
-        db=db,
-        iterations=iterations,
-        datasets=datasets,
-    )
-
-    # Write individual tables to a database
-    with Bar(
-        "Benchmarking writing individual tables to database", max=iterations
-    ) as bar:
-        data = defaultdict(list)
-        for _ in range(iterations):
-            dataset: scoda_dataset.Dataset
-            for dataset in datasets:
-                data[dataset.name].append(
-                    benchmark_per_db_table_write(
-                        db=db,
-                        dataset=dataset,
-                    )
-                )
-            bar.next()
-
-    results = DataFrame(data=data)
-    results.to_sql(
-        name="benchmark_per_table_write",
-        con=benchmark_results_db.engine,
-        if_exists="append",
-        index=False,
-    )
+    benchmark_write_all_tables(db=db, iterations=iterations, datasets=datasets)
+    benchmark_write_per_table(db=db, iterations=iterations, datasets=datasets)
 
 
 def main() -> int:

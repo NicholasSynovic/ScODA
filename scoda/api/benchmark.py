@@ -42,10 +42,13 @@ def benchmark_write_all_tables(
     )
 
 
-def benchmark_per_db_table_write(
+def benchmark_write_per_table(
     db: DB,
-    dataset: scoda_dataset.Dataset,
-) -> float:
+    iterations: int,
+    datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
+) -> None:
+    data: dict[str, list[float]] = defaultdict(list)
+
     def _run() -> None:
         dataset.data.to_sql(
             name=dataset.name,
@@ -54,13 +57,27 @@ def benchmark_per_db_table_write(
             index=False,
         )
 
-    start_time: float = time()
-    _run()
-    end_time: float = time()
+    with Bar(
+        "Benchmarking writing individual tables to database",
+        max=iterations,
+    ) as bar:
+        for _ in range(iterations):
+            dataset: scoda_dataset.Dataset
+            for dataset in datasets:
+                start_time: float = time()
+                _run()
+                end_time: float = time()
+                db.recreate_tables()
+                data[dataset.name].append(end_time - start_time)
+                bar.next()
 
-    db.recreate_tables()
-
-    return end_time - start_time
+    df: DataFrame = DataFrame(data=data)
+    df.to_sql(
+        name="benchmark_per_table_write",
+        con=db.engine,
+        if_exists="append",
+        index=False,
+    )
 
 
 def benchmark_sequential_writes_per_table(

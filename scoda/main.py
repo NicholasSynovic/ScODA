@@ -9,34 +9,52 @@ from time import time
 from collections.abc import Iterator
 from copy import copy
 from typing import Literal
+from argparse import Namespace
+from typing import Any
 
 
-def create_db(db_name: str) -> llnl_last.LLNL_LAST | theta.Theta | bool:
+def identify_input(key: str) -> bool:
+    # Returns True if LAST dataset, False if Theta
+    split_key: list[str] = key.split(sep=".")
+
+    if split_key[0] == "last":
+        return True
+    else:
+        return False
+
+
+def create_last_db(db_name) -> llnl_last.LLNL_LAST | Literal[False]:
     match db_name:
-        case "postgres-theta":
-            return implementations.PostgreSQL_Theta()
-        case "postgres-llnl":
+        case "postgres":
             return implementations.PostgreSQL_LLNL()
-        case "mysql-theta":
-            return implementations.MySQL_Theta()
-        case "mysql-llnl":
+        case "mysql":
             return implementations.MySQL_LLNL()
-        case "sqlite3-theta":
-            return implementations.SQLite3_Theta(fp=Path(f"{time()}_theta.sqlite3"))
-        case "sqlite3-llnl":
-            return implementations.SQLite3_LLNL(fp=Path(f"{time()}_llnl.sqlite3"))
-        case "sqlite3-memory-theta":
-            return implementations.InMemorySQLite3_Theta()
-        case "sqlite3-memory-llnl":
+        case "sqlite3":
+            return implementations.SQLite3_LLNL(fp=Path(f"{time()}_last.sqlite3"))
+        case "sqlite3-memory":
             return implementations.InMemorySQLite3_LLNL()
-        case "mariadb-theta":
-            return implementations.MariaDB_Theta()
-        case "mariadb-llnl":
+        case "mariadb":
             return implementations.MariaDB_LLNL()
-        case "db2-theta":
-            return implementations.DB2_Theta()
-        case "db2-llnl":
+        case "db2":
             return implementations.DB2_LLNL()
+        case _:
+            return False
+
+
+def create_theta_db(db_name) -> theta.Theta | Literal[False]:
+    match db_name:
+        case "postgres":
+            return implementations.PostgreSQL_Theta()
+        case "mysql":
+            return implementations.MySQL_Theta()
+        case "sqlite3":
+            return implementations.SQLite3_Theta(fp=Path(f"{time()}_theta.sqlite3"))
+        case "sqlite3-memory":
+            return implementations.InMemorySQLite3_Theta()
+        case "mariadb":
+            return implementations.MariaDB_Theta()
+        case "db2":
+            return implementations.DB2_Theta()
         case _:
             return False
 
@@ -179,19 +197,41 @@ def benchmark_db_llnl(
 
 def main() -> int:
     cli: CLI = CLI()
-    args = cli.parse_args().__dict__
-    dataset_type: Literal["llnl", "theta"] = "llnl"
+    args: dict[str, Any] = cli.parse_args().__dict__
+    arg_keys: list[str] = list(args.keys())
 
-    # 0: Connect to database
-    db: llnl_last.DB | bool = create_db(db_name=args["db"][0])
-    if isinstance(db, bool):
+    # True if LAST, False if Theta
+    print("Identifying dataset...")
+    dataset: bool = identify_input(key=arg_keys[0])
+
+    # Create db connection
+    print("Creating testing database connection...")
+    test_db: llnl_last.LLNL_LAST | theta.Theta | bool
+    if dataset:
+        test_db = create_last_db(db_name=args["db"][0])
+    else:
+        test_db = create_theta_db(db_name=args["db"][0])
+    if isinstance(test_db, bool):
         return 1
-    # Clear tables even if there is nothing in them
-    db.recreate_tables()
 
-    benchmark_result_db: (
-        implementations.BenchmarkResults_LLNL | implementations.BenchmarkResults_Theta
+    # Create benchmark db connection
+    print("Creating benchmarking results database...")
+    benchmark_db: (
+        implementations.BenchmarkResults_LLNL
+        | implementations.BenchmarkResults_Theta
+        | bool
     )
+    if dataset:
+        benchmark_db = implementations.BenchmarkResults_LLNL(
+            fp=args["output"][0],
+        )
+    else:
+        benchmark_db = implementations.BenchmarkResults_Theta(
+            fp=args["output"][0],
+        )
+
+    # Load datasets
+    datasets: list[scoda_dataset.Dataset] | bool
 
     datasets: list[scoda_dataset.Dataset] | bool = None
     # 1. Identify what dataset type was choosen

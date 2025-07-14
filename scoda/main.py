@@ -118,11 +118,31 @@ def benchmark_db_llnl(
     datasets: list[scoda_dataset.Dataset],
     benchmark_results_db: implementations.BenchmarkResults_LLNL,
 ) -> None:
-    results: DataFrame
-    data: dict[str, list[float]]
+    benchmark_write_all_tables(
+        test_db=db,
+        datasets=datasets,
+        iterations=iterations,
+        benchmark_db=benchmark_results_db,
+    )
+    benchmark_write_per_table(
+        test_db=db,
+        datasets=datasets,
+        iterations=iterations,
+        benchmark_db=benchmark_results_db,
+    )
+    benchmark_sequential_writes_all_tables(
+        test_db=db,
+        datasets=datasets,
+        iterations=iterations,
+        benchmark_db=benchmark_results_db,
+    )
 
-    benchmark_write_all_tables(db=db, iterations=iterations, datasets=datasets)
-    benchmark_write_per_table(db=db, iterations=iterations, datasets=datasets)
+    benchmark_sequential_writes_per_tables(
+        test_db=db,
+        datasets=datasets,
+        iterations=iterations,
+        benchmark_db=benchmark_results_db,
+    )
 
 
 def main() -> int:

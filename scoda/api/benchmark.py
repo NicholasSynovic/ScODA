@@ -72,8 +72,8 @@ def benchmark_write_per_table(
                 _run(ds=dataset)
                 end_time: float = time()
                 data[dataset.name].append(end_time - start_time)
-                bar.next()
             test_db.recreate_tables()
+            bar.next()
 
     df: DataFrame = DataFrame(data=data)
     df.to_sql(
@@ -154,8 +154,8 @@ def benchmark_sequential_writes_per_tables(
                 _run(ds=dataset)
                 end_time: float = time()
                 data[dataset.name].append(end_time - start_time)
-                bar.next()
             test_db.recreate_tables()
+            bar.next()
 
     df: DataFrame = DataFrame(data=data)
     df.to_sql(

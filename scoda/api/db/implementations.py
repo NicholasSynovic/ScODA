@@ -1,7 +1,12 @@
 from scoda.api.db.llnl_last import LLNL_LAST
+from scoda.api.db import DocumentDB
 from scoda.api.db.theta import Theta
 from pathlib import Path
 from sqlalchemy import Table, Column, Float, Integer
+from requests import get, put, post, Response
+from requests.auth import HTTPBasicAuth
+from typing import Any
+import json
 
 
 class PostgreSQL_LLNL(LLNL_LAST):
@@ -107,9 +112,39 @@ class MongoDB:
     ...
 
 
-class CouchDB:
-    # TODO: implement this
-    ...
+class CouchDB(DocumentDB):
+    def __init__(self) -> None:
+        super().__init__(
+            url="http://localhost:5984",
+            username="root",
+            password="example",
+        )
+        self.db_url: str = self.url + "/" + self.database_name
+        self.headers: dict[str, str] = {"Content-Type": "application/json"}
+        self.auth: HTTPBasicAuth = HTTPBasicAuth(
+            username=self.username,
+            password=self.password,
+        )
+
+    def create_database(self) -> None:
+        if get(url=self.db_url, auth=self.auth).status_code == 200:
+            pass
+        else:
+            put(url=self.db_url, auth=self.auth)
+
+    def upload(self, data: str) -> Response:
+        return post(
+            url=self.db_url,
+            auth=self.auth,
+            headers=self.headers,
+            json=data,
+        )
+
+    def query_avg_value(self) -> None:
+        pass
+
+    def query_min_value(self) -> None:
+        pass
 
 
 class BenchmarkResults_Theta(SQLite3_Theta):

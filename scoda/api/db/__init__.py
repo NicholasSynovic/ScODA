@@ -20,7 +20,7 @@ class DB(ABC):
     def query_min_value(self, table_name: str, column_name: str) -> Any:
         table: Table = Table(
             table_name,
-            metadata=self.metadata,
+            self.metadata,
             autoload_with=self.engine,
         )
 

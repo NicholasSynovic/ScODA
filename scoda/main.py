@@ -105,7 +105,12 @@ def main() -> int:
 
     # Run benchmarks
     print("Running benchmarks...")
-    run_benchmarks(test_db=test_db, results_db=results_db, datasets=datasets, iterations=args["iterations"][0])
+    run_benchmarks(
+        test_db=test_db,
+        results_db=results_db,
+        datasets=datasets,
+        iterations=args["iterations"][0],
+    )
 
     return 0
 

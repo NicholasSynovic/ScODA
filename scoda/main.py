@@ -6,6 +6,7 @@ from scoda.cli import CLI
 from typing import Any
 import scoda.api.dataset as scoda_dataset
 import scoda.db as scoda_db
+import scoda.api.benchmarks as scoda_benchmarks
 
 
 def identify_input(key: str) -> bool:
@@ -40,8 +41,32 @@ def run_benchmarks(
     test_db: scoda_db.DB,
     results_db: scoda_results.Results,
     datasets: list[scoda_dataset.Dataset],
+    iterations: int,
 ) -> None:
-    pass
+    scoda_benchmarks.benchmark_total_time_to_batch_write_tables(
+        test_db=test_db, iterations=iterations, results_db=results_db, datasets=datasets
+    )
+
+    scoda_benchmarks.benchmark_total_time_to_batch_write_individual_tables(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.benchmark_total_time_to_sequential_write_tables(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.benchmark_total_time_to_sequential_write_individual_tables(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
 
 
 def main() -> int:

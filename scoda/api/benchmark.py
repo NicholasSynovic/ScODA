@@ -3,12 +3,17 @@ from scoda.api.db import DB
 from time import time
 import scoda.api.dataset as scoda_dataset
 from collections.abc import Iterator
+from progress.bar import Bar
+from collections import defaultdict
 
 
 def benchmark_write_all_tables(
     db: DB,
+    iterations: int,
     datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
-) -> float:
+) -> None:
+    data = defaultdict(list)
+
     def _run() -> None:
         dataset: scoda_dataset.Dataset
         for dataset in datasets:
@@ -19,13 +24,22 @@ def benchmark_write_all_tables(
                 index=False,
             )
 
-    start_time: float = time()
-    _run()
-    end_time: float = time()
+    with Bar("Benchmarking writing all tables to the database", max=iterations) as bar:
+        for _ in range(iterations):
+            start_time: float = time()
+            _run()
+            end_time: float = time()
+            db.recreate_tables()
+            data["seconds"].append(end_time - start_time)
+            bar.next()
 
-    db.recreate_tables()
-
-    return end_time - start_time
+    df: DataFrame = DataFrame(data=data)
+    df.to_sql(
+        name="benchmark_write_all_tables",
+        con=db.engine,
+        if_exists="append",
+        index=False,
+    )
 
 
 def benchmark_per_db_table_write(
@@ -47,6 +61,12 @@ def benchmark_per_db_table_write(
     db.recreate_tables()
 
     return end_time - start_time
+
+
+def benchmark_sequential_writes_per_table(
+    db: DB, dataset: scoda_dataset.Dataset
+) -> DataFrame:
+    pass
 
 
 def benchmark_max_query(db: DB) -> DataFrame:

@@ -1,5 +1,4 @@
 import scoda.db as scoda_db
-from requests.auth import HTTPBasicAuth
 from abc import abstractmethod
 import scoda.api.dataset as scoda_dataset
 
@@ -13,10 +12,6 @@ class DocumentDB(scoda_db.DB):
         database: str = "research",
     ):
         super().__init__(uri, username, password, database)
-        self.auth: HTTPBasicAuth = HTTPBasicAuth(
-            username=self.username,
-            password=self.password,
-        )
 
         self.create()
 

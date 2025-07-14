@@ -179,6 +179,7 @@ def main() -> int:
         if isinstance(datasets, bool):
             return 2
     else:
+        return 1
         dataset_type = "theta"
         # Connect to THETA benchmark result DB
         benchmark_result_db = implementations.BenchmarkResults_Theta(
@@ -194,12 +195,13 @@ def main() -> int:
             benchmark_results_db=benchmark_result_db,
         )
     else:
-        benchmark_db_theta(
-            iterations=args["iterations"][0],
-            db=db,
-            directory=args["input_dir"][0],
-            benchmark_results_db=benchmark_result_db,
-        )
+        # benchmark_db_theta(
+        #     iterations=args["iterations"][0],
+        #     db=db,
+        #     directory=args["input_dir"][0],
+        #     benchmark_results_db=benchmark_result_db,
+        # )
+        return 2
 
     return 0
 

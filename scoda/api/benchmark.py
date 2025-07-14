@@ -7,6 +7,24 @@ from progress.bar import Bar
 from collections import defaultdict
 
 
+def _write(
+    db: DB,
+    clear_database: bool,
+    datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
+) -> None:
+    if clear_database:
+        db.recreate_tables()
+
+    ds: scoda_dataset.Dataset
+    for ds in datasets:
+        ds.data.to_sql(
+            name=ds.name,
+            con=db.engine,
+            if_exists="append",
+            index=False,
+        )
+
+
 def benchmark_total_time_to_batch_write_tables(
     test_db: DB,
     iterations: int,
@@ -281,8 +299,38 @@ def benchmark_total_time_to_sequential_write_individual_tables(
     )
 
 
-def benchmark_min_query(db: DB) -> DataFrame:
-    pass
+def benchmark_min_query_on_each_table(
+    test_db: DB,
+    clear_db: bool,
+    iterations: int,
+    benchmark_db: DB,
+    datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
+) -> None:
+    def _run(db: DB, table_name: str) -> None:
+        db.query_min_value(table_name=table_name, column_name="measured_kW")
+
+    data: dict[str, list] = defaultdict(list)
+
+    print("Writing data to test database...")
+    _write(db=test_db, clear_database=clear_db, datasets=datasets)
+
+    with Bar("Benchmarking minimum value query per table...", max=iterations) as bar:
+        for _ in range(iterations):
+            dataset: scoda_dataset.Dataset
+            start_time: float = time()
+            for dataset in datasets:
+                _run(db=test_db, table_name=dataset.name)
+            end_time: float = time()
+            data["seconds"].append(end_time - start_time)
+            bar.next()
+
+    df: DataFrame = DataFrame(data=data)
+    df.to_sql(
+        name="benchmark_min_query_on_each_table",
+        con=benchmark_db.engine,
+        if_exists="append",
+        index=False,
+    )
 
 
 def benchmark_average_query(db: DB) -> DataFrame:

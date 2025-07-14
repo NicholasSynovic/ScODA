@@ -140,6 +140,13 @@ class BenchmarkResults_LLNL(SQLite3_LLNL):
         )
 
         _: Table = Table(
+            "benchmark_min_query_on_each_table",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("seconds", Float),
+        )
+
+        _: Table = Table(
             "benchmark_total_time_to_batch_write_individual_tables",
             self.metadata,
             Column("id", Integer, primary_key=True),

@@ -307,7 +307,10 @@ def benchmark_min_query_on_each_table(
     datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
 ) -> None:
     def _run(db: DB, table_name: str) -> None:
-        db.query_min_value(table_name=table_name, column_name="measured_kW")
+        try:
+            db.query_min_value(table_name=table_name, column_name="measured_kW")
+        except KeyError:
+            pass
 
     data: dict[str, list] = defaultdict(list)
 

@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  couchdb:
+    image: couchdb:3.5.0
+    container_name: couchdb_3.5.0
+    restart: always
+    volumes:
+      - $PWD/data/couchdb:/opt/couchdb/data
+    ports:
+      - 5984:5984
+    environment:
+      COUCHDB_USER: root
+      COUCHDB_PASSWORD: example

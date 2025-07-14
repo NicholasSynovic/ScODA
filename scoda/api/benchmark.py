@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from scoda.api.db import DB
+from scoda.db import DB
 from time import time
 import scoda.api.dataset as scoda_dataset
 from collections.abc import Iterator

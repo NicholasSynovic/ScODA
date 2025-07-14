@@ -1,11 +1,11 @@
 import scoda.db.relational.last as last_db
-from scoda.db.relational import RDBMS
-import scoda.db.benchmark as scoda_benchmark
-from typing import Literal
+import scoda.db.results as scoda_results
 from pathlib import Path
 from time import time
 from scoda.cli import CLI
 from typing import Any
+import scoda.api.dataset as scoda_dataset
+import scoda.db as scoda_db
 
 
 def identify_input(key: str) -> bool:
@@ -36,6 +36,14 @@ def create_last_db(db_name) -> last_db.LAST:
             return last_db.LAST(uri="", username="", password="")
 
 
+def run_benchmarks(
+    test_db: scoda_db.DB,
+    results_db: scoda_results.Results,
+    datasets: list[scoda_dataset.Dataset],
+) -> None:
+    pass
+
+
 def main() -> int:
     cli: CLI = CLI()
     args: dict[str, Any] = cli.parse_args().__dict__
@@ -56,56 +64,23 @@ def main() -> int:
     if test_db.uri == "":
         return 2
 
-    # Create benchmark db connection
+    # Create results db connection
     print("Creating benchmarking results database...")
-    benchmark_db: scoda_benchmark.Benchmark = scoda_benchmark.Benchmark(
+    results_db: scoda_results.Results = scoda_results.Results(
         fp=args["output"][0],
     )
 
     # Load datasets
+    print("Loading datasets...")
     datasets: list[scoda_dataset.Dataset] | bool
+    # TODO: Add support for loading `theta` datasets
+    datasets = scoda_dataset.load_llnl_datasets(directory=args["input_dir"][0])
+    if datasets is False:
+        return 3
 
-    datasets: list[scoda_dataset.Dataset] | bool = None
-    # 1. Identify what dataset type was choosen
-    if issubclass(db.__class__, llnl_last.LLNL_LAST):
-        dataset_type = "llnl"
-        # Connect to LLNL/LAST benchmark result DB
-        benchmark_result_db = implementations.BenchmarkResults_LLNL(
-            fp=args["output"][0]
-        )
-
-        # Load LLNL/LAST datasets
-        datasets: list[scoda_dataset.Dataset] | bool = scoda_dataset.load_llnl_datasets(
-            directory=args["input_dir"][0],
-        )
-
-        # Check if dataset loading failed
-        if isinstance(datasets, bool):
-            return 2
-    else:
-        return 1
-        dataset_type = "theta"
-        # Connect to THETA benchmark result DB
-        benchmark_result_db = implementations.BenchmarkResults_Theta(
-            fp=args["output"][0]
-        )
-
-    # 3. Benchmark writing to database
-    if dataset_type == "llnl":
-        benchmark_db_llnl(
-            iterations=args["iterations"][0],
-            db=db,
-            datasets=datasets,
-            benchmark_results_db=benchmark_result_db,
-        )
-    else:
-        # benchmark_db_theta(
-        #     iterations=args["iterations"][0],
-        #     db=db,
-        #     directory=args["input_dir"][0],
-        #     benchmark_results_db=benchmark_result_db,
-        # )
-        return 2
+    # Run benchmarks
+    print("Running benchmarks...")
+    run_benchmarks(test_db=test_db, results_db=results_db, datasets=datasets)
 
     return 0
 

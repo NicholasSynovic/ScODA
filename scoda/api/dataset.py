@@ -4,6 +4,7 @@ from pandas import DataFrame
 import pandas as pd
 from collections.abc import Iterator
 import os
+from typing import Literal
 
 
 class Dataset(ABC):
@@ -95,7 +96,7 @@ class PerlmutterPower(Dataset):
         super().__init__(name="perlmutter_power_60_sec", fp=fp)
 
 
-def load_llnl_datasets(directory: Path) -> list[Dataset] | bool:
+def load_llnl_datasets(directory: Path) -> list[Dataset] | Literal[False]:
     data: list[Dataset] = []
 
     try:

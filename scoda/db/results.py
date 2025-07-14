@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any
 
 
-class Benchmark(scoda_db.DB):
+class Results(scoda_db.DB):
     def __init__(self, fp: Path):
         self.fp: Path = fp.resolve()
         super().__init__(

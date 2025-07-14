@@ -118,26 +118,26 @@ def benchmark_db_llnl(
     datasets: list[scoda_dataset.Dataset],
     benchmark_results_db: implementations.BenchmarkResults_LLNL,
 ) -> None:
-    benchmark_write_all_tables(
+    benchmark_total_time_to_batch_write_tables(
         test_db=db,
         datasets=datasets,
         iterations=iterations,
         benchmark_db=benchmark_results_db,
     )
-    benchmark_write_per_table(
+    benchmark_total_time_to_batch_write_individual_tables(
         test_db=db,
         datasets=datasets,
         iterations=iterations,
         benchmark_db=benchmark_results_db,
     )
-    benchmark_sequential_writes_all_tables(
+    benchmark_total_time_to_sequential_write_tables(
         test_db=db,
         datasets=datasets,
         iterations=iterations,
         benchmark_db=benchmark_results_db,
     )
 
-    benchmark_sequential_writes_per_tables(
+    benchmark_total_time_to_sequential_write_individual_tables(
         test_db=db,
         datasets=datasets,
         iterations=iterations,

@@ -126,57 +126,21 @@ class BenchmarkResults_LLNL(SQLite3_LLNL):
 
     def create_tables(self) -> None:
         _: Table = Table(
-            "benchmark_write_all_tables",
+            "benchmark_total_time_to_batch_write_tables",
             self.metadata,
             Column("id", Integer, primary_key=True),
             Column("seconds", Float),
         )
 
         _: Table = Table(
-            "benchmark_per_table_write",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("cori_power_30_sec", Float),
-            Column("hawk_power_15_min", Float),
-            Column("lumi_power_10_min", Float),
-            Column("marconi100_power_60_sec", Float),
-            Column("perlmutter_power_60_sec", Float),
-            Column("lumi_hpcg", Float),
-            Column("hpcg_dpc", Float),
-            Column("hpcg_spc", Float),
-            Column("hpcg_uc", Float),
-            Column("hpl_dpc", Float),
-            Column("hpl_spc", Float),
-            Column("hpl_uc", Float),
-        )
-
-        _: Table = Table(
-            "benchmark_sequential_table_writes",
-            self.metadata,
-            Column("id", Integer, primary_key=True),
-            Column("cori_power_30_sec", Float),
-            Column("hawk_power_15_min", Float),
-            Column("lumi_power_10_min", Float),
-            Column("marconi100_power_60_sec", Float),
-            Column("perlmutter_power_60_sec", Float),
-            Column("lumi_hpcg", Float),
-            Column("hpcg_dpc", Float),
-            Column("hpcg_spc", Float),
-            Column("hpcg_uc", Float),
-            Column("hpl_dpc", Float),
-            Column("hpl_spc", Float),
-            Column("hpl_uc", Float),
-        )
-
-        _: Table = Table(
-            "benchmark_write_all_tables_row_by_row",
+            "benchmark_total_time_to_sequential_write_tables",
             self.metadata,
             Column("id", Integer, primary_key=True),
             Column("seconds", Float),
         )
 
         _: Table = Table(
-            "benchmark_write_per_tables_row_by_row",
+            "benchmark_total_time_to_batch_write_individual_tables",
             self.metadata,
             Column("id", Integer, primary_key=True),
             Column("cori_power_30_sec", Float),
@@ -192,4 +156,23 @@ class BenchmarkResults_LLNL(SQLite3_LLNL):
             Column("hpl_spc", Float),
             Column("hpl_uc", Float),
         )
+
+        _: Table = Table(
+            "benchmark_total_time_to_sequential_write_individual_tables",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("cori_power_30_sec", Float),
+            Column("hawk_power_15_min", Float),
+            Column("lumi_power_10_min", Float),
+            Column("marconi100_power_60_sec", Float),
+            Column("perlmutter_power_60_sec", Float),
+            Column("lumi_hpcg", Float),
+            Column("hpcg_dpc", Float),
+            Column("hpcg_spc", Float),
+            Column("hpcg_uc", Float),
+            Column("hpl_dpc", Float),
+            Column("hpl_spc", Float),
+            Column("hpl_uc", Float),
+        )
+
         self.metadata.create_all(bind=self.engine, checkfirst=True)

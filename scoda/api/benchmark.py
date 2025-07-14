@@ -7,12 +7,40 @@ from progress.bar import Bar
 from collections import defaultdict
 
 
-def benchmark_write_all_tables(
+def benchmark_total_time_to_batch_write_tables(
     test_db: DB,
     iterations: int,
     benchmark_db: DB,
     datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
 ) -> None:
+    """
+    Benchmark the performance of writing multiple datasets to a database by
+        measuring the time taken for each iteration and storing the results in a
+        benchmark database.
+
+    The function performs the following steps:
+    1. Iterates over the specified number of iterations.
+    2. For each iteration, writes all datasets to the test database and measures
+        the time taken.
+    3. Recreates the tables in the test database to ensure a clean state for the
+        next iteration.
+    4. Collects the time taken for each iteration and stores it in a DataFrame.
+    5. Writes the benchmark results to the benchmark database for further
+        analysis.
+
+    The progress of the benchmarking process is displayed using a progress bar.
+
+    Args:
+        test_db (DB): The database instance where datasets will be written
+            during the benchmark.
+        iterations (int): The number of times the writing operation should be
+            repeated for benchmarking.
+        benchmark_db (DB): The database instance where benchmark results will be
+            stored.
+        datasets (list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset]):
+            A collection of datasets to be written to the test database. Can be
+            provided as a list or an iterator.
+    """
     data = defaultdict(list)
 
     def _run(
@@ -38,19 +66,48 @@ def benchmark_write_all_tables(
 
     df: DataFrame = DataFrame(data=data)
     df.to_sql(
-        name="benchmark_write_all_tables",
+        name="benchmark_total_time_to_batch_write_tables",
         con=benchmark_db.engine,
         if_exists="append",
         index=False,
     )
 
 
-def benchmark_write_per_table(
+def benchmark_total_time_to_batch_write_individual_tables(
     test_db: DB,
     iterations: int,
     benchmark_db: DB,
     datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
 ) -> None:
+    """
+    Benchmarks the performance of writing each dataset individually to a
+        database by measuring the time taken for each dataset and storing the
+        results in a benchmark database.
+
+    The function performs the following steps:
+    1. Iterates over the specified number of iterations.
+    2. For each iteration, writes each dataset individually to the test database
+        and measures the time taken.
+    3. Recreates the tables in the test database to ensure a clean state for the
+        next iteration.
+    4. Collects the time taken for each dataset and stores it in a DataFrame.
+    5. Writes the benchmark results to the benchmark database for further
+        analysis.
+
+    The progress of the benchmarking process is displayed using a progress bar.
+
+    Args:
+        test_db (DB): The database instance where datasets will be written
+            during the benchmark.
+        iterations (int): The number of times the writing operation should be
+            repeated for benchmarking.
+        benchmark_db (DB): The database instance where benchmark results will be
+            stored.
+        datasets (list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset]):
+            A collection of datasets to be written to the test database. Can be
+            provided as a list or an iterator.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(ds: scoda_dataset.Dataset) -> None:
@@ -77,19 +134,48 @@ def benchmark_write_per_table(
 
     df: DataFrame = DataFrame(data=data)
     df.to_sql(
-        name="benchmark_per_table_write",
+        name="benchmark_total_time_to_batch_write_individual_tables",
         con=benchmark_db.engine,
         if_exists="append",
         index=False,
     )
 
 
-def benchmark_sequential_writes_all_tables(
+def benchmark_total_time_to_sequential_write_tables(
     test_db: DB,
     iterations: int,
     benchmark_db: DB,
     datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
 ) -> None:
+    """
+    Benchmarks the performance of writing all datasets to a database one row at
+        a time by measuring the time taken for each iteration and storing the
+        results in a benchmark database.
+
+    The function performs the following steps:
+    1. Iterates over the specified number of iterations.
+    2. For each iteration, writes all datasets to the test database one row at a
+        time and measures the time taken.
+    3. Recreates the tables in the test database to ensure a clean state for the
+        next iteration.
+    4. Collects the time taken for each iteration and stores it in a DataFrame.
+    5. Writes the benchmark results to the benchmark database for further
+        analysis.
+
+    The progress of the benchmarking process is displayed using a progress bar.
+
+    Args:
+        test_db (DB): The database instance where datasets will be written
+            during the benchmark.
+        iterations (int): The number of times the writing operation should be
+            repeated for benchmarking.
+        benchmark_db (DB): The database instance where benchmark results will be
+            stored.
+        datasets (list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset]):
+            A collection of datasets to be written to the test database. Can be
+            provided as a list or an iterator.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(
@@ -119,19 +205,48 @@ def benchmark_sequential_writes_all_tables(
 
     df: DataFrame = DataFrame(data=data)
     df.to_sql(
-        name="benchmark_write_all_tables_row_by_row",
+        name="benchmark_total_time_to_sequential_write_tables",
         con=benchmark_db.engine,
         if_exists="append",
         index=False,
     )
 
 
-def benchmark_sequential_writes_per_tables(
+def benchmark_total_time_to_sequential_write_individual_tables(
     test_db: DB,
     iterations: int,
     benchmark_db: DB,
     datasets: list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset],
 ) -> None:
+    """
+    Benchmarks the performance of writing each dataset to a database one row at
+        a time by measuring the time taken for each dataset and storing the
+        results in a benchmark database.
+
+    The function performs the following steps:
+    1. Iterates over the specified number of iterations.
+    2. For each iteration, writes each dataset to the test database one row at a
+        time and measures the time taken.
+    3. Recreates the tables in the test database to ensure a clean state for the
+        next iteration.
+    4. Collects the time taken for each dataset and stores it in a DataFrame.
+    5. Writes the benchmark results to the benchmark database for further
+        analysis.
+
+    The progress of the benchmarking process is displayed using a progress bar.
+
+    Args:
+        test_db (DB): The database instance where datasets will be written
+            during the benchmark.
+        iterations (int): The number of times the writing operation should be
+            repeated for benchmarking.
+        benchmark_db (DB): The database instance where benchmark results will be
+            stored.
+        datasets (list[scoda_dataset.Dataset] | Iterator[scoda_dataset.Dataset]):
+            A collection of datasets to be written to the test database. Can be
+            provided as a list or an iterator.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(ds: scoda_dataset.Dataset) -> None:
@@ -159,7 +274,7 @@ def benchmark_sequential_writes_per_tables(
 
     df: DataFrame = DataFrame(data=data)
     df.to_sql(
-        name="benchmark_write_per_table_row_by_row",
+        name="benchmark_total_time_to_sequential_write_individual_tables",
         con=benchmark_db.engine,
         if_exists="append",
         index=False,

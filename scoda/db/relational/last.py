@@ -1,78 +1,17 @@
-import scoda.api.db as scoda_db
-from sqlalchemy import (
-    Engine,
-    create_engine,
-    MetaData,
-    Table,
-    select,
-    func,
-    Column,
-    Integer,
-    DateTime,
-)
-from typing import Any
-import scoda.api.dataset as scoda_dataset
+import scoda.db.relational as scoda_relational
+from sqlalchemy import Table, Column, Integer, DateTime
+from pathlib import Path
 
 
-class RDBMS(scoda_db.DB):
+class LAST(scoda_relational.RDBMS):
     def __init__(
-        self, uri: str, username: str, password: str, database: str = "research"
+        self,
+        uri: str,
+        username: str,
+        password: str,
+        database: str = "research",
     ):
         super().__init__(uri, username, password, database)
-        self.engine: Engine = create_engine(url=self.uri)
-        self.metadata: MetaData = MetaData()
-
-        self.create()
-
-    def recreate(self) -> None:
-        self.metadata.reflect(bind=self.engine)
-        self.metadata.drop_all(bind=self.engine)
-        self.metadata.create_all(bind=self.engine, checkfirst=True)
-
-    def batch_upload(self, data: scoda_dataset.Dataset) -> None:
-        data.data.to_sql(
-            name=data.name,
-            con=self.engine,
-            if_exists="append",
-            index=False,
-        )
-
-    def sequential_upload(self, data: scoda_dataset.Dataset) -> None:
-        data.data.to_sql(
-            name=data.name,
-            con=self.engine,
-            if_exists="append",
-            index=False,
-            chunksize=1,
-        )
-
-    def query_min_value(self, table_name: str, column_name: str) -> Any:
-        table: Table = Table(
-            table_name,
-            self.metadata,
-            autoload_with=self.engine,
-        )
-
-        with self.engine.connect() as connection:
-            minimum_value_query = select(func.min(table.c[column_name]))
-            result = connection.execute(minimum_value_query)
-            minimum_value = result.scalar()
-
-        return minimum_value
-
-    def query_avg_value(self, table_name: str, column_name: str) -> Any:
-        table: Table = Table(
-            table_name,
-            self.metadata,
-            autoload_with=self.engine,
-        )
-
-        with self.engine.connect() as connection:
-            average_value_query = select(func.avg(table.c[column_name]))
-            result = connection.execute(average_value_query)
-            average_value = result.scalar()
-
-        return average_value
 
     def create(self) -> None:
         _: Table = Table(
@@ -562,3 +501,130 @@ class RDBMS(scoda_db.DB):
         )
 
         self.metadata.create_all(bind=self.engine, checkfirst=True)
+
+
+class PostgreSQL(LAST):
+    def __init__(self) -> None:
+        super().__init__(
+            uri="postgresql+psycopg2://admin:example@localhost:5432/research",
+            username="admin",
+            password="example",
+        )
+
+
+class MySQL(LAST):
+    def __init__(self) -> None:
+        super().__init__(
+            uri="mysql+pymysql://root:example@localhost:3306/research",
+            username="root",
+            password="example",
+        )
+
+
+class MariaDB(LAST):
+    def __init__(self) -> None:
+        super().__init__(
+            uri="mariadb+pymysql://root:example@localhost:3306/research",
+            username="root",
+            password="example",
+        )
+
+
+class DB2(LAST):
+    def __init__(self) -> None:
+        super().__init__(
+            uri="db2+ibm_db://db2inst1:example@localhost:50000/research",
+            username="db2inst1",
+            password="example",
+        )
+
+
+class SQLite3(LAST):
+    def __init__(self, fp: Path) -> None:
+        self.fp: Path = fp.resolve()
+        super().__init__(
+            uri=f"sqlite:///{self.fp}",
+            username="",
+            password="",
+        )
+
+
+class InMemorySQLite3(LAST):
+    def __init__(self) -> None:
+        super().__init__(
+            uri=f"sqlite:///:memory:",
+            username="",
+            password="",
+        )
+
+
+class Redis:
+    # TODO: Implement this
+    ...
+
+
+class Valkey:
+    # TODO: Implement this
+    ...
+
+
+class Druid:
+    # TODO: implement this
+    # https://projects.apache.org/project.html?druid
+    ...
+
+
+class Phoenix:
+    # TODO: implement this
+    # https://projects.apache.org/project.html?phoenix
+    ...
+
+
+class ElasticSearch:
+    # TODO: implement this
+    ...
+
+
+class InfluxDB:
+    # TODO: implement this
+    ...
+
+
+class MongoDB:
+    # TODO: implement this
+    ...
+
+
+class CouchDB(DocumentDB):
+    def __init__(self) -> None:
+        super().__init__(
+            url="http://localhost:5984",
+            username="root",
+            password="example",
+        )
+        self.db_url: str = self.url + "/" + self.database_name
+        self.headers: dict[str, str] = {"Content-Type": "application/json"}
+        self.auth: HTTPBasicAuth = HTTPBasicAuth(
+            username=self.username,
+            password=self.password,
+        )
+
+    def create_database(self) -> None:
+        if get(url=self.db_url, auth=self.auth).status_code == 200:
+            pass
+        else:
+            put(url=self.db_url, auth=self.auth)
+
+    def upload(self, data: str) -> Response:
+        return post(
+            url=self.db_url,
+            auth=self.auth,
+            headers=self.headers,
+            json=data,
+        )
+
+    def query_avg_value(self) -> None:
+        pass
+
+    def query_min_value(self) -> None:
+        pass

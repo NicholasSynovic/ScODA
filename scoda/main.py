@@ -1,15 +1,10 @@
-from scoda.cli import CLI
-from scoda.api.db import implementations, llnl_last, theta
-import scoda.api.dataset as scoda_dataset
-from pathlib import Path
-from scoda.api.benchmark import *
-from collections import defaultdict
-from progress.bar import Bar
-from time import time
-from collections.abc import Iterator
-from copy import copy
+import scoda.db.relational.last as last_db
+from scoda.db.relational import RDBMS
+import scoda.db.benchmark as scoda_benchmark
 from typing import Literal
-from argparse import Namespace
+from pathlib import Path
+from time import time
+from scoda.cli import CLI
 from typing import Any
 
 
@@ -23,176 +18,22 @@ def identify_input(key: str) -> bool:
         return False
 
 
-def create_last_db(db_name) -> llnl_last.LLNL_LAST | Literal[False]:
+def create_last_db(db_name) -> last_db.LAST:
     match db_name:
-        case "postgres":
-            return implementations.PostgreSQL_LLNL()
-        case "mysql":
-            return implementations.MySQL_LLNL()
-        case "sqlite3":
-            return implementations.SQLite3_LLNL(fp=Path(f"{time()}_last.sqlite3"))
-        case "sqlite3-memory":
-            return implementations.InMemorySQLite3_LLNL()
-        case "mariadb":
-            return implementations.MariaDB_LLNL()
         case "db2":
-            return implementations.DB2_LLNL()
-        case _:
-            return False
-
-
-def create_theta_db(db_name) -> theta.Theta | Literal[False]:
-    match db_name:
-        case "postgres":
-            return implementations.PostgreSQL_Theta()
-        case "mysql":
-            return implementations.MySQL_Theta()
-        case "sqlite3":
-            return implementations.SQLite3_Theta(fp=Path(f"{time()}_theta.sqlite3"))
-        case "sqlite3-memory":
-            return implementations.InMemorySQLite3_Theta()
+            return last_db.DB2()
         case "mariadb":
-            return implementations.MariaDB_Theta()
-        case "db2":
-            return implementations.DB2_Theta()
+            return last_db.MariaDB()
+        case "mysql":
+            return last_db.MySQL()
+        case "postgres":
+            return last_db.PostgreSQL()
+        case "sqlite3":
+            return last_db.SQLite3(fp=Path(f"{time()}_last.sqlite3"))
+        case "sqlite3-memory":
+            return last_db.InMemorySQLite3()
         case _:
-            return False
-
-
-# def benchmark_db_theta(
-#     iterations: int,
-#     db: theta.Theta,
-#     directory: Path,
-#     benchmark_results_db: implementations.BenchmarkResults_Theta,
-# ) -> None:
-#     results: DataFrame
-#     data: dict[str, list[float]]
-
-#     def _getDatasets() -> Iterator[scoda_dataset.Dataset]:
-#         datasets: Iterator[scoda_dataset.Dataset] | bool = (
-#             scoda_dataset.load_theta_datasets(
-#                 directory=directory,
-#             )
-#         )
-
-#         if isinstance(datasets, bool):
-#             print(
-#                 "I'm destroying this process right now because you couldn't point me to a directory containing THETA CSV files."
-#             )
-#             quit(10)
-
-#         return datasets
-
-#     # Write all tables to a database
-#     with Bar("Benchmarking writing all tables to database", max=iterations) as bar:
-#         datasets: Iterator[scoda_dataset.Dataset] = _getDatasets()
-#         data = defaultdict(list)
-#         for _ in range(iterations):
-#             data["seconds"].append(
-#                 benchmark_write_all_tables(
-#                     db=db,
-#                     datasets=datasets,
-#                 )
-#             )
-#             bar.next()
-
-#     results = DataFrame(data=data)
-#     results.to_sql(
-#         name="benchmark_write_all_tables",
-#         con=benchmark_results_db.engine,
-#         if_exists="append",
-#         index=False,
-#     )
-
-#     # Write individual tables to a database
-#     with Bar(
-#         "Benchmarking writing individual tables to database", max=iterations
-#     ) as bar:
-#         datasets = _getDatasets()
-#         data = defaultdict(list)
-#         for _ in range(iterations):
-#             dataset: scoda_dataset.Dataset
-#             for dataset in datasets:
-#                 data[dataset.name].append(
-#                     benchmark_per_db_table_write(
-#                         db=db,
-#                         dataset=dataset,
-#                     )
-#                 )
-#             bar.next()
-
-#     results = DataFrame(data=data)
-#     results.to_sql(
-#         name="benchmark_per_table_write",
-#         con=benchmark_results_db.engine,
-#         if_exists="append",
-#         index=False,
-#     )
-
-
-def benchmark_db_llnl(
-    iterations: int,
-    db: llnl_last.LLNL_LAST,
-    datasets: list[scoda_dataset.Dataset],
-    benchmark_results_db: implementations.BenchmarkResults_LLNL,
-) -> None:
-    benchmark_total_time_to_batch_write_tables(
-        test_db=db,
-        datasets=datasets,
-        iterations=iterations,
-        benchmark_db=benchmark_results_db,
-    )
-    benchmark_total_time_to_batch_write_individual_tables(
-        test_db=db,
-        datasets=datasets,
-        iterations=iterations,
-        benchmark_db=benchmark_results_db,
-    )
-    benchmark_total_time_to_sequential_write_tables(
-        test_db=db,
-        datasets=datasets,
-        iterations=iterations,
-        benchmark_db=benchmark_results_db,
-    )
-
-    benchmark_total_time_to_sequential_write_individual_tables(
-        test_db=db,
-        datasets=datasets,
-        iterations=iterations,
-        benchmark_db=benchmark_results_db,
-    )
-
-    benchmark_min_query_on_all_tables(
-        test_db=db,
-        clear_db=True,
-        datasets=datasets,
-        iterations=iterations,
-        benchmark_db=benchmark_results_db,
-    )
-
-    benchmark_min_query_on_each_table(
-        test_db=db,
-        clear_db=True,
-        datasets=datasets,
-        iterations=iterations,
-        benchmark_db=benchmark_results_db,
-    )
-
-    benchmark_avg_query_on_all_tables(
-        test_db=db,
-        clear_db=True,
-        datasets=datasets,
-        iterations=iterations,
-        benchmark_db=benchmark_results_db,
-    )
-
-    benchmark_avg_query_on_each_table(
-        test_db=db,
-        clear_db=True,
-        datasets=datasets,
-        iterations=iterations,
-        benchmark_db=benchmark_results_db,
-    )
+            return last_db.LAST(uri="", username="", password="")
 
 
 def main() -> int:
@@ -204,31 +45,22 @@ def main() -> int:
     print("Identifying dataset...")
     dataset: bool = identify_input(key=arg_keys[0])
 
+    # TODO: Implement `theta` benchmarking
+    if dataset is False:
+        return 1
+
     # Create db connection
     print("Creating testing database connection...")
-    test_db: llnl_last.LLNL_LAST | theta.Theta | bool
-    if dataset:
-        test_db = create_last_db(db_name=args["db"][0])
-    else:
-        test_db = create_theta_db(db_name=args["db"][0])
-    if isinstance(test_db, bool):
-        return 1
+    test_db: last_db.LAST
+    test_db = create_last_db(db_name=args["db"][0])
+    if test_db.uri == "":
+        return 2
 
     # Create benchmark db connection
     print("Creating benchmarking results database...")
-    benchmark_db: (
-        implementations.BenchmarkResults_LLNL
-        | implementations.BenchmarkResults_Theta
-        | bool
+    benchmark_db: scoda_benchmark.Benchmark = scoda_benchmark.Benchmark(
+        fp=args["output"][0],
     )
-    if dataset:
-        benchmark_db = implementations.BenchmarkResults_LLNL(
-            fp=args["output"][0],
-        )
-    else:
-        benchmark_db = implementations.BenchmarkResults_Theta(
-            fp=args["output"][0],
-        )
 
     # Load datasets
     datasets: list[scoda_dataset.Dataset] | bool

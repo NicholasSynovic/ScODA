@@ -31,5 +31,19 @@ class DB(ABC):
 
         return minimum_value
 
+    def query_avg_value(self, table_name: str, column_name: str) -> Any:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            average_value_query = select(func.avg(table.c[column_name]))
+            result = connection.execute(average_value_query)
+            average_value = result.scalar()
+
+        return average_value
+
     @abstractmethod
     def create_tables(self) -> None: ...

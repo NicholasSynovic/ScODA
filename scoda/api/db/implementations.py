@@ -140,10 +140,28 @@ class BenchmarkResults_LLNL(SQLite3_LLNL):
         )
 
         _: Table = Table(
-            "benchmark_min_query_on_each_table",
+            "benchmark_min_query_on_all_tables",
             self.metadata,
             Column("id", Integer, primary_key=True),
             Column("seconds", Float),
+        )
+
+        _: Table = Table(
+            "benchmark_min_query_on_each_table",
+            self.metadata,
+            Column("id", Integer, primary_key=True),
+            Column("cori_power_30_sec", Float),
+            Column("hawk_power_15_min", Float),
+            Column("lumi_power_10_min", Float),
+            Column("marconi100_power_60_sec", Float),
+            Column("perlmutter_power_60_sec", Float),
+            Column("lumi_hpcg", Float),
+            Column("hpcg_dpc", Float),
+            Column("hpcg_spc", Float),
+            Column("hpcg_uc", Float),
+            Column("hpl_dpc", Float),
+            Column("hpl_spc", Float),
+            Column("hpl_uc", Float),
         )
 
         _: Table = Table(

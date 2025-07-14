@@ -144,7 +144,31 @@ def benchmark_db_llnl(
         benchmark_db=benchmark_results_db,
     )
 
+    benchmark_min_query_on_all_tables(
+        test_db=db,
+        clear_db=True,
+        datasets=datasets,
+        iterations=iterations,
+        benchmark_db=benchmark_results_db,
+    )
+
     benchmark_min_query_on_each_table(
+        test_db=db,
+        clear_db=True,
+        datasets=datasets,
+        iterations=iterations,
+        benchmark_db=benchmark_results_db,
+    )
+
+    benchmark_avg_query_on_all_tables(
+        test_db=db,
+        clear_db=True,
+        datasets=datasets,
+        iterations=iterations,
+        benchmark_db=benchmark_results_db,
+    )
+
+    benchmark_avg_query_on_each_table(
         test_db=db,
         clear_db=True,
         datasets=datasets,

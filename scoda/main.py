@@ -144,6 +144,14 @@ def benchmark_db_llnl(
         benchmark_db=benchmark_results_db,
     )
 
+    benchmark_min_query_on_each_table(
+        test_db=db,
+        clear_db=True,
+        datasets=datasets,
+        iterations=iterations,
+        benchmark_db=benchmark_results_db,
+    )
+
 
 def main() -> int:
     cli: CLI = CLI()

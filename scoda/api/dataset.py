@@ -16,7 +16,9 @@ class Dataset(ABC):
         self.fp: Path = fp
         self.data: DataFrame = self.read()
 
-        self.data_dict: list[Any] = self.data.to_dict(orient="records")
+        json_data_copy: DataFrame = self.data.copy()
+        json_data_copy["name"] = self.name
+        self.data_dict: list[Any] = json_data_copy.to_dict(orient="records")
         self.json_str: str = dumps(self.data_dict)
         self.json_list_str: list[str] = [dumps(x) for x in self.data_dict]
 

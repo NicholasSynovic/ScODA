@@ -2,6 +2,7 @@ import scoda.db.document as scoda_document
 from requests import get, put, Response, delete, post
 from requests.auth import HTTPBasicAuth
 import scoda.api.dataset as scoda_dataset
+from requests.exceptions import ConnectionError
 
 
 class LAST(scoda_document.DocumentDB):
@@ -12,10 +13,10 @@ class LAST(scoda_document.DocumentDB):
         password: str,
         database: str = "research",
     ):
-        self.db_uri: str = self.uri + "/" + self.database
+        self.db_uri: str = uri + "/" + database
         self.auth: HTTPBasicAuth = HTTPBasicAuth(
-            username=self.username,
-            password=self.password,
+            username=username,
+            password=password,
         )
         super().__init__(uri, username, password, database)
 
@@ -31,12 +32,12 @@ class CouchDB(LAST):
         )
 
     def create(self) -> None:
-        resp: Response = get(self.db_uri, auth=self.auth)
+        resp: Response = get(self.db_uri, auth=self.auth, timeout=600)
         if resp.status_code != 200:
-            put(url=self.db_uri, auth=self.auth)
+            put(url=self.db_uri, auth=self.auth, timeout=600)
 
     def recreate(self) -> None:
-        delete(url=self.db_uri, auth=self.auth)
+        delete(url=self.db_uri, auth=self.auth, timeout=600)
         self.create()
 
     def batch_upload(self, data: scoda_dataset.Dataset) -> None:
@@ -45,6 +46,7 @@ class CouchDB(LAST):
             auth=self.auth,
             headers=self.headers,
             data=data.json_str,
+            timeout=600,
         )
 
     def sequential_upload(self, data: scoda_dataset.Dataset) -> None:
@@ -55,4 +57,5 @@ class CouchDB(LAST):
                 auth=self.auth,
                 headers=self.headers,
                 data=json_str,
+                timeout=600,
             )

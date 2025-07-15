@@ -1,4 +1,5 @@
-import scoda.db.relational.last as last_db
+import scoda.db.relational.last as last_rdbms
+import scoda.db.document.last as last_doc_db
 import scoda.db.results as scoda_results
 from pathlib import Path
 from time import time
@@ -19,22 +20,24 @@ def identify_input(key: str) -> bool:
         return False
 
 
-def create_last_db(db_name) -> last_db.LAST:
+def create_last_db(db_name) -> last_rdbms.LAST | last_doc_db.LAST:
     match db_name:
+        case "couch-db":
+            return last_doc_db.CouchDB()
         case "db2":
-            return last_db.DB2()
+            return last_rdbms.DB2()
         case "mariadb":
-            return last_db.MariaDB()
+            return last_rdbms.MariaDB()
         case "mysql":
-            return last_db.MySQL()
+            return last_rdbms.MySQL()
         case "postgres":
-            return last_db.PostgreSQL()
+            return last_rdbms.PostgreSQL()
         case "sqlite3":
-            return last_db.SQLite3(fp=Path(f"{time()}_last.sqlite3"))
+            return last_rdbms.SQLite3(fp=Path(f"{time()}_last.sqlite3"))
         case "sqlite3-memory":
-            return last_db.InMemorySQLite3()
+            return last_rdbms.InMemorySQLite3()
         case _:
-            return last_db.LAST(uri="", username="", password="")
+            return last_rdbms.LAST(uri="", username="", password="")
 
 
 def run_benchmarks(
@@ -44,7 +47,10 @@ def run_benchmarks(
     iterations: int,
 ) -> None:
     scoda_benchmarks.benchmark_total_time_to_batch_write_tables(
-        test_db=test_db, iterations=iterations, results_db=results_db, datasets=datasets
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
     )
 
     scoda_benchmarks.benchmark_total_time_to_batch_write_individual_tables(
@@ -84,7 +90,7 @@ def main() -> int:
 
     # Create db connection
     print("Creating testing database connection...")
-    test_db: last_db.LAST
+    test_db: last_rdbms.LAST | last_doc_db.LAST
     test_db = create_last_db(db_name=args["db"][0])
     if test_db.uri == "":
         return 2

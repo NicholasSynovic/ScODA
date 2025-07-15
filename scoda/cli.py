@@ -30,13 +30,14 @@ def _add_base_arguments(parser: ArgumentParser) -> None:
     )
 
 
-def _configure_relational_dbms(parser: ArgumentParser) -> None:
+def _configure_dbms(parser: ArgumentParser) -> None:
     parser.add_argument(
         "-d",
         "--db",
         nargs=1,
         type=str,
         choices=[
+            "couch-db",
             "db2",
             "mariadb",
             "mysql",
@@ -91,7 +92,7 @@ class CLI:
         )
 
         _add_base_arguments(parser=self.last_subparser)
-        _configure_relational_dbms(parser=self.last_subparser)
+        _configure_dbms(parser=self.last_subparser)
 
     def configure_theta(self) -> None:
         self.theta_subparser.add_argument(
@@ -105,7 +106,7 @@ class CLI:
         )
 
         _add_base_arguments(parser=self.theta_subparser)
-        _configure_relational_dbms(parser=self.theta_subparser)
+        _configure_dbms(parser=self.theta_subparser)
 
     def parse_args(self) -> Namespace:
         """

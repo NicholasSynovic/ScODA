@@ -15,9 +15,10 @@ class Dataset(ABC):
         self.name: str = name
         self.fp: Path = fp
         self.data: DataFrame = self.read()
+
         self.data_dict: list[Any] = self.data.to_dict(orient="records")
-        self.json_str: str = str(self.data_dict)
-        self.json_list_str: list[str] = [str(x) for x in self.data_dict]
+        self.json_str: str = dumps(self.data_dict)
+        self.json_list_str: list[str] = [dumps(x) for x in self.data_dict]
 
     def read(self) -> DataFrame:
         try:

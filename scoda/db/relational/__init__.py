@@ -10,7 +10,7 @@ from sqlalchemy import (
     select,
 )
 
-import scoda.api.dataset as scoda_dataset
+import scoda.datasets as scoda_dataset
 import scoda.db as scoda_db
 
 

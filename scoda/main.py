@@ -9,8 +9,8 @@ from pathlib import Path
 from time import time
 from typing import Any
 
-import scoda.api.dataset as scoda_dataset
 import scoda.benchmarks as scoda_benchmarks
+import scoda.datasets as scoda_dataset
 import scoda.db as scoda_db
 import scoda.db.document.last as last_doc_db
 import scoda.db.relational.last as last_rdbms

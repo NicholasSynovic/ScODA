@@ -3,7 +3,7 @@ from pymongo.errors import CollectionInvalid
 from requests import Response, delete, get, post, put
 from requests.auth import HTTPBasicAuth
 
-import scoda.api.dataset as scoda_dataset
+import scoda.datasets as scoda_dataset
 import scoda.db.document as scoda_document
 
 

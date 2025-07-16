@@ -11,7 +11,7 @@ from time import time
 from pandas import DataFrame
 from progress.bar import Bar
 
-import scoda.api.dataset as scoda_dataset
+import scoda.datasets as scoda_dataset
 import scoda.db.results as scoda_results
 from scoda.db import DB
 

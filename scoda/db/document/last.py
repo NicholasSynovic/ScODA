@@ -189,3 +189,18 @@ class MongoDB(LAST):
         document: dict
         for document in data.json_dict:
             self.db["research_data"].insert_one(document)
+
+
+class Redis:
+    # TODO: Implement this
+    ...
+
+
+class Valkey:
+    # TODO: Implement this
+    ...
+
+
+class ElasticSearch:
+    # TODO: implement this
+    ...

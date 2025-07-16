@@ -1,0 +1,3 @@
+class InfluxDB:
+    # TODO: implement this
+    ...

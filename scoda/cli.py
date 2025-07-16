@@ -12,6 +12,18 @@ from scoda.api.utils import resolve_path
 
 
 def _add_base_arguments(parser: ArgumentParser) -> None:
+    """
+    Add base arguments to the argument parser.
+
+    Args:
+        parser (ArgumentParser): The argument parser to which the base arguments
+            will be added.
+
+    The base arguments include:
+        - `--output`: Path to SQLite3 database to store benchmark results.
+        - `--iterations`: Number of iterations to benchmark the database against.
+
+    """
     parser.add_argument(
         "-o",
         "--output",
@@ -31,6 +43,17 @@ def _add_base_arguments(parser: ArgumentParser) -> None:
 
 
 def _configure_dbms(parser: ArgumentParser) -> None:
+    """
+    Configure the database management system (DBMS) argument for the parser.
+
+    The DBMS argument includes:
+        - `--db`: Database to benchmark against.
+
+    Args:
+        parser (ArgumentParser): The argument parser to which the DBMS argument
+            will be added.
+
+    """
     parser.add_argument(
         "-d",
         "--db",
@@ -51,7 +74,27 @@ def _configure_dbms(parser: ArgumentParser) -> None:
 
 
 class CLI:
+    """
+    Command Line Interface (CLI) for the ScODA DB Benchmarker.
+
+    This class sets up the argument parser for benchmarking databases against datasets.
+    It includes subparsers for specific datasets and configures arguments for each.
+
+    Attributes:
+        parser (ArgumentParser): The main argument parser for the CLI.
+        last_subparser (ArgumentParser): Subparser for the LLNL/LAST dataset.
+        theta_subparser (ArgumentParser): Subparser for the THETA dataset.
+
+    """
+
     def __init__(self) -> None:
+        """
+        Initialize the CLI with default settings.
+
+        Sets up the main argument parser and subparsers for datasets.
+        Configures version information and dataset-specific arguments.
+
+        """
         self.parser: ArgumentParser = ArgumentParser(
             prog="ScODA",
             description="Supercomputing Operational Data Analysis DB Benchmarker",
@@ -81,6 +124,12 @@ class CLI:
         self.configure_theta()
 
     def configure_last(self) -> None:
+        """
+        Configure arguments specific to the LLNL/LAST dataset.
+
+        Adds the input directory argument and base arguments to the LAST subparser.
+
+        """
         self.last_subparser.add_argument(
             "-i",
             "--input-dir",
@@ -95,13 +144,19 @@ class CLI:
         _configure_dbms(parser=self.last_subparser)
 
     def configure_theta(self) -> None:
+        """
+        Configure arguments specific to the THETA dataset.
+
+        Adds the input directory argument and base arguments to the THETA subparser.
+
+        """
         self.theta_subparser.add_argument(
             "-i",
             "--input-dir",
             nargs=1,
             type=resolve_path,
             required=True,
-            help="Path to Theta Dataset",
+            help="Path to THETA Dataset",
             dest="theta.input",
         )
 

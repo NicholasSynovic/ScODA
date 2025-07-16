@@ -9,8 +9,6 @@ services:
     container_name: ibm_db2
     privileged: true
     restart: always
-    volumes:
-      - $PWD/data/db2:/database
     ports:
       - 50000:50000
     env_file:

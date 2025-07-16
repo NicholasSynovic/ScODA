@@ -49,7 +49,7 @@ def create_last_db(db_name: str) -> last_rdbms.LAST | last_doc_db.LAST:  # noqa:
 
     """
     match db_name:
-        case "couch-db":
+        case "couchdb":
             return last_doc_db.CouchDB()
         case "db2":
             return last_rdbms.DB2()

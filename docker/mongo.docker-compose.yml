@@ -5,8 +5,6 @@ services:
     image: mongo:8.0.12-rc0
     container_name: mongo_8.0.12-rc0
     restart: always
-    volumes:
-      - $PWD/data/couchdb:/data/db
     ports:
       - 27017:27017
     environment:

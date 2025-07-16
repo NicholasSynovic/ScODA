@@ -4,3 +4,4 @@ include:
   - mariadb.docker-compose.yml
   - mysql.docker-compose.yml
   - postgresql.docker-compose.yml
+  - couchdb.docker-compose.yml

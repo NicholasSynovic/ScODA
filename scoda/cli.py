@@ -60,7 +60,7 @@ def _configure_dbms(parser: ArgumentParser) -> None:
         nargs=1,
         type=str,
         choices=[
-            "couch-db",
+            "couchdb",
             "db2",
             "mariadb",
             "mysql",

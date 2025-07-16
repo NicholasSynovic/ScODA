@@ -25,7 +25,7 @@ class Results:
 
     """
 
-    def __init__(self, fp: Path):
+    def __init__(self, fp: Path) -> None:
         """
         Initialize the Results instance with a database file path.
 

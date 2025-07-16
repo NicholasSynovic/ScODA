@@ -14,7 +14,7 @@ from scoda.cli import CLI
 from typing import Any
 import scoda.api.dataset as scoda_dataset
 import scoda.db as scoda_db
-import scoda.api.benchmarks as scoda_benchmarks
+import scoda.benchmarks as scoda_benchmarks
 
 
 def identify_input(key: str) -> bool:
@@ -32,7 +32,6 @@ def identify_input(key: str) -> bool:
     split_key: list[str] = key.split(sep=".")
 
     return split_key[0] == "last"
-    return False
 
 
 def create_last_db(db_name: str) -> last_rdbms.LAST | last_doc_db.LAST:  # noqa: PLR0911

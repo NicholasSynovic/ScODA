@@ -5,16 +5,17 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
-import scoda.db.relational.last as last_rdbms
-import scoda.db.document.last as last_doc_db
-import scoda.db.results as scoda_results
 from pathlib import Path
 from time import time
-from scoda.cli import CLI
 from typing import Any
+
 import scoda.api.dataset as scoda_dataset
-import scoda.db as scoda_db
 import scoda.benchmarks as scoda_benchmarks
+import scoda.db as scoda_db
+import scoda.db.document.last as last_doc_db
+import scoda.db.relational.last as last_rdbms
+import scoda.db.results as scoda_results
+from scoda.cli import CLI
 
 
 def identify_input(key: str) -> bool:

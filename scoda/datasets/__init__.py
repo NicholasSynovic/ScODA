@@ -5,12 +5,13 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
-from pathlib import Path
-from pandas import DataFrame
-from json import dumps
-from typing import Any
-import pandas as pd
 import sys
+from json import dumps
+from pathlib import Path
+from typing import Any
+
+import pandas as pd
+from pandas import DataFrame
 
 
 class Dataset:

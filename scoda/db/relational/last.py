@@ -1,6 +1,8 @@
-import scoda.db.relational as scoda_relational
-from sqlalchemy import Table, Column, Integer, DateTime
 from pathlib import Path
+
+from sqlalchemy import Column, DateTime, Integer, Table
+
+import scoda.db.relational as scoda_relational
 
 
 class LAST(scoda_relational.RDBMS):

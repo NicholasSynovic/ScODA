@@ -5,6 +5,7 @@ Copyright 2025 (C) Nicholas M. Synovic
 """
 
 from abc import ABC, abstractmethod
+
 import scoda.datasets as scoda_datasets
 
 

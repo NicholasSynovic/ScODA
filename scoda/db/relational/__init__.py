@@ -1,15 +1,17 @@
-import scoda.db as scoda_db
+from abc import abstractmethod
+from typing import Any
+
 from sqlalchemy import (
     Engine,
-    create_engine,
     MetaData,
     Table,
-    select,
+    create_engine,
     func,
+    select,
 )
-from typing import Any
+
 import scoda.api.dataset as scoda_dataset
-from abc import abstractmethod
+import scoda.db as scoda_db
 
 
 class RDBMS(scoda_db.DB):

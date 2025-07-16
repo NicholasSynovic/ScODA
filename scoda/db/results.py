@@ -5,9 +5,10 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
-from pandas import DataFrame
-from sqlalchemy import Engine, create_engine, MetaData
 from pathlib import Path
+
+from pandas import DataFrame
+from sqlalchemy import Engine, MetaData, create_engine
 
 
 class Results:

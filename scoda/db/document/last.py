@@ -1,9 +1,10 @@
-import scoda.db.document as scoda_document
-from requests import get, put, Response, delete, post
-from requests.auth import HTTPBasicAuth
-import scoda.api.dataset as scoda_dataset
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
+from requests import Response, delete, get, post, put
+from requests.auth import HTTPBasicAuth
+
+import scoda.api.dataset as scoda_dataset
+import scoda.db.document as scoda_document
 
 
 class LAST(scoda_document.DocumentDB):

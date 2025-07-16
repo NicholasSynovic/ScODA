@@ -1,6 +1,7 @@
 import argparse
-import numpy as np
 from datetime import datetime, timedelta
+
+import numpy as np
 
 
 def simulate_status_data(

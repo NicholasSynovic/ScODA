@@ -5,13 +5,15 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
-from pandas import DataFrame
-from scoda.db import DB
-import scoda.db.results as scoda_results
-from time import time
-import scoda.api.dataset as scoda_dataset
-from progress.bar import Bar
 from collections import defaultdict
+from time import time
+
+from pandas import DataFrame
+from progress.bar import Bar
+
+import scoda.api.dataset as scoda_dataset
+import scoda.db.results as scoda_results
+from scoda.db import DB
 
 
 def benchmark_total_time_to_batch_write_tables(

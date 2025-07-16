@@ -1,10 +1,11 @@
-import pandas as pd
-from pandas import DataFrame
 from pathlib import Path
-from sqlalchemy import create_engine
+
 import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
+import pandas as pd
 import seaborn as sns
+from matplotlib.axes import Axes
+from pandas import DataFrame
+from sqlalchemy import create_engine
 
 SUPTITLE_FONT_SIZE: int = 16
 TITLE_FONT_SIZE: int = 14

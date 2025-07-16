@@ -1,6 +1,7 @@
-import scoda.db as scoda_db
 from abc import abstractmethod
+
 import scoda.api.dataset as scoda_dataset
+import scoda.db as scoda_db
 
 
 class DocumentDB(scoda_db.DB):

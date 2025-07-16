@@ -6,8 +6,9 @@ Copyright 2025 (C) Nicholas M. Synovic
 """
 
 from pathlib import Path
-import scoda.datasets as scoda_datasets
 from typing import Literal
+
+import scoda.datasets as scoda_datasets
 
 
 class CoriPower(scoda_datasets.Dataset):

@@ -5,8 +5,9 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
-from pathlib import Path
 from collections.abc import Iterator
+from pathlib import Path
+
 import scoda.datasets as scoda_datasets
 
 

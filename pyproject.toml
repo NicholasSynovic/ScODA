@@ -1,6 +1,6 @@
 [project]
 name = "scoda"
-version = "0.0.0"
+version = "0.1.0"
 description = "Hello World"
 authors = [{ name = "Nicholas M. Synovic", email = "nicholas.synovic@gmail.com" }]
 requires-python = "~=3.13"

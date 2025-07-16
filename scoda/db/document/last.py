@@ -1,5 +1,6 @@
 from typing import Any
 
+import pymongo.synchronous.database as pymongo_database
 import redis
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
@@ -23,7 +24,12 @@ class LAST(scoda_document.DocumentDB):
             username=username,
             password=password,
         )
-        super().__init__(uri, username, password, database)
+        super().__init__(
+            uri=uri,
+            username=username,
+            password=password,
+            database=database,
+        )
 
 
 class CouchDB(LAST):
@@ -137,14 +143,21 @@ class MongoDB(LAST):
 
         Sets up the MongoDB client and database using default connection details.
         """
+        uri: str = "mongodb://root:example@localhost:27017"
+        database_name: str = "research"
+
+        self.collection: str = "research_data"
+        self.client: MongoClient = MongoClient(uri)
+
+        self.conn: pymongo_database.Database = self.client[database_name]
+        self.conn.au
+
         super().__init__(
             uri="mongodb://localhost:27017",
             username="root",
             password="example",
-            database="research",
+            database=database_name,
         )
-        self.client = MongoClient(self.uri)
-        self.db = self.client[self.database]
 
     def create(self) -> None:
         """
@@ -153,7 +166,7 @@ class MongoDB(LAST):
         Checks for the existence of the collection and creates it if necessary.
         """
         try:
-            self.db.create_collection(self.database)
+            self.conn.create_collection(self.database)
         except CollectionInvalid:
             print("Collection already exists.")
 
@@ -163,7 +176,7 @@ class MongoDB(LAST):
 
         Drops the existing collection and then calls the `create` method to create a new collection.
         """
-        self.db.drop_collection("research_data")
+        self.conn.drop_collection(self.collection)
         self.create()
 
     def batch_upload(self, data: scoda_dataset.Dataset) -> None:
@@ -176,7 +189,7 @@ class MongoDB(LAST):
             data (scoda_dataset.Dataset): The dataset to be uploaded, which should
                                           provide a `json_list` attribute for serialization.
         """
-        self.db["research_data"].insert_many(data.json_dict)
+        self.conn[self.collection].insert_many(data.json_dict)
 
     def sequential_upload(self, data: scoda_dataset.Dataset) -> None:
         """
@@ -191,103 +204,4 @@ class MongoDB(LAST):
         """
         document: dict
         for document in data.json_dict:
-            self.db["research_data"].insert_one(document)
-
-
-class RedisDB(LAST):
-    """
-    A class to interact with a Redis database for research purposes.
-
-    This class provides methods to connect to a Redis instance and perform basic operations.
-    It inherits from the LAST class, which is assumed to provide necessary authentication
-    and database URI configuration.
-
-    Attributes:
-        client (redis.Redis): The Redis client used for database operations.
-
-    """
-
-    def __init__(self):
-        """
-        Initializes the RedisDB instance with default connection parameters.
-
-        Sets up the Redis client using default connection details.
-
-        """
-        super().__init__(
-            uri="redis://localhost:6379",
-            username=None,  # Redis typically doesn't use username
-            password=None,  # Assuming no password for simplicity
-            database=0,  # Redis database index
-        )
-        self.client = redis.Redis.from_url(self.uri)
-
-    def set_data(self, key: str, value: str) -> None:
-        """
-        Sets a key-value pair in the Redis database.
-
-        Args:
-            key (str): The key under which the value is stored.
-            value (str): The value to be stored.
-
-        """
-        self.client.set(key, value)
-
-    def get_data(self, key: str) -> str:
-        """
-        Retrieves the value associated with a key from the Redis database.
-
-        Args:
-            key (str): The key whose value is to be retrieved.
-
-        Returns:
-            str: The value associated with the key, or None if the key does not exist.
-
-        """
-        return self.client.get(key)
-
-    def delete_data(self, key: str) -> None:
-        """
-        Deletes a key-value pair from the Redis database.
-
-        Args:
-            key (str): The key to be deleted.
-
-        """
-        self.client.delete(key)
-
-    def batch_upload(self, data: scoda_dataset.Dataset) -> None:
-        """
-        Uploads data to the Redis database in batch mode.
-
-        Args:
-            data (Dataset): The dataset to be uploaded, which should provide a `json_dict` attribute.
-
-        """
-        for key, value in data.json_dict.items():
-            self.set_data(key, value)
-
-    def sequential_upload(self, data: scoda_dataset.Dataset) -> None:
-        """
-        Uploads data to the Redis database sequentially, one key-value pair at a time.
-
-        Args:
-            data (Dataset): The dataset to be uploaded, which should provide a `json_dict` attribute.
-
-        """
-        datum: dict
-        for datum in data.json_dict:
-            key: str
-            value: Any
-            for key, value in datum.items():
-                self.set_data(key=key, value=value)
-
-
-class Valkey:
-    # TODO: Implement this
-    ...
-
-
-class ElasticSearch:
-    # TODO: implement this
-    ...
+            self.conn[self.collection].insert_one(document)

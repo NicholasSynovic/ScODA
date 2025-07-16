@@ -63,6 +63,7 @@ def _configure_dbms(parser: ArgumentParser) -> None:
             "couchdb",
             "db2",
             "mariadb",
+            "mongodb",
             "mysql",
             "postgres",
             "sqlite3",

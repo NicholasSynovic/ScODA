@@ -41,7 +41,12 @@ class DocumentDB(scoda_db.DB):
                 "research".
 
         """
-        super().__init__(uri, username, password, database)
+        super().__init__(
+            uri=uri,
+            username=username,
+            password=password,
+            database=database,
+        )
 
         self.create()
 

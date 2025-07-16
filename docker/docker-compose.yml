@@ -5,3 +5,4 @@ include:
   - mysql.docker-compose.yml
   - postgresql.docker-compose.yml
   - couchdb.docker-compose.yml
+  - mongo.docker-compose.yml

@@ -55,6 +55,8 @@ def create_last_db(db_name: str) -> last_rdbms.LAST | last_doc_db.LAST:  # noqa:
             return last_rdbms.DB2()
         case "mariadb":
             return last_rdbms.MariaDB()
+        case "mongodb":
+            return last_doc_db.MongoDB()
         case "mysql":
             return last_rdbms.MySQL()
         case "postgres":

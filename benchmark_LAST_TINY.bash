@@ -4,45 +4,52 @@ DATASET_DIR="./benchmark_datasets/LAST_TINY/Power-Provisioning-Dataset"
 BENCHMARK_RESULTS_DIR="./benchmark_results"
 ITERATIONS=10
 
-# SQLite3 Memory
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/sqlite3-memory_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db sqlite3-memory
+# # SQLite3 Memory
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/sqlite3-memory_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db sqlite3-memory
 
-# SQLite3
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/sqlite3_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db sqlite3
-rm *_last.sqlite3
+# # SQLite3
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/sqlite3_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db sqlite3
+# rm *_last.sqlite3
 
-# MariaDB
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/mariadb_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db mariadb
+# # MariaDB
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/mariadb_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db mariadb
 
-#MySQL
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/mysql_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db mysql
+# #MySQL
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/mysql_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db mysql
 
-# PostgreSQL
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/postgresql_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db postgres
+# # PostgreSQL
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/postgresql_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db postgres
 
-# CouchDB
+# # CouchDB
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/couchdb_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db couchdb
+
+# MongoDB
 scoda last \
     --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/couchdb_last-tiny_$ITERATIONS.sqlite3 \
+    --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \
     --iterations $ITERATIONS \
-    --db couchdb
+    --db mongodb

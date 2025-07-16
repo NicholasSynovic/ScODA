@@ -1,3 +1,10 @@
+"""
+Database benchmarks.
+
+Copyright 2025 (C) Nicholas M. Synovic
+
+"""
+
 from pandas import DataFrame
 from scoda.db import DB
 import scoda.db.results as scoda_results
@@ -13,6 +20,21 @@ def benchmark_total_time_to_batch_write_tables(
     results_db: scoda_results.Results,
     datasets: list[scoda_dataset.Dataset],
 ) -> None:
+    """
+    Benchmark the total time taken to batch write all tables to the database.
+
+    This function measures the time taken to batch upload all datasets to the
+    test database and stores the results in the results database.
+
+    Args:
+        test_db (DB): The database instance where the datasets will be uploaded.
+        iterations (int): The number of times the benchmark should be repeated.
+        results_db (scoda_results.Results): The database instance where benchmark
+            results will be stored.
+        datasets (list[scoda_dataset.Dataset]): The datasets to be uploaded
+            during the benchmark.
+
+    """
     data = defaultdict(list)
 
     def _run() -> None:
@@ -47,6 +69,22 @@ def benchmark_total_time_to_batch_write_individual_tables(
     results_db: scoda_results.Results,
     datasets: list[scoda_dataset.Dataset],
 ) -> None:
+    """
+    Benchmark the time taken to batch write individual tables to the database.
+
+    This function measures the time taken to batch upload each dataset
+    individually to the test database and stores the results in the results
+    database.
+
+    Args:
+        test_db (DB): The database instance where the datasets will be uploaded.
+        iterations (int): The number of times the benchmark should be repeated.
+        results_db (scoda_results.Results): The database instance where
+            benchmark results will be stored.
+        datasets (list[scoda_dataset.Dataset]): The datasets to be uploaded
+            during the benchmark.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(ds: scoda_dataset.Dataset) -> None:
@@ -81,6 +119,21 @@ def benchmark_total_time_to_sequential_write_tables(
     results_db: scoda_results.Results,
     datasets: list[scoda_dataset.Dataset],
 ) -> None:
+    """
+    Benchmark the time to sequentially write all tables.
+
+    This function measures the time taken to sequentially upload all datasets to
+    the test database and stores the results in the results database.
+
+    Args:
+        test_db (DB): The database instance where the datasets will be uploaded.
+        iterations (int): The number of times the benchmark should be repeated.
+        results_db (scoda_results.Results): The database instance where
+            benchmark results will be stored.
+        datasets (list[scoda_dataset.Dataset]): The datasets to be uploaded
+            during the benchmark.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run() -> None:
@@ -115,6 +168,22 @@ def benchmark_total_time_to_sequential_write_individual_tables(
     results_db: scoda_results.Results,
     datasets: list[scoda_dataset.Dataset],
 ) -> None:
+    """
+    Benchmark the time to sequentially write individual tables.
+
+    This function measures the time taken to sequentially upload each dataset
+    individually to the test database and stores the results in the results
+    database.
+
+    Args:
+        test_db (DB): The database instance where the datasets will be uploaded.
+        iterations (int): The number of times the benchmark should be repeated.
+        results_db (scoda_results.Results): The database instance where
+            benchmark results will be stored.
+        datasets (list[scoda_dataset.Dataset]): The datasets to be uploaded
+            during the benchmark.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(ds: scoda_dataset.Dataset) -> None:

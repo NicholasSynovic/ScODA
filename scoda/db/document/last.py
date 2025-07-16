@@ -1,3 +1,6 @@
+from typing import Any
+
+import redis
 from pymongo import MongoClient
 from pymongo.errors import CollectionInvalid
 from requests import Response, delete, get, post, put
@@ -191,9 +194,93 @@ class MongoDB(LAST):
             self.db["research_data"].insert_one(document)
 
 
-class Redis:
-    # TODO: Implement this
-    ...
+class RedisDB(LAST):
+    """
+    A class to interact with a Redis database for research purposes.
+
+    This class provides methods to connect to a Redis instance and perform basic operations.
+    It inherits from the LAST class, which is assumed to provide necessary authentication
+    and database URI configuration.
+
+    Attributes:
+        client (redis.Redis): The Redis client used for database operations.
+
+    """
+
+    def __init__(self):
+        """
+        Initializes the RedisDB instance with default connection parameters.
+
+        Sets up the Redis client using default connection details.
+
+        """
+        super().__init__(
+            uri="redis://localhost:6379",
+            username=None,  # Redis typically doesn't use username
+            password=None,  # Assuming no password for simplicity
+            database=0,  # Redis database index
+        )
+        self.client = redis.Redis.from_url(self.uri)
+
+    def set_data(self, key: str, value: str) -> None:
+        """
+        Sets a key-value pair in the Redis database.
+
+        Args:
+            key (str): The key under which the value is stored.
+            value (str): The value to be stored.
+
+        """
+        self.client.set(key, value)
+
+    def get_data(self, key: str) -> str:
+        """
+        Retrieves the value associated with a key from the Redis database.
+
+        Args:
+            key (str): The key whose value is to be retrieved.
+
+        Returns:
+            str: The value associated with the key, or None if the key does not exist.
+
+        """
+        return self.client.get(key)
+
+    def delete_data(self, key: str) -> None:
+        """
+        Deletes a key-value pair from the Redis database.
+
+        Args:
+            key (str): The key to be deleted.
+
+        """
+        self.client.delete(key)
+
+    def batch_upload(self, data: scoda_dataset.Dataset) -> None:
+        """
+        Uploads data to the Redis database in batch mode.
+
+        Args:
+            data (Dataset): The dataset to be uploaded, which should provide a `json_dict` attribute.
+
+        """
+        for key, value in data.json_dict.items():
+            self.set_data(key, value)
+
+    def sequential_upload(self, data: scoda_dataset.Dataset) -> None:
+        """
+        Uploads data to the Redis database sequentially, one key-value pair at a time.
+
+        Args:
+            data (Dataset): The dataset to be uploaded, which should provide a `json_dict` attribute.
+
+        """
+        datum: dict
+        for datum in data.json_dict:
+            key: str
+            value: Any
+            for key, value in datum.items():
+                self.set_data(key=key, value=value)
 
 
 class Valkey:

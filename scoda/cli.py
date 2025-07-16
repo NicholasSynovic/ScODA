@@ -8,7 +8,7 @@ Copyright 2025 (C) Nicholas M. Synovic
 import importlib.metadata
 from argparse import ArgumentParser, Namespace
 
-from scoda.api.utils import resolve_path
+import scoda.utils as scoda_utils
 
 
 def _add_base_arguments(parser: ArgumentParser) -> None:
@@ -28,7 +28,7 @@ def _add_base_arguments(parser: ArgumentParser) -> None:
         "-o",
         "--output",
         nargs=1,
-        type=resolve_path,
+        type=scoda_utils.resolve_path,
         required=True,
         help="Path to SQLite3 database to store benchmark results",
     )
@@ -134,7 +134,7 @@ class CLI:
             "-i",
             "--input-dir",
             nargs=1,
-            type=resolve_path,
+            type=scoda_utils.resolve_path,
             required=True,
             help="Path to LLNL/LAST Power Provisioning Dataset",
             dest="last.input",
@@ -154,7 +154,7 @@ class CLI:
             "-i",
             "--input-dir",
             nargs=1,
-            type=resolve_path,
+            type=scoda_utils.resolve_path,
             required=True,
             help="Path to THETA Dataset",
             dest="theta.input",

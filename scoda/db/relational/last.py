@@ -517,7 +517,7 @@ class PostgreSQL(LAST):
 class MySQL(LAST):
     def __init__(self) -> None:
         super().__init__(
-            uri="mysql+pymysql://root:example@localhost:3306/research",
+            uri="mysql+pymysql://root:example@localhost:3307/research",
             username="root",
             password="example",
         )

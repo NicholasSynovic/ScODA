@@ -11,6 +11,7 @@ from typing import Any
 
 import scoda.benchmarks as scoda_benchmarks
 import scoda.datasets as scoda_dataset
+import scoda.datasets.last as scoda_last_dataset
 import scoda.db as scoda_db
 import scoda.db.document.last as last_doc_db
 import scoda.db.relational.last as last_rdbms
@@ -162,7 +163,7 @@ def main() -> int:
     print("Loading datasets...")  # noqa: T201
     datasets: list[scoda_dataset.Dataset] | bool
     # TODO: Add support for loading `theta` datasets
-    datasets = scoda_dataset.load_llnl_datasets(directory=args["last.input"][0])
+    datasets = scoda_last_dataset.load_llnl_datasets(directory=args["last.input"][0])
     if datasets is False:
         return 3
 

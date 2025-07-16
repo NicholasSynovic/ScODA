@@ -7,8 +7,6 @@ services:
     image: mariadb:lts-ubi9
     container_name: mariadb_lts-ubi9
     restart: always
-    volumes:
-      - $PWD/data/mariadb:/var/lib/mysql
     ports:
       - 3306:3306
     environment:

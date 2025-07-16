@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Find all CSV files in the ../LAST directory and its subdirectories
+# Find all CSV files in the ./LAST directory and its subdirectories
 find ./LAST -type f -name "*.csv" | while read file; do
     # Extract the filename without the directory path
     filename=$(basename "$file")

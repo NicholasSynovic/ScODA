@@ -33,7 +33,7 @@ class Dataset:
 
     """
 
-    def __init__(self, name: str, fp: Path) -> None:
+    def __init__(self, name: str, fp: Path, time_column: str) -> None:
         """
         Initialize the Dataset with a name and file path.
 
@@ -44,7 +44,18 @@ class Dataset:
         """
         self.name: str = name
         self.fp: Path = fp
+        self.time_column: str = time_column
         self.data: DataFrame = self.read()
+
+        self.time_series_data = self.data.copy()
+        self.time_series_data[time_column] = self.time_series_data[time_column].apply(
+            pd.Timestamp
+        )
+        self.time_series_data = self.time_series_data.set_index(
+            keys=time_column,
+            drop=True,
+            inplace=True,
+        )
 
         json_compatible_data: DataFrame = self.data.copy()
         json_compatible_data["name"] = self.name

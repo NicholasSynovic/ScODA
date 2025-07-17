@@ -21,7 +21,11 @@ class CoriPower(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "Cori_power_30_sec.csv").resolve()
-        super().__init__(name="cori_power_30_sec", fp=fp)
+        super().__init__(
+            name="cori_power_30_sec",
+            fp=fp,
+            time_column="timestamp_secs",
+        )
 
 
 class HawkPower(scoda_datasets.Dataset):
@@ -34,7 +38,11 @@ class HawkPower(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "Hawk_power_15_min.csv").resolve()
-        super().__init__(name="hawk_power_15_min", fp=fp)
+        super().__init__(
+            name="hawk_power_15_min",
+            fp=fp,
+            time_column="timestamp_secs",
+        )
 
 
 class HPCGDPC(scoda_datasets.Dataset):
@@ -47,7 +55,7 @@ class HPCGDPC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpcg_dpc.csv").resolve()
-        super().__init__(name="hpcg_dpc", fp=fp)
+        super().__init__(name="hpcg_dpc", fp=fp, time_column="Time")
 
 
 class HPCGSPC(scoda_datasets.Dataset):
@@ -60,7 +68,7 @@ class HPCGSPC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpcg_spc.csv").resolve()
-        super().__init__(name="hpcg_spc", fp=fp)
+        super().__init__(name="hpcg_spc", fp=fp, time_column="Time")
 
 
 class HPCGUC(scoda_datasets.Dataset):
@@ -73,7 +81,7 @@ class HPCGUC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpcg_uc.csv").resolve()
-        super().__init__(name="hpcg_uc", fp=fp)
+        super().__init__(name="hpcg_uc", fp=fp, time_column="Time")
 
 
 class HPLDPC(scoda_datasets.Dataset):
@@ -86,7 +94,7 @@ class HPLDPC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpl_dpc.csv").resolve()
-        super().__init__(name="hpl_dpc", fp=fp)
+        super().__init__(name="hpl_dpc", fp=fp, time_column="Time")
 
 
 class HPLSPC(scoda_datasets.Dataset):
@@ -99,7 +107,7 @@ class HPLSPC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpl_spc.csv").resolve()
-        super().__init__(name="hpl_spc", fp=fp)
+        super().__init__(name="hpl_spc", fp=fp, time_column="Time")
 
 
 class HPLUC(scoda_datasets.Dataset):
@@ -112,7 +120,7 @@ class HPLUC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpl_uc.csv").resolve()
-        super().__init__(name="hpl_uc", fp=fp)
+        super().__init__(name="hpl_uc", fp=fp, time_column="Time")
 
 
 class LumiHPCG(scoda_datasets.Dataset):
@@ -125,7 +133,11 @@ class LumiHPCG(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "lumi_hpcg_data/lumi_hpcg.csv").resolve()
-        super().__init__(name="lumi_hpcg", fp=fp)
+        super().__init__(
+            name="lumi_hpcg",
+            fp=fp,
+            time_column="timestamp_secs",
+        )
 
 
 class LumiPower(scoda_datasets.Dataset):
@@ -138,7 +150,11 @@ class LumiPower(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "Lumi_power_10_min.csv").resolve()
-        super().__init__(name="lumi_power_10_min", fp=fp)
+        super().__init__(
+            name="lumi_power_10_min",
+            fp=fp,
+            time_column="timestamp_secs",
+        )
 
 
 class Marconi100Power(scoda_datasets.Dataset):
@@ -151,7 +167,11 @@ class Marconi100Power(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "Marconi100_power_60_sec.csv").resolve()
-        super().__init__(name="marconi100_power_60_sec", fp=fp)
+        super().__init__(
+            name="marconi100_power_60_sec",
+            fp=fp,
+            time_column="timestamp_secs",
+        )
 
 
 class PerlmutterPower(scoda_datasets.Dataset):
@@ -164,7 +184,11 @@ class PerlmutterPower(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "Perlmutter_power_60_sec.csv").resolve()
-        super().__init__(name="perlmutter_power_60_sec", fp=fp)
+        super().__init__(
+            name="perlmutter_power_60_sec",
+            fp=fp,
+            time_column="timestamp_secs",
+        )
 
 
 def load_llnl_datasets(

@@ -47,9 +47,9 @@ ITERATIONS=10
 #     --iterations $ITERATIONS \
 #     --db couchdb
 
-# MongoDB
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db mongodb
+# # MongoDB
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db mongodb

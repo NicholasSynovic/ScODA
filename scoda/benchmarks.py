@@ -6,7 +6,7 @@ Copyright 2025 (C) Nicholas M. Synovic
 """
 
 from collections import defaultdict
-from time import time
+from time import sleep, time
 
 from pandas import DataFrame
 from progress.bar import Bar

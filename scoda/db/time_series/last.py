@@ -1,5 +1,6 @@
+import time
+
 import pandas as pd
-from influxdb_client import Point, WritePrecision
 from influxdb_client.client.bucket_api import BucketsApi
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.write.point import Point
@@ -27,7 +28,7 @@ class LAST(scoda_time_series.TimeSeriesDB):
 
 class InfluxDB(LAST):
     def __init__(self):
-        self.token: str = "research_token"
+        self.token: str = "2_k8KvLd_ehKs7DiSZzHj3XhBXJZpetNMInWLBH0H3q6S7J5gEpqgFvaUFcCWp926cu3qBBRhi_BVXfnt9D3NA=="
         self.bucket: str = "research"
         self.org: str = "research"
 
@@ -38,6 +39,7 @@ class InfluxDB(LAST):
             token=self.token,
             org=self.org,
         )
+
         self.write_api: WriteApi = self.write_client.write_api(
             write_options=SYNCHRONOUS
         )
@@ -57,7 +59,11 @@ class InfluxDB(LAST):
         )
 
     def create(self) -> None:
-        retention_seconds = 30 * 24 * 60 * 60  # 30 days
+        bucket = self.bucket_api.find_bucket_by_name(self.bucket)
+        if bucket is not None:
+            self.bucket_api.delete_bucket(bucket)
+
+        retention_seconds = 100 * 365 * 24 * 60 * 60
 
         existing_buckets = self.bucket_api.find_buckets().buckets
         bucket_exists = any(bucket.name == self.bucket for bucket in existing_buckets)
@@ -79,9 +85,6 @@ class InfluxDB(LAST):
     def batch_upload(self, data: Dataset) -> None:
         self.batch_write_api._write_options = WriteOptions(
             batch_size=data.time_series_data.shape[0],
-            flush_interval=10000,
-            jitter_interval=2000,
-            retry_interval=5000,
         )
 
         self.batch_write_api.write(
@@ -92,9 +95,11 @@ class InfluxDB(LAST):
             data_frame_tag_columns=["name"],
         )
 
+        time.sleep(0.1)
+
     def sequential_upload(self, data: Dataset) -> None:
         for idx, row in data.time_series_data.iterrows():
-            timestamp = row[data.time_column]
+            timestamp = row.name
             point = Point(data.name).time(timestamp)
 
             # Add tags (e.g., name)
@@ -119,3 +124,5 @@ class InfluxDB(LAST):
                     pass
 
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
+
+            time.sleep(0.1)

@@ -53,3 +53,10 @@ ITERATIONS=10
 #     --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \
 #     --iterations $ITERATIONS \
 #     --db mongodb
+
+# InfluxDB
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/influxb_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db influxdb

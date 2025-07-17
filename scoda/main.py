@@ -16,6 +16,7 @@ import scoda.db as scoda_db
 import scoda.db.document.last as last_doc_db
 import scoda.db.relational.last as last_rdbms
 import scoda.db.results as scoda_results
+import scoda.db.time_series.last as last_time_series
 from scoda.cli import CLI
 
 
@@ -36,7 +37,9 @@ def identify_input(key: str) -> bool:
     return split_key[0] == "last"
 
 
-def create_last_db(db_name: str) -> last_rdbms.LAST | last_doc_db.LAST:  # noqa: PLR0911
+def create_last_db(
+    db_name: str,
+) -> last_rdbms.LAST | last_doc_db.LAST | last_time_series.LAST:  # noqa: PLR0911
     """
     Create a database connection on the specified database name.
 
@@ -53,6 +56,8 @@ def create_last_db(db_name: str) -> last_rdbms.LAST | last_doc_db.LAST:  # noqa:
             return last_doc_db.CouchDB()
         case "db2":
             return last_rdbms.DB2()
+        case "influxdb":
+            return last_time_series.InfluxDB()
         case "mariadb":
             return last_rdbms.MariaDB()
         case "mongodb":

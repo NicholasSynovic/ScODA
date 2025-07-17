@@ -62,6 +62,7 @@ def _configure_dbms(parser: ArgumentParser) -> None:
         choices=[
             "couchdb",
             "db2",
+            "influxdb",
             "mariadb",
             "mongodb",
             "mysql",

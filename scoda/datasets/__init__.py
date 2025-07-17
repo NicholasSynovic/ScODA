@@ -53,8 +53,6 @@ class Dataset:
         )
         self.time_series_data = self.time_series_data.set_index(
             keys=time_column,
-            drop=True,
-            inplace=True,
         )
 
         json_compatible_data: DataFrame = self.data.copy()

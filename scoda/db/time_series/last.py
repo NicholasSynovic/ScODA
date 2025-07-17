@@ -1,6 +1,13 @@
-from influxdb_client import InfluxDBClient, Point, WritePrecision
+import pandas as pd
+from influxdb_client import Point, WritePrecision
 from influxdb_client.client.bucket_api import BucketsApi
-from influxdb_client.client.write_api import SYNCHRONOUS, WriteApi
+from influxdb_client.client.influxdb_client import InfluxDBClient
+from influxdb_client.client.write.point import Point
+from influxdb_client.client.write_api import (
+    SYNCHRONOUS,
+    WriteApi,
+    WriteOptions,
+)
 from influxdb_client.domain.bucket_retention_rules import BucketRetentionRules
 
 import scoda.db.time_series as scoda_time_series
@@ -34,6 +41,8 @@ class InfluxDB(LAST):
         self.write_api: WriteApi = self.write_client.write_api(
             write_options=SYNCHRONOUS
         )
+        self.batch_write_api: WriteApi = self.write_client.write_api()
+
         self.bucket_api: BucketsApi = InfluxDBClient(
             url=uri,
             token=self.token,
@@ -54,7 +63,7 @@ class InfluxDB(LAST):
         bucket_exists = any(bucket.name == self.bucket for bucket in existing_buckets)
 
         if not bucket_exists:
-            bucket = self.bucket_api.create_bucket(
+            self.bucket_api.create_bucket(
                 bucket_name=self.bucket,
                 org=self.org,
                 retention_rules=BucketRetentionRules(
@@ -63,14 +72,50 @@ class InfluxDB(LAST):
             )
 
     def recreate(self) -> None:
-        self.bucket_api.delete_bucket(self.bucket)
+        bucket = self.bucket_api.find_bucket_by_name(self.bucket)
+        self.bucket_api.delete_bucket(bucket)
         self.create()
 
     def batch_upload(self, data: Dataset) -> None:
-        self.write_api.write(
+        self.batch_write_api._write_options = WriteOptions(
+            batch_size=data.time_series_data.shape[0],
+            flush_interval=10000,
+            jitter_interval=2000,
+            retry_interval=5000,
+        )
+
+        self.batch_write_api.write(
             bucket=self.bucket,
             org=self.org,
             record=data.time_series_data,
             data_frame_measurement_name=data.name,
-            data_frame_tag_columns=["name"],  # tag column(s)
+            data_frame_tag_columns=["name"],
         )
+
+    def sequential_upload(self, data: Dataset) -> None:
+        for idx, row in data.time_series_data.iterrows():
+            timestamp = row[data.time_column]
+            point = Point(data.name).time(timestamp)
+
+            # Add tags (e.g., name)
+            point.tag("name", data.name)
+
+            # Add fields
+            for col in row.index:
+                if col == data.time_column:
+                    continue
+                value = row[col]
+                if pd.isna(value):
+                    continue
+                try:
+                    value = (
+                        float(value)
+                        if isinstance(value, str)
+                        and value.replace(".", "", 1).isdigit()
+                        else value
+                    )
+                    point.field(col, value)
+                except Exception as e:
+                    pass
+
+            self.write_api.write(bucket=self.bucket, org=self.org, record=point)

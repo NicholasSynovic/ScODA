@@ -70,6 +70,8 @@ def create_last_db(
             return last_rdbms.SQLite3(fp=Path(f"{time()}_last.sqlite3"))
         case "sqlite3-memory":
             return last_rdbms.InMemorySQLite3()
+        case "victoriametrics":
+            return last_time_series.VictoriaMetrics()
         case _:
             return last_rdbms.LAST(
                 uri="",

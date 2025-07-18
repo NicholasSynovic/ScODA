@@ -69,6 +69,7 @@ def _configure_dbms(parser: ArgumentParser) -> None:
             "postgres",
             "sqlite3",
             "sqlite3-memory",
+            "victoriametrics",
         ],
         required=True,
         help="Database to benchmark against",

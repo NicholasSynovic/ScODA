@@ -6,3 +6,5 @@ include:
   - postgresql.docker-compose.yml
   - couchdb.docker-compose.yml
   - mongo.docker-compose.yml
+  - influxdb.docker-compose.yml
+  - victoriametrics.docker-compose.yml

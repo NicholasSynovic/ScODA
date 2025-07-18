@@ -1,6 +1,8 @@
 import time
+from typing import Optional
 
 import pandas as pd
+import requests
 from influxdb_client.client.bucket_api import BucketsApi
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.write.point import Point
@@ -126,3 +128,96 @@ class InfluxDB(LAST):
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
             time.sleep(0.1)
+
+
+class VictoriaMetrics(LAST):
+    def __init__(
+        self,
+        uri: str = "http://localhost:8428",
+        username: str = "",
+        password: str = "",
+        database: str = "research",
+    ):
+        self.uri = uri
+        self.database = database
+        self.auth: Optional[tuple] = (
+            (username, password) if username and password else None
+        )
+        self.write_url = f"{self.uri}/write"
+        super().__init__(uri, username, password, database)
+
+    def create(self) -> None:
+        pass
+
+    def recreate(self) -> None:
+        pass
+
+    def _send_lines(self, lines: list[str]) -> None:
+        if not lines:
+            print("⚠️ No data to write.")
+            return
+
+        payload = "\n".join(lines)
+        response = requests.post(
+            self.write_url,
+            params={"db": self.database},
+            data=payload.encode("utf-8"),
+            auth=self.auth,
+            headers={"Content-Type": "text/plain"},
+        )
+        if not response.ok:
+            raise RuntimeError(
+                f"VictoriaMetrics write failed: {response.status_code} {response.text}"
+            )
+
+    def batch_upload(self, data: Dataset) -> None:
+        df = data.time_series_data
+        lines = []
+
+        for timestamp, row in df.iterrows():
+            point = Point(data.name).time(timestamp)
+            point.tag("name", data.name)
+
+            for col in row.index:
+                value = row[col]
+                if pd.isna(value):
+                    continue
+                try:
+                    value = (
+                        float(value)
+                        if isinstance(value, str)
+                        and value.replace(".", "", 1).isdigit()
+                        else value
+                    )
+                    point.field(col, value)
+                except Exception:
+                    continue
+
+            lines.append(point.to_line_protocol())
+
+        self._send_lines(lines)
+
+    def sequential_upload(self, data: Dataset) -> None:
+        df = data.time_series_data
+
+        for timestamp, row in df.iterrows():
+            point = Point(data.name).time(timestamp)
+            point.tag("name", data.name)
+
+            for col in row.index:
+                value = row[col]
+                if pd.isna(value):
+                    continue
+                try:
+                    value = (
+                        float(value)
+                        if isinstance(value, str)
+                        and value.replace(".", "", 1).isdigit()
+                        else value
+                    )
+                    point.field(col, value)
+                except Exception:
+                    continue
+
+            line = point.to_line_protocol()
+            self._send_lines([line])

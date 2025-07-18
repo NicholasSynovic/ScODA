@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.121.0
+    container_name: victoria-metrics_1.121.0
+    restart: always
+    ports:
+      - 8428:8428
+    command:
+      - '-retentionPeriod=100y'

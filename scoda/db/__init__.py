@@ -96,3 +96,9 @@ class DB(ABC):
 
         """
         ...
+
+    @abstractmethod
+    def batch_read(self, table_name: str) -> None: ...
+
+    @abstractmethod
+    def sequential_read(self, table_name: str, rows: int) -> None: ...

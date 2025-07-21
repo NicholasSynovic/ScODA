@@ -101,28 +101,94 @@ def run_benchmarks(
             test.
 
     """
-    scoda_benchmarks.benchmark_total_time_to_batch_write_tables(
+    scoda_benchmarks.batch_write_all_tables(
         test_db=test_db,
         iterations=iterations,
         results_db=results_db,
         datasets=datasets,
     )
 
-    scoda_benchmarks.benchmark_total_time_to_batch_write_individual_tables(
+    # Write benchmarks
+    scoda_benchmarks.batch_write_individual_tables(
         test_db=test_db,
         iterations=iterations,
         results_db=results_db,
         datasets=datasets,
     )
 
-    scoda_benchmarks.benchmark_total_time_to_sequential_write_tables(
+    scoda_benchmarks.sequential_read_all_tables(
         test_db=test_db,
         iterations=iterations,
         results_db=results_db,
         datasets=datasets,
     )
 
-    scoda_benchmarks.benchmark_total_time_to_sequential_write_individual_tables(
+    scoda_benchmarks.sequential_read_individual_tables(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    # Read benchmarks
+    scoda_benchmarks.batch_read_all_tables(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.batch_read_individual_tables(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.sequential_read_all_tables(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.sequential_read_individual_tables(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    # Aggregation benchmarks
+    scoda_benchmarks.query_average_value(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.query_groupby_time_window(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.query_max_value(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.query_median_value(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
+
+    scoda_benchmarks.query_min_value(
         test_db=test_db,
         iterations=iterations,
         results_db=results_db,

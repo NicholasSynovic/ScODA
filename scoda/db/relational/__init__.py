@@ -5,7 +5,10 @@ Copyright 2025 (C) Nicholas M. Synovic
 """
 
 from abc import abstractmethod
+from collections.abc import Iterator
 
+import pandas as pd
+from pandas import DataFrame
 from sqlalchemy import (
     Engine,
     MetaData,
@@ -17,9 +20,7 @@ from sqlalchemy import (
 
 import scoda.datasets as scoda_dataset
 import scoda.db as scoda_db
-import pandas as pd
-from collections.abc import Iterator
-from pandas import DataFrame
+
 
 class RDBMS(scoda_db.DB):
     """
@@ -108,7 +109,11 @@ class RDBMS(scoda_db.DB):
         pd.read_sql_table(table_name=table_name, con=self.engine)
 
     def sequential_read(self, table_name: str, rows: int) -> None:
-        dfs: Iterator[DataFrame] = pd.read_sql_table(table_name=table_name, con=self.engine, chunksize=rows,)
+        dfs: Iterator[DataFrame] = pd.read_sql_table(
+            table_name=table_name,
+            con=self.engine,
+            chunksize=rows,
+        )
 
         df: DataFrame
         for df in dfs:

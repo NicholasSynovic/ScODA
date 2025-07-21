@@ -17,7 +17,9 @@ from sqlalchemy import (
 
 import scoda.datasets as scoda_dataset
 import scoda.db as scoda_db
-
+import pandas as pd
+from collections.abc import Iterator
+from pandas import DataFrame
 
 class RDBMS(scoda_db.DB):
     """
@@ -101,6 +103,16 @@ class RDBMS(scoda_db.DB):
             index=False,
             chunksize=1,
         )
+
+    def batch_read(self, table_name: str) -> None:
+        pd.read_sql_table(table_name=table_name, con=self.engine)
+
+    def sequential_read(self, table_name: str, rows: int) -> None:
+        dfs: Iterator[DataFrame] = pd.read_sql_table(table_name=table_name, con=self.engine, chunksize=rows,)
+
+        df: DataFrame
+        for df in dfs:
+            pass
 
     def query_min_value(self, table_name: str, column_name: str) -> float:
         """

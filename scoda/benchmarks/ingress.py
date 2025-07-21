@@ -15,13 +15,6 @@ import scoda.datasets as scoda_dataset
 import scoda.db.results as scoda_results
 from scoda.db import DB
 
-__all__ = [
-    "batch_write_all_tables",
-    "batch_write_individual_tables",
-    "sequential_write_all_tables",
-    "sequential_write_individual_tables",
-]
-
 
 def batch_write_all_tables(
     test_db: DB,

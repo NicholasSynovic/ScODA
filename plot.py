@@ -1,216 +1,98 @@
+import sqlite3
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-from matplotlib.axes import Axes
-from pandas import DataFrame
-from sqlalchemy import create_engine
-
-SUPTITLE_FONT_SIZE: int = 16
-TITLE_FONT_SIZE: int = 14
-X_Y_LABEL_FONT_SIZE: int = 12
 
 
-def plot_llnl_last_table_size() -> None:
-    data: dict[str, list[str | int | float]] = {
-        "dataset": [],
-        "records": [],
-        "filesize_kb": [],
-    }
+def plot_benchmark_total_time_to_batch_write_tables(db_dir: Path) -> None:
+    # Path to directory containing .sqlite3 files
 
-    csv_files: list[Path] = [
-        Path("LAST/Power-Provisioning-Dataset/Cori_power_30_sec.csv").resolve(),
-        Path("LAST/Power-Provisioning-Dataset/Hawk_power_15_min.csv").resolve(),
-        Path("LAST/Power-Provisioning-Dataset/Lumi_power_10_min.csv").resolve(),
-        Path("LAST/Power-Provisioning-Dataset/Marconi100_power_60_sec.csv").resolve(),
-        Path("LAST/Power-Provisioning-Dataset/Perlmutter_power_60_sec.csv").resolve(),
-        Path("LAST/Power-Provisioning-Dataset/lumi_hpcg_data/lumi_hpcg.csv").resolve(),
-        Path("LAST/Power-Provisioning-Dataset/hlrs_hpl_hpcg_data/hpl_uc.csv").resolve(),
-        Path(
-            "LAST/Power-Provisioning-Dataset/hlrs_hpl_hpcg_data/hpl_spc.csv"
-        ).resolve(),
-        Path(
-            "LAST/Power-Provisioning-Dataset/hlrs_hpl_hpcg_data/hpl_dpc.csv"
-        ).resolve(),
-        Path(
-            "LAST/Power-Provisioning-Dataset/hlrs_hpl_hpcg_data/hpcg_uc.csv"
-        ).resolve(),
-        Path(
-            "LAST/Power-Provisioning-Dataset/hlrs_hpl_hpcg_data/hpcg_dpc.csv"
-        ).resolve(),
-        Path(
-            "LAST/Power-Provisioning-Dataset/hlrs_hpl_hpcg_data/hpcg_spc.csv"
-        ).resolve(),
-    ]
+    # Collect all .sqlite3 files
+    db_files = list(db_dir.glob("*.sqlite3"))
 
-    dfs: list[DataFrame] = [
-        pd.read_csv(filepath_or_buffer=csv_fp) for csv_fp in csv_files
-    ]
+    # Load and tag data from each database
+    all_data = []
+    for db_file in db_files:
+        conn = sqlite3.connect(db_file)
+        df = pd.read_sql_query(
+            "SELECT seconds FROM benchmark_total_time_to_batch_write_tables", conn
+        )
+        df["source"] = db_file.stem.split("_")[
+            0
+        ]  # Use filename (without extension) as label
+        conn.close()
+        all_data.append(df)
 
-    idx: int
-    for idx in range(len(dfs)):
-        df: DataFrame = dfs[idx]
-        name: str = csv_files[idx].name
+    # Combine all into one DataFrame
+    combined_df = pd.concat(all_data, ignore_index=True)
 
-        data["dataset"].append(idx)
-        data["records"].append(df.shape[0])
-        data["filesize_kb"].append(csv_files[idx].stat().st_size / 1024)
+    # Compute average seconds per database
+    mean_seconds = (
+        combined_df.groupby("source")["seconds"].mean().sort_values(ascending=False)
+    )
+    ordered_sources = mean_seconds.index.tolist()
 
-    df: DataFrame = DataFrame(data=data)
+    # Create the box-and-whisker plot
+    plt.figure()
+    sns.boxplot(x="source", y="seconds", data=combined_df, order=ordered_sources)
 
-    # axes: list[Axes]
-    # _, axes = plt.subplots(nrows=1, ncols=2)
-    sns.barplot(data=df, x="dataset", y="records", color="steelblue")
-    plt.title(label="Records per Dataset", fontsize=TITLE_FONT_SIZE)
-    plt.xlabel(xlabel="Dataset", fontsize=X_Y_LABEL_FONT_SIZE)
-    plt.ylabel(ylabel="Records (log-scaled)", fontsize=X_Y_LABEL_FONT_SIZE)
-    plt.yscale(value="log")
+    # Customize plot
+    plt.title("Batch Data Ingress Performance", fontsize=16)
+    plt.xlabel("Database", fontsize=14)
+    plt.ylabel("Seconds", fontsize=14)
+    # plt.xticks(rotation=45)
+    plt.grid(True)
 
-    # sns.barplot(data=df, x="dataset", y="filesize_kb", ax=axes[1])
-    # axes[1].set_title(label="File Size per Dataset")
-    # axes[1].set_xlabel(xlabel="Dataset")
-    # axes[1].set_ylabel(ylabel="File Size (kb)")
-
-    plt.suptitle(t="LLNL/LAST Dataset Hueristics", fontsize=SUPTITLE_FONT_SIZE)
     plt.tight_layout()
-    plt.savefig("llnl-last-dataset-heuristics.png")
-    plt.clf()
-    plt.close(fig="all")
-
-    pass
+    plt.savefig("test.png")
 
 
-def plot_llnl_last_total_seconds_to_write_llnl_last_tables() -> None:
-    write_all_tables_df: DataFrame = DataFrame()
+def plot_benchmark_total_time_to_sequential_write_tables(db_dir: Path) -> None:
+    # Path to directory containing .sqlite3 files
 
-    benchmark_results: list[Path] = [
-        Path("data/mariadb_10.sqlite3").resolve(),
-        Path("data/mysql_10.sqlite3").resolve(),
-        Path("data/postgres_10.sqlite3").resolve(),
-        Path("data/sqlite3_10.sqlite3").resolve(),
-        Path("data/sqlite3-memory_10.sqlite3").resolve(),
-    ]
+    # Collect all .sqlite3 files
+    db_files = list(db_dir.glob("*.sqlite3"))
 
-    dfs: list[DataFrame] = [
-        pd.read_sql_table(
-            table_name="benchmark_write_all_tables",
-            con=create_engine(url=f"sqlite:///{br}"),
-            index_col="id",
+    # Load and tag data from each database
+    all_data = []
+    for db_file in db_files:
+        conn = sqlite3.connect(db_file)
+        df = pd.read_sql_query(
+            "SELECT seconds FROM benchmark_total_time_to_sequential_write_tables", conn
         )
-        for br in benchmark_results
-    ]
+        df["source"] = db_file.stem.split("_")[
+            0
+        ]  # Use filename (without extension) as label
+        conn.close()
+        all_data.append(df)
 
-    write_all_tables_df["MariaDB"] = dfs[0]["seconds"]
-    write_all_tables_df["MySQL"] = dfs[1]["seconds"]
-    write_all_tables_df["PostgreSQL"] = dfs[2]["seconds"]
-    write_all_tables_df["SQLite3"] = dfs[3]["seconds"]
-    write_all_tables_df["SQLite3 (Memory)"] = dfs[4]["seconds"]
+    # Combine all into one DataFrame
+    combined_df = pd.concat(all_data, ignore_index=True)
 
-    sorted_columns = write_all_tables_df.mean().sort_values(ascending=False).index
-    write_all_tables_df = write_all_tables_df[sorted_columns]
+    # Compute average seconds per database
+    mean_seconds = (
+        combined_df.groupby("source")["seconds"].mean().sort_values(ascending=False)
+    )
+    ordered_sources = mean_seconds.index.tolist()
 
-    write_all_tables_df["MariaDB"] = write_all_tables_df["MariaDB"].mean()
-    write_all_tables_df["MySQL"] = write_all_tables_df["MySQL"].mean()
-    write_all_tables_df["PostgreSQL"] = write_all_tables_df["PostgreSQL"].mean()
-    write_all_tables_df["SQLite3"] = write_all_tables_df["SQLite3"].mean()
-    write_all_tables_df["SQLite3 (Memory)"] = write_all_tables_df[
-        "SQLite3 (Memory)"
-    ].mean()
+    # Create the box-and-whisker plot
+    plt.figure()
+    sns.boxplot(x="source", y="seconds", data=combined_df, order=ordered_sources)
 
-    # Create a boxplot using Seaborn
-    ax = sns.barplot(data=write_all_tables_df, color="steelblue")
+    # Customize plot
+    plt.title("Sequential Data Ingress Performance", fontsize=16)
+    plt.xlabel("Database", fontsize=14)
+    plt.ylabel("Seconds", fontsize=14)
+    # plt.xticks(rotation=45)
+    plt.grid(True)
 
-    # Annotate the boxplot with median values
-    for i, column in enumerate(write_all_tables_df.columns):
-        median_value = write_all_tables_df[column].mean()
-        ax.annotate(
-            f"{median_value:.5f}",
-            xy=(i, median_value),
-            xytext=(0, 2),
-            textcoords="offset points",
-            ha="center",
-            va="bottom",
-            fontsize=8,
-            color="black",
-        )
-
-    plt.suptitle(t="Total Seconds To Write All Datasets", fontsize=SUPTITLE_FONT_SIZE)
-    plt.title(label="Mean Value Shown After 10 Iterations", fontsize=TITLE_FONT_SIZE)
-    plt.ylabel(ylabel="Seconds", fontsize=X_Y_LABEL_FONT_SIZE)
-    plt.xlabel(xlabel="Database", fontsize=X_Y_LABEL_FONT_SIZE)
     plt.tight_layout()
-    plt.savefig("llnl-last-total-seconds-writing-tables.png")
-    plt.clf()
-    plt.close(fig="all")
+    plt.savefig("test.png")
 
 
-def plot_writes_per_table() -> None:
-    table_names: list[str] = [
-        "Cori_power_30_sec_seconds".lower(),
-        "Hawk_power_15_min_seconds".lower(),
-        "Lumi_power_10_min_seconds".lower(),
-        "Marconi100_power_60_sec_seconds".lower(),
-        "Perlmutter_power_60_sec_seconds".lower(),
-        "lumi_hpcg_seconds".lower(),
-        "hpl_uc_seconds".lower(),
-        "hpl_spc_seconds".lower(),
-        "hpl_dpc_seconds".lower(),
-        "hpcg_uc_seconds".lower(),
-        "hpcg_dpc_seconds".lower(),
-        "hpcg_spc_seconds".lower(),
-    ]
-
-    df: DataFrame = pd.read_sql_table(
-        table_name="benchmark_per_table_write",
-        con=create_engine(url=f"sqlite:///data/mariadb_10.sqlite3"),
-        index_col="id",
+if __name__ == "__main__":
+    plot_benchmark_total_time_to_sequential_write_tables(
+        db_dir=Path("benchmark_results/evaluate")
     )
-
-    sorted_columns = df.median().sort_values(ascending=False).index
-
-    # Reorder DataFrame columns
-    df_sorted = df[sorted_columns].iloc[:, 0:4]
-    df_sorted.columns = df_sorted.columns.str.lower()
-    df_sorted = df_sorted.rename(
-        columns={name: i for i, name in enumerate(table_names)}
-    )
-    df_sorted[0] = df_sorted[0].mean()
-    df_sorted[3] = df_sorted[3].mean()
-    df_sorted[4] = df_sorted[4].mean()
-    df_sorted[7] = df_sorted[7].mean()
-
-    ax = sns.barplot(data=df_sorted, color="steelblue")
-
-    # Annotate the boxplot with median values
-    for i, column in enumerate(df_sorted.columns):
-        median_value = df_sorted[column].mean()
-        ax.annotate(
-            f"{median_value:.5f}",
-            xy=(i, median_value),
-            xytext=(0, 2),
-            textcoords="offset points",
-            ha="center",
-            va="bottom",
-            fontsize=8,
-            color="black",
-        )
-
-    plt.suptitle(
-        t="Mean Time To Write Specific Datasets to MariaDB", fontsize=SUPTITLE_FONT_SIZE
-    )
-    plt.title(
-        label="10 Iterations Conducted; Longest 4 Datasets Writes Shown",
-        fontsize=TITLE_FONT_SIZE,
-    )
-    plt.xlabel(xlabel="Datasets", fontsize=X_Y_LABEL_FONT_SIZE)
-    plt.ylabel(ylabel="Seconds", fontsize=X_Y_LABEL_FONT_SIZE)
-
-    plt.savefig("llnl-last-time-to-write-specific-datasets-to-mariadb.png")
-    plt.clf()
-    plt.close()
-
-
-plot_llnl_last_table_size()
-plot_llnl_last_total_seconds_to_write_llnl_last_tables()
-plot_writes_per_table()

@@ -7,6 +7,12 @@ Copyright 2025 (C) Nicholas M. Synovic
 from abc import ABC, abstractmethod
 
 import scoda.datasets as scoda_datasets
+from scoda.db.results import Results
+
+__all__: list[str] = [
+    "DB",
+    "Results",
+]
 
 
 class DB(ABC):
@@ -48,6 +54,34 @@ class DB(ABC):
         self.database: str = database
 
     @abstractmethod
+    def batch_upload(self, data: scoda_datasets.Dataset) -> None:
+        """
+        Upload all documents in one pass.
+
+        This method should be implemented by subclasses to define how data is
+        uploaded in a batch to the database.
+
+        Args:
+            data (scoda_datasets.Dataset): The data to be uploaded.
+
+        """
+        ...
+
+    @abstractmethod
+    def batch_read(self, table_name: str) -> None:
+        """
+        Read all documents in one pass.
+
+        This method should be implemented by subclasses to define how data is
+        batch read to the database.
+
+        Args:
+            table_name (str): The table to be read.
+
+        """
+        ...
+
+    @abstractmethod
     def create(self) -> None:
         """
         Create database tables.
@@ -70,15 +104,16 @@ class DB(ABC):
         ...
 
     @abstractmethod
-    def batch_upload(self, data: scoda_datasets.Dataset) -> None:
+    def sequential_read(self, table_name: str, rows: int) -> None:
         """
-        Upload all documents in one pass.
+        Read documents one by one.
 
         This method should be implemented by subclasses to define how data is
-        uploaded in a batch to the database.
+        read sequentially from the database.
 
         Args:
-            data (scoda_datasets.Dataset): The data to be uploaded.
+            table_name (str): The table to be read.
+            rows (int): The number of rows to be read
 
         """
         ...
@@ -96,9 +131,3 @@ class DB(ABC):
 
         """
         ...
-
-    @abstractmethod
-    def batch_read(self, table_name: str) -> None: ...
-
-    @abstractmethod
-    def sequential_read(self, table_name: str, rows: int) -> None: ...

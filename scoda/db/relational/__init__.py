@@ -63,16 +63,15 @@ class RDBMS(scoda_db.DB):
 
         self.create()
 
-    @abstractmethod
-    def create(self) -> None:
-        """Create the database schema."""
-        ...
+    def batch_read(self, table_name: str) -> None:
+        """
+        Read an entire database table to memory.
 
-    def recreate(self) -> None:
-        """Recreate the database schema by dropping and creating all tables."""
-        self.metadata.reflect(bind=self.engine)
-        self.metadata.drop_all(bind=self.engine)
-        self.metadata.create_all(bind=self.engine, checkfirst=True)
+        Args:
+            table_name (str): The database table to be read.
+
+        """
+        pd.read_sql_table(table_name=table_name, con=self.engine)
 
     def batch_upload(self, data: scoda_dataset.Dataset) -> None:
         """
@@ -88,6 +87,39 @@ class RDBMS(scoda_db.DB):
             if_exists="append",
             index=False,
         )
+
+    @abstractmethod
+    def create(self) -> None:
+        """Create the database schema."""
+        ...
+
+    def recreate(self) -> None:
+        """Recreate the database schema by dropping and creating all tables."""
+        self.metadata.reflect(bind=self.engine)
+        self.metadata.drop_all(bind=self.engine)
+        self.metadata.create_all(bind=self.engine, checkfirst=True)
+
+    def sequential_read(self, table_name: str, rows: int) -> None:
+        """
+        Read data from the database sequentially.
+
+        Data is read in `row` sized chunks and for each returned object
+        (`pd.DataFrame`), it is tested to see if it is empty.
+
+        Args:
+            table_name (str): The database table to be read.
+            rows (int): The number of rows to be read
+
+        """
+        dfs: Iterator[DataFrame] = pd.read_sql_table(
+            table_name=table_name,
+            con=self.engine,
+            chunksize=rows,
+        )
+
+        df: DataFrame
+        for df in dfs:
+            df.isna()
 
     def sequential_upload(self, data: scoda_dataset.Dataset) -> None:
         """
@@ -105,30 +137,13 @@ class RDBMS(scoda_db.DB):
             chunksize=1,
         )
 
-    def batch_read(self, table_name: str) -> None:
-        pd.read_sql_table(table_name=table_name, con=self.engine)
-
-    def sequential_read(self, table_name: str, rows: int) -> None:
-        dfs: Iterator[DataFrame] = pd.read_sql_table(
-            table_name=table_name,
-            con=self.engine,
-            chunksize=rows,
-        )
-
-        df: DataFrame
-        for df in dfs:
-            pass
-
-    def query_min_value(self, table_name: str, column_name: str) -> float:
+    def query_min_value(self, table_name: str, column_name: str) -> None:
         """
         Query the minimum value from a specified column in a table.
 
         Args:
             table_name (str): The name of the table to query.
             column_name (str): The name of the column to find the minimum value.
-
-        Returns:
-            float: The minimum value found in the specified column.
 
         """
         table: Table = Table(
@@ -139,21 +154,16 @@ class RDBMS(scoda_db.DB):
 
         with self.engine.connect() as connection:
             minimum_value_query = select(func.min(table.c[column_name]))
-            result = connection.execute(minimum_value_query)
+            connection.execute(minimum_value_query)
             connection.close()
 
-        return result.scalar()
-
-    def query_avg_value(self, table_name: str, column_name: str) -> float:
+    def query_avg_value(self, table_name: str, column_name: str) -> None:
         """
         Query the average value from a specified column in a table.
 
         Args:
             table_name (str): The name of the table to query.
             column_name (str): The name of the column to find the average value.
-
-        Returns:
-            float: The average value found in the specified column.
 
         """
         table: Table = Table(
@@ -164,7 +174,5 @@ class RDBMS(scoda_db.DB):
 
         with self.engine.connect() as connection:
             average_value_query = select(func.avg(table.c[column_name]))
-            result = connection.execute(average_value_query)
+            connection.execute(average_value_query)
             connection.close()
-
-        return result.scalar()

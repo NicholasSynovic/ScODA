@@ -7,7 +7,7 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 from typing import Any
 
-import scoda.datasets as scoda_dataset
+import scoda.datasets
 import scoda.datasets.wrappers as scoda_last_dataset
 import scoda.db as scoda_db
 import scoda.db.results as scoda_results
@@ -21,13 +21,19 @@ def main() -> int:
     args: dict[str, Any] = cli.parse_args().__dict__
     arg_keys: list[str] = list(args.keys())
 
-    # True if LAST, False if Theta
-    print("Identifying dataset...")  # noqa: T201
-    dataset: bool = identify_input(key=arg_keys[0])
+    print("Loading dataset...")  # noqa: T201
+    dataset_name: str = identify_input(key=arg_keys[0])
 
-    # TODO: Implement `theta` benchmarking
-    if dataset is False:
-        return 1
+    datasets: list[scoda.datasets.Dataset]
+    match dataset_name:
+        case "last":
+            datasets = scoda_last_dataset.load_llnl_datasets(
+                directory=args["last.input"][0]
+            )
+        case "theta":
+            quit()
+        case _:
+            quit()
 
     # Create db connection
     print("Creating testing database connection...")  # noqa: T201

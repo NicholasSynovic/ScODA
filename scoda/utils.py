@@ -17,10 +17,10 @@ def resolve_path(filepath: str) -> Path:
     return Path(filepath).resolve()
 
 
-def identify_input(key: str) -> bool:
+def identify_input(key: str) -> str:
     split_key: list[str] = key.split(sep=".")
 
-    return split_key[0] == "last"
+    return split_key[0]
 
 
 def create_db_instance(db_name: str, last_dataset: bool = True) -> scoda_rdbms.RDBMS:

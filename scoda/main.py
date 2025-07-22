@@ -13,10 +13,9 @@ import scoda.benchmarks as scoda_benchmarks
 import scoda.datasets as scoda_dataset
 import scoda.datasets.last as scoda_last_dataset
 import scoda.db as scoda_db
-import scoda.db.document.last as last_doc_db
-import scoda.db.relational.engines as last_rdbms
+import scoda.db.document as scoda_document_engine
+import scoda.db.relational as scoda_relational_engine
 import scoda.db.results as scoda_results
-import scoda.db.time_series.last as last_time_series
 from scoda.cli import CLI
 
 
@@ -37,9 +36,7 @@ def identify_input(key: str) -> bool:
     return split_key[0] == "last"
 
 
-def create_last_db(
-    db_name: str,
-) -> last_rdbms.LAST | last_doc_db.LAST | last_time_series.LAST:  # noqa: PLR0911
+def create_last_db(db_name: str) -> scoda_db.DB:  # noqa: PLR0911
     """
     Create a database connection on the specified database name.
 
@@ -52,32 +49,34 @@ def create_last_db(
 
     """
     match db_name:
-        case "couchdb":
-            return last_doc_db.CouchDB()
+        # case "couchdb":
+        #     return scoda_document_engine.
         case "db2":
-            return last_rdbms.DB2()
-        case "influxdb":
-            return last_time_series.InfluxDB()
+            return scoda_relational_engine.DB2_LAST()
+        # case "influxdb":
+        #     return last_time_series.InfluxDB()
         case "mariadb":
-            return last_rdbms.MariaDB()
-        case "mongodb":
-            return last_doc_db.MongoDB()
+            return scoda_relational_engine.MariaDB_LAST()
+        # case "mongodb":
+        #     return last_doc_db.MongoDB()
         case "mysql":
-            return last_rdbms.MySQL()
+            return scoda_relational_engine.MySQL_LAST()
         case "postgres":
-            return last_rdbms.PostgreSQL()
+            return scoda_relational_engine.PostgreSQL_LAST()
         case "sqlite3":
-            return last_rdbms.SQLite3(fp=Path(f"{time()}_last.sqlite3"))
+            return scoda_relational_engine.SQLite3_LAST(
+                fp=Path(f"{time()}_last.sqlite3")
+            )
         case "sqlite3-memory":
-            return last_rdbms.InMemorySQLite3()
-        case "victoriametrics":
-            return last_time_series.VictoriaMetrics()
-        case _:
-            return last_rdbms.LAST(
-                uri="",
-                username="",
-                password="",
-            )  # nosec: B106
+            return scoda_relational_engine.InMemorySQLite3_LAST()
+        # case "victoriametrics":
+        #     return last_time_series.VictoriaMetrics()
+        # case _:
+        #     return scoda_relational_engine.LAST(
+        #         uri="",
+        #         username="",
+        #         password="",
+        #     )  # nosec: B106
 
 
 def run_benchmarks(

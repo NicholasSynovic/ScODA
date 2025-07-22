@@ -5,208 +5,18 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
-from pathlib import Path
-from time import time
 from typing import Any
 
-import scoda.benchmarks as scoda_benchmarks
 import scoda.datasets as scoda_dataset
 import scoda.datasets.last as scoda_last_dataset
 import scoda.db as scoda_db
-import scoda.db.relational.engines as scoda_relational_engines
 import scoda.db.results as scoda_results
+from scoda.benchmarks import run_benchmarks
 from scoda.cli import CLI
-
-
-def identify_input(key: str) -> bool:
-    """
-    Identify the dataset type based on the input key.
-
-    Args:
-        key (str): The key indicating the dataset type, expected to be in the
-            format "dataset_name.some_other_info".
-
-    Returns:
-        bool: Returns True if the dataset is LAST, False if it is THETA.
-
-    """
-    split_key: list[str] = key.split(sep=".")
-
-    return split_key[0] == "last"
-
-
-def create_last_db(db_name: str) -> scoda_db.DB:  # noqa: PLR0911
-    """
-    Create a database connection on the specified database name.
-
-    Args:
-        db_name (str): The name of the database to connect to.
-
-    Returns:
-        last_rdbms.LAST | last_doc_db.LAST: An instance of the appropriate
-            database connection class.
-
-    """
-    match db_name:
-        # case "couchdb":
-        #     return scoda_document_engine.
-        case "db2":
-            return scoda_relational_engines.DB2_LAST()
-        # case "influxdb":
-        #     return last_time_series.InfluxDB()
-        case "mariadb":
-            return scoda_relational_engines.MariaDB_LAST()
-        # case "mongodb":
-        #     return last_doc_db.MongoDB()
-        case "mysql":
-            return scoda_relational_engines.MySQL_LAST()
-        case "postgres":
-            return scoda_relational_engines.PostgreSQL_LAST()
-        case "sqlite3":
-            return scoda_relational_engines.SQLite3_LAST(
-                fp=Path(f"{time()}_last.sqlite3")
-            )
-        case "sqlite3-memory":
-            return scoda_relational_engines.InMemorySQLite3_LAST()
-        # case "victoriametrics":
-        #     return last_time_series.VictoriaMetrics()
-        # case _:
-        #     return scoda_relational_engine.LAST(
-        #         uri="",
-        #         username="",
-        #         password="",
-        #     )  # nosec: B106
-
-
-def run_benchmarks(
-    test_db: scoda_db.DB,
-    results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
-    iterations: int,
-) -> None:
-    """
-    Run benchmarking tests on the specified database using the provided datasets.
-
-    Performs various benchmarking tests, including batch and sequential writes.
-
-    Args:
-        test_db (scoda_db.DB): The database to be tested.
-        results_db (scoda_results.Results): The database to store benchmark
-            results.
-        datasets (list[scoda_dataset.Dataset]): The datasets to be used for
-            benchmarking.
-        iterations (int): The number of iterations to perform for each benchmark
-            test.
-
-    """
-    scoda_benchmarks.batch_write_all_tables(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    # Write benchmarks
-    scoda_benchmarks.batch_write_individual_tables(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.sequential_read_all_tables(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.sequential_read_individual_tables(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    # Read benchmarks
-    scoda_benchmarks.batch_read_all_tables(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.batch_read_individual_tables(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.sequential_read_all_tables(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.sequential_read_individual_tables(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    # Aggregation benchmarks
-    scoda_benchmarks.query_average_value(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.query_groupby_time_window(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.query_max_value(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.query_min_value(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
-
-    scoda_benchmarks.query_mode_value(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
+from scoda.utils import create_db_instance, identify_input
 
 
 def main() -> int:
-    """
-    Execute the benchmarking process.
-
-    Sets up the CLI, identifies the dataset, creates database connections, loads
-        datasets, and runs benchmarks.
-
-    Returns:
-        int: Status code indicating the result of the execution. Returns 0 for
-            success, 1 if Theta dataset is not implemented, 2 if database
-            connection fails, and 3 if dataset loading fails.
-
-    """
     cli: CLI = CLI()
     args: dict[str, Any] = cli.parse_args().__dict__
     arg_keys: list[str] = list(args.keys())
@@ -221,8 +31,7 @@ def main() -> int:
 
     # Create db connection
     print("Creating testing database connection...")  # noqa: T201
-    test_db: last_rdbms.LAST | last_doc_db.LAST
-    test_db = create_last_db(db_name=args["db"][0])
+    test_db: scoda_db.DB = create_db_instance(db_name=args["db"][0])
     if test_db.uri is False:
         return 2
 

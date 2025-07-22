@@ -20,35 +20,6 @@ from sqlalchemy import (
 
 import scoda.datasets as scoda_dataset
 import scoda.db as scoda_db
-from scoda.db.relational.engines import (
-    DB2_LAST,
-    DB2_Theta,
-    InMemorySQLite3_LAST,
-    InMemorySQLite3_Theta,
-    MariaDB_LAST,
-    MariaDB_Theta,
-    MySQL_LAST,
-    MySQL_Theta,
-    PostgreSQL_LAST,
-    PostgreSQL_Theta,
-    SQLite3_LAST,
-    SQLite3_Theta,
-)
-
-__all__: list[str] = [
-    "DB2_LAST",
-    "DB2_Theta",
-    "InMemorySQLite3_LAST",
-    "InMemorySQLite3_Theta",
-    "MariaDB_LAST",
-    "MariaDB_Theta",
-    "MySQL_LAST",
-    "MySQL_Theta",
-    "PostgreSQL_LAST",
-    "PostgreSQL_Theta",
-    "SQLite3_LAST",
-    "SQLite3_Theta",
-]
 
 
 class RDBMS(scoda_db.DB):

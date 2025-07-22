@@ -13,8 +13,7 @@ import scoda.benchmarks as scoda_benchmarks
 import scoda.datasets as scoda_dataset
 import scoda.datasets.last as scoda_last_dataset
 import scoda.db as scoda_db
-import scoda.db.document as scoda_document_engine
-import scoda.db.relational as scoda_relational_engine
+import scoda.db.relational.engines as scoda_relational_engines
 import scoda.db.results as scoda_results
 from scoda.cli import CLI
 
@@ -52,23 +51,23 @@ def create_last_db(db_name: str) -> scoda_db.DB:  # noqa: PLR0911
         # case "couchdb":
         #     return scoda_document_engine.
         case "db2":
-            return scoda_relational_engine.DB2_LAST()
+            return scoda_relational_engines.DB2_LAST()
         # case "influxdb":
         #     return last_time_series.InfluxDB()
         case "mariadb":
-            return scoda_relational_engine.MariaDB_LAST()
+            return scoda_relational_engines.MariaDB_LAST()
         # case "mongodb":
         #     return last_doc_db.MongoDB()
         case "mysql":
-            return scoda_relational_engine.MySQL_LAST()
+            return scoda_relational_engines.MySQL_LAST()
         case "postgres":
-            return scoda_relational_engine.PostgreSQL_LAST()
+            return scoda_relational_engines.PostgreSQL_LAST()
         case "sqlite3":
-            return scoda_relational_engine.SQLite3_LAST(
+            return scoda_relational_engines.SQLite3_LAST(
                 fp=Path(f"{time()}_last.sqlite3")
             )
         case "sqlite3-memory":
-            return scoda_relational_engine.InMemorySQLite3_LAST()
+            return scoda_relational_engines.InMemorySQLite3_LAST()
         # case "victoriametrics":
         #     return last_time_series.VictoriaMetrics()
         # case _:

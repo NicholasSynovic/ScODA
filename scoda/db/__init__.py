@@ -9,11 +9,6 @@ from abc import ABC, abstractmethod
 import scoda.datasets as scoda_datasets
 from scoda.db.results import Results
 
-__all__: list[str] = [
-    "DB",
-    "Results",
-]
-
 
 class DB(ABC):
     """

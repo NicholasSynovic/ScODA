@@ -166,6 +166,81 @@ class RDBMS(scoda_db.DB):
             chunksize=1,
         )
 
+    def query_average_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the average value from a specified column in a table.
+
+        Args:
+            table_name (str): The name of the table to query.
+            column_name (str): The name of the column to find the average value.
+
+        """
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = select(func.avg(table.c[column_name]))
+            connection.execute(query)
+            connection.close()
+
+    def query_groupby_time_window_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None:
+        """
+        Query the groups of time windows by hour from a table.
+
+        Args:
+            table_name (str): The name of the table to query.
+            column_name (str): The name of the column to groupby.
+
+        """
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = (
+                select(
+                    func.strftime("%Y-%m-%d %H:00:00", table.c[column_name]).label(
+                        "hour"
+                    ),
+                    func.avg(table.c[column_name]).label("average_value"),
+                )
+                .group_by("hour")
+                .order_by("hour")
+            )
+
+            result = connection.execute(query)
+
+            connection.close()
+
+    def query_max_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the maximum value from a specified column in a table.
+
+        Args:
+            table_name (str): The name of the table to query.
+            column_name (str): The name of the column to find the maximum value.
+
+        """
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = select(func.max(table.c[column_name]))
+            connection.execute(query)
+            connection.close()
+
     def query_min_value(self, table_name: str, column_name: str) -> None:
         """
         Query the minimum value from a specified column in a table.
@@ -182,17 +257,17 @@ class RDBMS(scoda_db.DB):
         )
 
         with self.engine.connect() as connection:
-            minimum_value_query = select(func.min(table.c[column_name]))
-            connection.execute(minimum_value_query)
+            query = select(func.min(table.c[column_name]))
+            connection.execute(query)
             connection.close()
 
-    def query_avg_value(self, table_name: str, column_name: str) -> None:
+    def query_mode_value(self, table_name: str, column_name: str) -> None:
         """
-        Query the average value from a specified column in a table.
+        Query the mode value from a specified column in a table.
 
         Args:
             table_name (str): The name of the table to query.
-            column_name (str): The name of the column to find the average value.
+            column_name (str): The name of the column to find the mode value.
 
         """
         table: Table = Table(
@@ -202,6 +277,6 @@ class RDBMS(scoda_db.DB):
         )
 
         with self.engine.connect() as connection:
-            average_value_query = select(func.avg(table.c[column_name]))
-            connection.execute(average_value_query)
+            query = select(func.mode(table.c[column_name]))
+            connection.execute(query)
             connection.close()

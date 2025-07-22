@@ -114,14 +114,14 @@ class DB(ABC):
     ) -> None: ...
 
     @abstractmethod
-    def query_median_value(
+    def query_min_value(
         self,
         table_name: str,
         column_name: str,
     ) -> None: ...
 
     @abstractmethod
-    def query_min_value(
+    def query_mode_value(
         self,
         table_name: str,
         column_name: str,

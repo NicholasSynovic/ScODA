@@ -180,14 +180,14 @@ def run_benchmarks(
         datasets=datasets,
     )
 
-    scoda_benchmarks.query_median_value(
+    scoda_benchmarks.query_min_value(
         test_db=test_db,
         iterations=iterations,
         results_db=results_db,
         datasets=datasets,
     )
 
-    scoda_benchmarks.query_min_value(
+    scoda_benchmarks.query_mode_value(
         test_db=test_db,
         iterations=iterations,
         results_db=results_db,

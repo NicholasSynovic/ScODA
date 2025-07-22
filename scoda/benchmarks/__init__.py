@@ -9,8 +9,8 @@ from scoda.benchmarks.aggregation import (
     query_average_value,
     query_groupby_time_window,
     query_max_value,
-    query_median_value,
     query_min_value,
+    query_mode_value,
 )
 from scoda.benchmarks.egress import (
     batch_read_all_tables,
@@ -33,7 +33,7 @@ __all__: list[str] = [
     "query_average_value",
     "query_groupby_time_window",
     "query_max_value",
-    "query_median_value",
+    "query_mode_value",
     "query_min_value",
     "sequential_read_all_tables",
     "sequential_read_individual_tables",

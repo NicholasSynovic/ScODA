@@ -25,6 +25,7 @@ class CoriPower(scoda_datasets.Dataset):
             name="cori_power_30_sec",
             fp=fp,
             time_column="timestamp_secs",
+            query_column="measured_kW",
         )
 
 
@@ -42,6 +43,7 @@ class HawkPower(scoda_datasets.Dataset):
             name="hawk_power_15_min",
             fp=fp,
             time_column="timestamp_secs",
+            query_column="measured_kW",
         )
 
 
@@ -55,7 +57,12 @@ class HPCGDPC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpcg_dpc.csv").resolve()
-        super().__init__(name="hpcg_dpc", fp=fp, time_column="Time")
+        super().__init__(
+            name="hpcg_dpc",
+            fp=fp,
+            time_column="Time",
+            query_column="Node r9c1t1n1",
+        )
 
 
 class HPCGSPC(scoda_datasets.Dataset):
@@ -68,7 +75,12 @@ class HPCGSPC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpcg_spc.csv").resolve()
-        super().__init__(name="hpcg_spc", fp=fp, time_column="Time")
+        super().__init__(
+            name="hpcg_spc",
+            fp=fp,
+            time_column="Time",
+            query_column="Node r6c3t1n1",
+        )
 
 
 class HPCGUC(scoda_datasets.Dataset):
@@ -81,7 +93,12 @@ class HPCGUC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpcg_uc.csv").resolve()
-        super().__init__(name="hpcg_uc", fp=fp, time_column="Time")
+        super().__init__(
+            name="hpcg_uc",
+            fp=fp,
+            time_column="Time",
+            query_column="Node r7c3t1n1",
+        )
 
 
 class HPLDPC(scoda_datasets.Dataset):
@@ -94,7 +111,12 @@ class HPLDPC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpl_dpc.csv").resolve()
-        super().__init__(name="hpl_dpc", fp=fp, time_column="Time")
+        super().__init__(
+            name="hpl_dpc",
+            fp=fp,
+            time_column="Time",
+            query_column="Node r10c1t1n1",
+        )
 
 
 class HPLSPC(scoda_datasets.Dataset):
@@ -107,7 +129,12 @@ class HPLSPC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpl_spc.csv").resolve()
-        super().__init__(name="hpl_spc", fp=fp, time_column="Time")
+        super().__init__(
+            name="hpl_spc",
+            fp=fp,
+            time_column="Time",
+            query_column="Node r14c3t1n1",
+        )
 
 
 class HPLUC(scoda_datasets.Dataset):
@@ -120,7 +147,12 @@ class HPLUC(scoda_datasets.Dataset):
 
     def __init__(self, directory: Path) -> None:  # noqa: D107
         fp: Path = Path(directory, "hlrs_hpl_hpcg_data/hpl_uc.csv").resolve()
-        super().__init__(name="hpl_uc", fp=fp, time_column="Time")
+        super().__init__(
+            name="hpl_uc",
+            fp=fp,
+            time_column="Time",
+            query_column="Node r14c3t1n1",
+        )
 
 
 class LumiHPCG(scoda_datasets.Dataset):
@@ -137,6 +169,7 @@ class LumiHPCG(scoda_datasets.Dataset):
             name="lumi_hpcg",
             fp=fp,
             time_column="timestamp_secs",
+            query_column="measured_kW",
         )
 
 
@@ -154,6 +187,7 @@ class LumiPower(scoda_datasets.Dataset):
             name="lumi_power_10_min",
             fp=fp,
             time_column="timestamp_secs",
+            query_column="measured_kW",
         )
 
 
@@ -171,6 +205,7 @@ class Marconi100Power(scoda_datasets.Dataset):
             name="marconi100_power_60_sec",
             fp=fp,
             time_column="timestamp_secs",
+            query_column="measured_kW",
         )
 
 
@@ -188,6 +223,7 @@ class PerlmutterPower(scoda_datasets.Dataset):
             name="perlmutter_power_60_sec",
             fp=fp,
             time_column="timestamp_secs",
+            query_column="measured_kW",
         )
 
 

@@ -14,10 +14,19 @@ from pandas import DataFrame
 
 
 class Dataset:
-    def __init__(self, name: str, fp: Path, time_column: str) -> None:
+    def __init__(
+        self,
+        name: str,
+        fp: Path,
+        time_column: str,
+        query_column: str,
+    ) -> None:
         self.name: str = name  # Name of the dataset
         self.fp: Path = fp  # Path to the dataset
         self.time_column: str = time_column  # Name of the timestamp column
+        self.query_column: str = (
+            query_column  # Name of the column to query in benchmarks
+        )
 
         self.data: DataFrame = self.read()  # Unformatted data
         self.time_series_data: DataFrame = (

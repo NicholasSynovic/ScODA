@@ -6,6 +6,7 @@ Copyright 2025 (C) Nicholas M. Synovic
 """
 
 from collections import defaultdict
+from collections.abc import Iterable
 from time import time
 
 from pandas import DataFrame
@@ -20,7 +21,7 @@ def batch_write_all_tables(
     test_db: DB,
     iterations: int,
     results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: Iterable[scoda_dataset.Dataset],
 ) -> None:
     # TODO: Add different code paths for relational, time series, document, etc.
     # databases
@@ -56,7 +57,7 @@ def batch_write_individual_tables(
     test_db: DB,
     iterations: int,
     results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: Iterable[scoda_dataset.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
@@ -90,7 +91,7 @@ def sequential_write_all_tables(
     test_db: DB,
     iterations: int,
     results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: Iterable[scoda_dataset.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
@@ -124,7 +125,7 @@ def sequential_write_individual_tables(
     test_db: DB,
     iterations: int,
     results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: Iterable[scoda_dataset.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 

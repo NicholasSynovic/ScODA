@@ -5,6 +5,8 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
+from collections.abc import Iterable
+
 import scoda.benchmarks.aggregation as scoda_benchmarks_aggregation
 import scoda.benchmarks.egress as scoda_benchmarks_egress
 import scoda.benchmarks.ingress as scoda_benchmarks_ingress
@@ -18,7 +20,7 @@ __all__: list[str] = ["run_benchmarks"]
 def run_benchmarks(
     test_db: scoda_db.DB,
     results_db: scoda_db_results.Results,
-    datasets: list[scoda_datasets.Dataset],
+    datasets: Iterable[scoda_datasets.Dataset],
     iterations: int,
 ) -> None:
     # Ingress benchmarks

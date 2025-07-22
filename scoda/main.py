@@ -5,10 +5,10 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
+from collections.abc import Iterable
 from typing import Any
 
 import scoda.datasets
-import scoda.datasets.wrappers as scoda_last_dataset
 import scoda.db as scoda_db
 import scoda.db.results as scoda_results
 from scoda.benchmarks import run_benchmarks
@@ -24,14 +24,12 @@ def main() -> int:
     print("Loading dataset...")  # noqa: T201
     dataset_name: str = identify_input(key=arg_keys[0])
 
-    datasets: list[scoda.datasets.Dataset]
+    datasets: Iterable[scoda.datasets.Dataset]
     match dataset_name:
         case "last":
-            datasets = scoda_last_dataset.load_llnl_datasets(
-                directory=args["last.input"][0]
-            )
+            datasets = scoda.datasets.load_llnl_last(directory=args["last.input"][0])
         case "theta":
-            quit()
+            datasets = scoda.datasets.load_anl_theta(directory=args["theta.input"][0])
         case _:
             quit()
 
@@ -46,14 +44,6 @@ def main() -> int:
     results_db: scoda_results.Results = scoda_results.Results(
         fp=args["output"][0],
     )
-
-    # Load datasets
-    print("Loading datasets...")  # noqa: T201
-    datasets: list[scoda_dataset.Dataset] | bool
-    # TODO: Add support for loading `theta` datasets
-    datasets = scoda_last_dataset.load_llnl_datasets(directory=args["last.input"][0])
-    if datasets is False:
-        return 3
 
     # Run benchmarks
     print("Running benchmarks...")  # noqa: T201

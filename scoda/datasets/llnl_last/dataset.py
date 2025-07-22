@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from pathlib import Path
 
 import scoda.datasets
@@ -219,7 +220,7 @@ class PerlmutterPower(scoda.datasets.Dataset):
         )
 
 
-def load_llnl_last(directory: Path) -> list[scoda.datasets.Dataset]:
+def load_llnl_last(directory: Path) -> Iterable[scoda.datasets.Dataset]:
     return [
         CoriPower(directory=directory),
         HawkPower(directory=directory),

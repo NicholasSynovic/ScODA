@@ -20,7 +20,7 @@ def batch_read_all_tables(
     test_db: scoda_db.DB,
     iterations: int,
     results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: Iterable[scoda_dataset.Dataset],
 ) -> None:
     data = defaultdict(list)
 
@@ -54,7 +54,7 @@ def batch_read_individual_tables(
     test_db: scoda_db.DB,
     iterations: int,
     results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: Iterable[scoda_dataset.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
@@ -88,7 +88,7 @@ def sequential_read_all_tables(
     test_db: scoda_db.DB,
     iterations: int,
     results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: Iterable[scoda_dataset.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
@@ -122,7 +122,7 @@ def sequential_read_individual_tables(
     test_db: scoda_db.DB,
     iterations: int,
     results_db: scoda_results.Results,
-    datasets: list[scoda_dataset.Dataset],
+    datasets: Iterable[scoda_dataset.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 

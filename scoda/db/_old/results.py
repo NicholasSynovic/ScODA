@@ -45,7 +45,7 @@ class Results:
         """
         Upload data to a specified table in the SQLite database.
 
-        Uses pandas' to_sql method to append the data to the specified table.
+        Uses pandas' to_sql method return 0to append the data to the specified table.
 
         Args:
             data (DataFrame): The data to be uploaded, represented as a pandas

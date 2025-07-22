@@ -98,7 +98,9 @@ def query_average_value(
     def _run() -> None:
         ds: scoda_dataset.Dataset
         for ds in datasets:
-            test_db.batch_read(table_name=ds.name)
+            test_db.query_average_value(
+                table_name=ds.name,
+            )
 
     with Bar(
         "Benchmarking reading all tables from the database...",
@@ -121,7 +123,7 @@ def query_average_value(
     )
 
 
-def query_median_value(
+def query_mode_value(
     test_db: scoda_db.DB,
     iterations: int,
     results_db: scoda_results.Results,

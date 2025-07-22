@@ -8,7 +8,6 @@ Copyright 2025 (C) Nicholas M. Synovic
 import sys
 from json import dumps
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 from pandas import DataFrame
@@ -42,28 +41,34 @@ class Dataset:
             fp (Path): The file path to the dataset CSV file.
 
         """
-        self.name: str = name
-        self.fp: Path = fp
-        self.time_column: str = time_column
-        self.data: DataFrame = self.read()
+        self.name: str = name  # Name of the dataset
+        self.fp: Path = fp  # Path to the dataset
+        self.time_column: str = time_column  # Name of the timestamp column
 
-        self.time_series_data = self.data.copy()
-        self.time_series_data[time_column] = self.time_series_data[time_column].apply(
+        self.data: DataFrame = self.read()  # Unformatted data
+        self.time_series_data: DataFrame = (
+            self._create_time_series_data()
+        )  # time series formatted data
+        self.json_data: list[dict] = self._create_json_data()  # JSON data
+        self.json_data_str: str = dumps(obj=self.json_data)  # Stringified JSON
+        self.json_data_list: list[str] = [
+            dumps(x) for x in self.json_data
+        ]  # List of stringified JSON objects
+
+    def _create_time_series_data(self) -> DataFrame:
+        time_series_data = self.data.copy()
+        time_series_data[self.time_column] = time_series_data[self.time_column].apply(
             pd.Timestamp
         )
-        self.time_series_data = self.time_series_data.set_index(
-            keys=time_column,
+
+        return time_series_data.set_index(
+            keys=self.time_column,
         )
 
-        json_compatible_data: DataFrame = self.data.copy()
-        json_compatible_data["name"] = self.name
-
-        self.json_dict: list[Any] = json_compatible_data.to_dict(
-            orient="records",
-        )
-
-        self.json_str: str = dumps(self.json_dict)
-        self.json_list_str: list[str] = [dumps(x) for x in self.json_dict]
+    def _create_json_data(self) -> list[dict]:
+        json_data: DataFrame = self.data.copy()
+        json_data["name"] = self.name
+        return json_data.to_dict(orient="records")
 
     def read(self) -> DataFrame:
         """

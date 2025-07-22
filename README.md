@@ -23,6 +23,7 @@
       - [Requesting Benchmarks](#requesting-benchmarks)
   - [Developing Features](#developing-features)
     - [Adding Databases](#adding-databases)
+    - [Adding Datasets](#adding-datasets)
     - [Adding Benchmarks](#adding-benchmarks)
 
 ## Abstract
@@ -75,5 +76,7 @@ synthetic environmental data from supercomputing facilities.
 ## Developing Features
 
 ### Adding Databases
+
+### Adding Datasets
 
 ### Adding Benchmarks

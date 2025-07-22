@@ -133,7 +133,6 @@ def query_mode_value(
     results_db: scoda_results.Results,
     datasets: list[scoda_dataset.Dataset],
 ) -> None:
-    # FIXME: Make this benchmark functional
     data = defaultdict(list)
 
     def _run() -> None:

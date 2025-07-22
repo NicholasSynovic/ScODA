@@ -116,7 +116,7 @@ class HPCGDPC(Dataset):
             name="hpcg_dpc",
             fp=fp,
             time_column="Time",
-            query_column="Node r9c1t1n1",
+            query_column="Node_r9c1t1n1",
         )
 
 
@@ -134,7 +134,7 @@ class HPCGSPC(Dataset):
             name="hpcg_spc",
             fp=fp,
             time_column="Time",
-            query_column="Node r6c3t1n1",
+            query_column="Node_r6c3t1n1",
         )
 
 
@@ -152,7 +152,7 @@ class HPCGUC(Dataset):
             name="hpcg_uc",
             fp=fp,
             time_column="Time",
-            query_column="Node r7c3t1n1",
+            query_column="Node_r7c3t1n1",
         )
 
 
@@ -170,7 +170,7 @@ class HPLDPC(Dataset):
             name="hpl_dpc",
             fp=fp,
             time_column="Time",
-            query_column="Node r10c1t1n1",
+            query_column="Node_r10c1t1n1",
         )
 
 
@@ -188,7 +188,7 @@ class HPLSPC(Dataset):
             name="hpl_spc",
             fp=fp,
             time_column="Time",
-            query_column="Node r14c3t1n1",
+            query_column="Node_r14c3t1n1",
         )
 
 
@@ -206,7 +206,7 @@ class HPLUC(Dataset):
             name="hpl_uc",
             fp=fp,
             time_column="Time",
-            query_column="Node r14c3t1n1",
+            query_column="Node_r14c3t1n1",
         )
 
 

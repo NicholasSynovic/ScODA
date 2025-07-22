@@ -28,6 +28,10 @@ class Relational(scoda.db.DB):
     def create(self) -> None:
         pass
 
+    def delete(self) -> None:
+        self.metadata.reflect(bind=self.engine)
+        self.metadata.drop_all(bind=self.engine)
+
     @abstractmethod
     def query_average_value(
         self,
@@ -52,8 +56,7 @@ class Relational(scoda.db.DB):
     def query_mode_value(self, table_name: str, column_name: str) -> None: ...
 
     def recreate(self) -> None:
-        self.metadata.reflect(bind=self.engine)
-        self.metadata.drop_all(bind=self.engine)
+        self.delete()
         self.create()
 
     def sequential_read(self, table_name: str, rows: int) -> None:

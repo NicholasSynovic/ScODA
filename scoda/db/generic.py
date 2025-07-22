@@ -17,6 +17,9 @@ class DB(ABC):
     def create(self) -> None: ...
 
     @abstractmethod
+    def delete(self) -> None: ...
+
+    @abstractmethod
     def query_average_value(
         self,
         table_name: str,
@@ -39,7 +42,6 @@ class DB(ABC):
     @abstractmethod
     def query_mode_value(self, table_name: str, column_name: str) -> None: ...
 
-    @abstractmethod
     def recreate(self) -> None: ...
 
     @abstractmethod

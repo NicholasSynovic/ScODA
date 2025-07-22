@@ -219,7 +219,7 @@ class PerlmutterPower(scoda.datasets.Dataset):
         )
 
 
-def load_llnl_datasets(directory: Path) -> list[scoda.datasets.Dataset]:
+def load_llnl_last(directory: Path) -> list[scoda.datasets.Dataset]:
     return [
         CoriPower(directory=directory),
         HawkPower(directory=directory),

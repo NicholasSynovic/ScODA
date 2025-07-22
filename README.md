@@ -1,67 +1,79 @@
-# High Performance Computing (HPC) Operational Data Analytics (ODA) Database (DB) Benchmarking
+# ScODA: Supercomputing Operational Data Analytics Database Benchmarking
 
-> Benchmarking previously and currently implemented ODA DBs utilized at super
-> computing facilities on simultainous data ingress and egress
+> An emerging pipeline for evaluating distributed database performance
 
-## Table of Contents
+## Table Of Contents
 
-- [High Performance Computing (HPC) Operational Data Analytics (ODA) Database (DB) Benchmarking](#high-performance-computing-hpc-operational-data-analytics-oda-database-db-benchmarking)
-  - [Table of Contents](#table-of-contents)
+- [ScODA: Supercomputing Operational Data Analytics Database Benchmarking](#scoda-supercomputing-operational-data-analytics-database-benchmarking)
+  - [Table Of Contents](#table-of-contents)
   - [Abstract](#abstract)
-  - [Intellectual Merit](#intellectual-merit)
-  - [Broader Impacts](#broader-impacts)
-  - [Databases Benchmarked](#databases-benchmarked)
-    - [IBM DB2 Community Edition Notes](#ibm-db2-community-edition-notes)
-      - [Acquiring the JDBC driver](#acquiring-the-jdbc-driver)
+  - [System Dependencies](#system-dependencies)
+  - [Using ScODA](#using-scoda)
+    - [Install With `pip`](#install-with-pip)
+    - [Install With `pipx`](#install-with-pipx)
+    - [Build From Source](#build-from-source)
+    - [Command Line Options](#command-line-options)
+    - [Leveraging ScODA SQLite3 Database](#leveraging-scoda-sqlite3-database)
+  - [Contributing To ScODA](#contributing-to-scoda)
+    - [Submitting Issues](#submitting-issues)
+      - [Submitting Bug Reports](#submitting-bug-reports)
+      - [Submitting Incorrect Benchmarks](#submitting-incorrect-benchmarks)
+      - [Submitting Security Patches](#submitting-security-patches)
+    - [Requesting Features](#requesting-features)
+      - [Requesting Benchmarks](#requesting-benchmarks)
+  - [Developing Features](#developing-features)
+    - [Adding Databases](#adding-databases)
+    - [Adding Benchmarks](#adding-benchmarks)
 
 ## Abstract
 
-Super computers are heterogenous systems composed of many compute resources that
-allow users to distribute and parallelize workloads. These systems are
-expensive, and monitoring them allows business intelligence, maintence, and
-systems research teams to make business, operational, and organization decsions
-that optimize the return on investment of these systems. To do so, system and
-environmental metrics are captured by stakeholders in real time and stored in
-databases and lakehouses on premises to retain data security and integrity.
+Supercomputers are powerful, complicated, and exepensive national resources.
+These devices enable researchers to answer basic science research questions
+through computational modeling, training of foundational scientific deep
+learning models, and prediction of natural phenomenon. However, these devices
+are prone to failure, consume significant power and cooling resources, and
+undergo varying levels of computational load. Thus the system logs, environment
+sensors, and other monitoring utilities are captured in stored in distributed,
+parallel databases and lakehouses.
 
-However, with the rise of exascale super computing, the amount of data captured
-is approaching *petabytes per day*. The scale of this data strains existing
-database solutions at premier super computing facilities, with one anecdote
-claiming that querying the database while writing data to it consumes ~70% of
-CPU resources on the distributed database solution. As super computing resources
-continue to grow it is expected that the simultainous ingress and egress of data
-on database solutions will require significantly more computational resources to
-enable real time ODA, including heuristics, visualizations, and machine learning
-operations. This repository is a test suite of the scalability and performance
-of simultainous ODA operations on databases. The test data is from publicly
-availible *environmental data* from super computing facilities.
+This data enables business intelligence, operations, and high-performance
+computing (HPC) research teams to access, query, and evaluate the data for
+different tasks. But as supercomputers scale towards post-exascale computation,
+the amount of processing power to host, query, and load data into these
+databases concurrently and in real-time also grows. Thus, *ScODA* was created as
+a pipeline to evaluate different database and lakehouse solutions on real and
+synthetic environmental data from supercomputing facilities.
 
-## Intellectual Merit
+## System Dependencies
 
-> TODO: Add me!
+## Using ScODA
 
-## Broader Impacts
+### Install With `pip`
 
-> TODO: Add me!
+### Install With `pipx`
 
-## Databases Benchmarked
+### Build From Source
 
-| **Database**                  | **Open Source** | **Storage Format** |
-| ----------------------------- | --------------- | ------------------ |
-| IBM DB2 BLU Community Edition | No              | Columnar           |
-| Apache Druid                  | Yes             | Columnar           |
-| Apache Pinot                  | Yes             | Columnar           |
-| ClickHouse                    | Yes             | Columnar           |
-| Apache HBase                  | Yes             | Column-Oriented    |
-| MySQL Community Edition       | Yes             | Row                |
-| Postgres                      | Yes             | Row                |
-| InfluxDB                      | Yes             | Time series        |
+### Command Line Options
 
-### IBM DB2 Community Edition Notes
+### Leveraging ScODA SQLite3 Database
 
-#### Acquiring the JDBC driver
+## Contributing To ScODA
 
-You can find the download for the JDBC driver used in this work on
-[this webpage](https://www.ibm.com/support/fixcentral/swg/selectFixes?source=dbluesearch&product=ibm%2FInformation+Management%2FIBM+Data+Server+Client+Packages&release=12.1.2.0&platform=Linux+32-bit,x86&searchtype=fix&fixids=*jdbc*FP000&function=fixId&parent=ibm/Information%20Management).
-You do not need to download any of the prerequisite packages. Rename the JDBC
-driver from `db2jcc.jar` to `db2.jar` after extracting it.
+### Submitting Issues
+
+#### Submitting Bug Reports
+
+#### Submitting Incorrect Benchmarks
+
+#### Submitting Security Patches
+
+### Requesting Features
+
+#### Requesting Benchmarks
+
+## Developing Features
+
+### Adding Databases
+
+### Adding Benchmarks

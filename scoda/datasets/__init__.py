@@ -14,33 +14,7 @@ from pandas import DataFrame
 
 
 class Dataset:
-    """
-    Base class for datasets.
-
-    This class provides a common interface for reading CSV files into a
-    DataFrame, converting the data to JSON-compatible formats, and storing
-    metadata.
-
-    Attributes:
-        name (str): The name of the dataset.
-        fp (Path): The file path to the dataset CSV file.
-        data (DataFrame): The data read from the CSV file.
-        json_dict (list[Any]): The data converted to a list of dictionaries for
-            JSON serialization.
-        json_str (str): The data serialized as a JSON string.
-        json_list_str (list[str]): The data serialized as a list of JSON strings.
-
-    """
-
     def __init__(self, name: str, fp: Path, time_column: str) -> None:
-        """
-        Initialize the Dataset with a name and file path.
-
-        Args:
-            name (str): The name of the dataset.
-            fp (Path): The file path to the dataset CSV file.
-
-        """
         self.name: str = name  # Name of the dataset
         self.fp: Path = fp  # Path to the dataset
         self.time_column: str = time_column  # Name of the timestamp column
@@ -71,13 +45,6 @@ class Dataset:
         return json_data.to_dict(orient="records")
 
     def read(self) -> DataFrame:
-        """
-        Read the dataset from a CSV file into a DataFrame.
-
-        Returns:
-            DataFrame: The data read from the CSV file.
-
-        """
         try:
             data: DataFrame = pd.read_csv(filepath_or_buffer=self.fp)
         except pd.errors.ParserError as pe:

@@ -93,6 +93,41 @@ class DB(ABC):
         ...
 
     @abstractmethod
+    def query_average_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None: ...
+
+    @abstractmethod
+    def query_groupby_time_window_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None: ...
+
+    @abstractmethod
+    def query_max_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None: ...
+
+    @abstractmethod
+    def query_median_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None: ...
+
+    @abstractmethod
+    def query_min_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None: ...
+
+    @abstractmethod
     def recreate(self) -> None:
         """
         Delete tables and recreate them.

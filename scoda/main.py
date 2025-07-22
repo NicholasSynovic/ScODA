@@ -14,7 +14,7 @@ import scoda.datasets as scoda_dataset
 import scoda.datasets.last as scoda_last_dataset
 import scoda.db as scoda_db
 import scoda.db.document.last as last_doc_db
-import scoda.db.relational.last as last_rdbms
+import scoda.db.relational.engines as last_rdbms
 import scoda.db.results as scoda_results
 import scoda.db.time_series.last as last_time_series
 from scoda.cli import CLI

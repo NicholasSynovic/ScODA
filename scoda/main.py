@@ -5,6 +5,7 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
+import sys
 from collections.abc import Iterable
 from typing import Any
 
@@ -17,13 +18,18 @@ from scoda.utils import create_db_instance, identify_input
 
 
 def main() -> int:
+    # Handle CLI args
     cli: CLI = CLI()
     args: dict[str, Any] = cli.parse_args().__dict__
     arg_keys: list[str] = list(args.keys())
 
-    print("Loading dataset...")  # noqa: T201
-    dataset_name: str = identify_input(key=arg_keys[0])
+    # Create results db connection
+    results_db: scoda_results.Results = scoda_results.Results(
+        fp=args["output"][0],
+    )
 
+    # Load the dataset
+    dataset_name: str = identify_input(key=arg_keys[0])
     datasets: Iterable[scoda.datasets.Dataset]
     match dataset_name:
         case "last":
@@ -31,22 +37,14 @@ def main() -> int:
         case "theta":
             datasets = scoda.datasets.load_anl_theta(directory=args["theta.input"][0])
         case _:
-            quit()
+            sys.exit(1)
 
-    # Create db connection
-    print("Creating testing database connection...")  # noqa: T201
+    # Create test db connection
     test_db: scoda_db.DB = create_db_instance(db_name=args["db"][0])
     if test_db.uri is False:
-        return 2
-
-    # Create results db connection
-    print("Creating benchmarking results database...")  # noqa: T201
-    results_db: scoda_results.Results = scoda_results.Results(
-        fp=args["output"][0],
-    )
+        sys.exit(2)
 
     # Run benchmarks
-    print("Running benchmarks...")  # noqa: T201
     run_benchmarks(
         test_db=test_db,
         results_db=results_db,
@@ -54,7 +52,7 @@ def main() -> int:
         iterations=args["iterations"][0],
     )
 
-    return 0
+    sys.exit(0)
 
 
 if __name__ == "__main__":

@@ -9,25 +9,7 @@ class MariaDB(Relational):
             connection_string="mariadb+pymysql://root:example@localhost:3306/research",
         )
 
-    def query_average_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
     def query_groupby_time_window_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
-    def query_max_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
-    def query_min_value(
         self,
         table_name: str,
         column_name: str,
@@ -46,25 +28,7 @@ class MySQLDB(Relational):
             connection_string="mysql+pymysql://root:example@localhost:3307/research"
         )
 
-    def query_average_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
     def query_groupby_time_window_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
-    def query_max_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
-    def query_min_value(
         self,
         table_name: str,
         column_name: str,
@@ -83,25 +47,7 @@ class PostgreSQL(Relational):
             connection_string="postgresql+psycopg2://admin:example@localhost:5432/research"
         )
 
-    def query_average_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
     def query_groupby_time_window_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
-    def query_max_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
-    def query_min_value(
         self,
         table_name: str,
         column_name: str,
@@ -116,27 +62,9 @@ class PostgreSQL(Relational):
 
 class GenericSQLite3(Relational):
     def __init__(self, connection_string: str) -> None:
-        super().__init__(connection_string)
-
-    def query_average_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
+        super().__init__(connection_string=connection_string)
 
     def query_groupby_time_window_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
-    def query_max_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None: ...
-
-    def query_min_value(
         self,
         table_name: str,
         column_name: str,

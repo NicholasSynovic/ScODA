@@ -2,7 +2,19 @@ from abc import abstractmethod
 from collections.abc import Iterable
 
 import pandas as pd
-from sqlalchemy import Engine, MetaData, create_engine
+from sqlalchemy import (
+    Column,
+    DateTime,
+    Engine,
+    Float,
+    Integer,
+    MetaData,
+    Table,
+    create_engine,
+    desc,
+    func,
+    select,
+)
 
 import scoda.datasets
 import scoda.db
@@ -32,12 +44,21 @@ class Relational(scoda.db.DB):
         self.metadata.reflect(bind=self.engine)
         self.metadata.drop_all(bind=self.engine)
 
-    @abstractmethod
     def query_average_value(
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = select(func.avg(table.c[column_name]))
+            connection.execute(query)
+            connection.close()
 
     @abstractmethod
     def query_groupby_time_window_value(
@@ -46,11 +67,29 @@ class Relational(scoda.db.DB):
         column_name: str,
     ) -> None: ...
 
-    @abstractmethod
-    def query_max_value(self, table_name: str, column_name: str) -> None: ...
+    def query_max_value(self, table_name: str, column_name: str) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
 
-    @abstractmethod
-    def query_min_value(self, table_name: str, column_name: str) -> None: ...
+        with self.engine.connect() as connection:
+            query = select(func.max(table.c[column_name]))
+            connection.execute(query)
+            connection.close()
+
+    def query_min_value(self, table_name: str, column_name: str) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = select(func.min(table.c[column_name]))
+            connection.execute(query)
+            connection.close()
 
     @abstractmethod
     def query_mode_value(self, table_name: str, column_name: str) -> None: ...

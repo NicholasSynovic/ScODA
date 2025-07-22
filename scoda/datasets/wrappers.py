@@ -5,13 +5,68 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
+import sys
+from collections.abc import Iterator
+from json import dumps
 from pathlib import Path
 from typing import Literal
 
-import scoda.datasets as scoda_datasets
+import pandas as pd
+from pandas import DataFrame
 
 
-class CoriPower(scoda_datasets.Dataset):
+class Dataset:
+    def __init__(
+        self,
+        name: str,
+        fp: Path,
+        time_column: str,
+        query_column: str,
+    ) -> None:
+        self.name: str = name  # Name of the dataset
+        self.fp: Path = fp  # Path to the dataset
+        self.time_column: str = time_column  # Name of the timestamp column
+        self.query_column: str = (
+            query_column  # Name of the column to query in benchmarks
+        )
+
+        self.data: DataFrame = self.read()  # Unformatted data
+        self.time_series_data: DataFrame = (
+            self._create_time_series_data()
+        )  # time series formatted data
+        self.json_data: list[dict] = self._create_json_data()  # JSON data
+        self.json_data_str: str = dumps(obj=self.json_data)  # Stringified JSON
+        self.json_data_list: list[str] = [
+            dumps(x) for x in self.json_data
+        ]  # List of stringified JSON objects
+
+    def _create_time_series_data(self) -> DataFrame:
+        time_series_data = self.data.copy()
+        time_series_data[self.time_column] = time_series_data[self.time_column].apply(
+            pd.Timestamp
+        )
+
+        return time_series_data.set_index(
+            keys=self.time_column,
+        )
+
+    def _create_json_data(self) -> list[dict]:
+        json_data: DataFrame = self.data.copy()
+        json_data["name"] = self.name
+        return json_data.to_dict(orient="records")
+
+    def read(self) -> DataFrame:
+        try:
+            data: DataFrame = pd.read_csv(filepath_or_buffer=self.fp)
+        except pd.errors.ParserError as pe:
+            print(self.name, self.fp, pe)  # noqa: T201
+            sys.exit(1)
+
+        data.columns = data.columns.str.replace(pat=" ", repl="_")
+        return data
+
+
+class CoriPower(Dataset):
     """
     Dataset class for Cori Power data.
 
@@ -29,7 +84,7 @@ class CoriPower(scoda_datasets.Dataset):
         )
 
 
-class HawkPower(scoda_datasets.Dataset):
+class HawkPower(Dataset):
     """
     Dataset class for Hawk Power data.
 
@@ -47,7 +102,7 @@ class HawkPower(scoda_datasets.Dataset):
         )
 
 
-class HPCGDPC(scoda_datasets.Dataset):
+class HPCGDPC(Dataset):
     """
     Dataset class for HPCG DPC data.
 
@@ -65,7 +120,7 @@ class HPCGDPC(scoda_datasets.Dataset):
         )
 
 
-class HPCGSPC(scoda_datasets.Dataset):
+class HPCGSPC(Dataset):
     """
     Dataset class for HPCG SPC data.
 
@@ -83,7 +138,7 @@ class HPCGSPC(scoda_datasets.Dataset):
         )
 
 
-class HPCGUC(scoda_datasets.Dataset):
+class HPCGUC(Dataset):
     """
     Dataset class for HPCG UC data.
 
@@ -101,7 +156,7 @@ class HPCGUC(scoda_datasets.Dataset):
         )
 
 
-class HPLDPC(scoda_datasets.Dataset):
+class HPLDPC(Dataset):
     """
     Dataset class for HPL DPC data.
 
@@ -119,7 +174,7 @@ class HPLDPC(scoda_datasets.Dataset):
         )
 
 
-class HPLSPC(scoda_datasets.Dataset):
+class HPLSPC(Dataset):
     """
     Dataset class for HPL SPC data.
 
@@ -137,7 +192,7 @@ class HPLSPC(scoda_datasets.Dataset):
         )
 
 
-class HPLUC(scoda_datasets.Dataset):
+class HPLUC(Dataset):
     """
     Dataset class for HPL UC data.
 
@@ -155,7 +210,7 @@ class HPLUC(scoda_datasets.Dataset):
         )
 
 
-class LumiHPCG(scoda_datasets.Dataset):
+class LumiHPCG(Dataset):
     """
     Dataset class for Lumi HPCG data.
 
@@ -173,7 +228,7 @@ class LumiHPCG(scoda_datasets.Dataset):
         )
 
 
-class LumiPower(scoda_datasets.Dataset):
+class LumiPower(Dataset):
     """
     Dataset class for Lumi Power data.
 
@@ -191,7 +246,7 @@ class LumiPower(scoda_datasets.Dataset):
         )
 
 
-class Marconi100Power(scoda_datasets.Dataset):
+class Marconi100Power(Dataset):
     """
     Dataset class for Marconi100 Power data.
 
@@ -209,7 +264,7 @@ class Marconi100Power(scoda_datasets.Dataset):
         )
 
 
-class PerlmutterPower(scoda_datasets.Dataset):
+class PerlmutterPower(Dataset):
     """
     Dataset class for Perlmutter Power data.
 
@@ -229,19 +284,8 @@ class PerlmutterPower(scoda_datasets.Dataset):
 
 def load_llnl_datasets(
     directory: Path,
-) -> list[scoda_datasets.Dataset] | Literal[False]:
-    """
-    Load LLNL datasets from the specified directory.
-
-    Args:
-        directory (Path): The directory containing the dataset files.
-
-    Returns:
-        list[Dataset] | Literal[False]: A list of Dataset instances if
-            successful, False if any file is not found.
-
-    """
-    data: list[scoda_datasets.Dataset] = []
+) -> list[Dataset] | Literal[False]:
+    data: list[Dataset] = []
 
     try:
         data.extend(
@@ -264,3 +308,15 @@ def load_llnl_datasets(
         return False
 
     return data
+
+
+def load_theta_datasets(directory: Path) -> Iterator[Dataset]:
+    fps: list[Path] = [Path(directory, fp) for fp in Path(directory).iterdir()]
+
+    for fp in fps:
+        if not fp.is_file():
+            error_message: str = f"Path {fp} is not a file."
+            raise FileNotFoundError(error_message)
+
+    for fp in fps:
+        yield Dataset(name=fp.stem, fp=fp)

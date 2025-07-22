@@ -8,7 +8,7 @@ Copyright 2025 (C) Nicholas M. Synovic
 from typing import Any
 
 import scoda.datasets as scoda_dataset
-import scoda.datasets.last as scoda_last_dataset
+import scoda.datasets.wrappers as scoda_last_dataset
 import scoda.db as scoda_db
 import scoda.db.results as scoda_results
 from scoda.benchmarks import run_benchmarks

@@ -14,38 +14,16 @@ import scoda.db.relational.engines as scoda_rdbms_engines
 
 
 def resolve_path(filepath: str) -> Path:
-    """
-    Resolve the absolute path of the given file path.
-
-    This function converts the provided file path string into a Path object
-    and resolves it to its absolute path.
-
-    Args:
-        filepath (str): The file path to be resolved.
-
-    Returns:
-        Path: The resolved absolute path as a Path object.
-
-    """
     return Path(filepath).resolve()
 
+
 def identify_input(key: str) -> bool:
-    """
-    Identify the dataset type based on the input key.
-
-    Args:
-        key (str): The key indicating the dataset type, expected to be in the
-            format "dataset_name.some_other_info".
-
-    Returns:
-        bool: Returns True if the dataset is LAST, False if it is THETA.
-
-    """
     split_key: list[str] = key.split(sep=".")
 
     return split_key[0] == "last"
 
-def create_db_instance(db_name: str, last_dataset: bool = True) ->  scoda_rdbms.RDBMS:
+
+def create_db_instance(db_name: str, last_dataset: bool = True) -> scoda_rdbms.RDBMS:
     if last_dataset:
         match db_name:
             case "db2":
@@ -66,6 +44,7 @@ def create_db_instance(db_name: str, last_dataset: bool = True) ->  scoda_rdbms.
                 sys.exit(100)
 
     else:
+        pass
         # TODO: Implement these database classes
         # match db_name:
         #     case "db2":

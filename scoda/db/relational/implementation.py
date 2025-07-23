@@ -5,68 +5,11 @@ from sqlalchemy import Table, desc, func, select
 from scoda.db.relational.generic import RelationalDB
 
 
-class MariaDB(RelationalDB):
-    def __init__(self) -> None:
-        super().__init__(
-            connection_string="mariadb+pymysql://root:example@localhost:3306/research",
-        )
-
-    def query_groupby_time_window_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None:
-        table: Table = Table(
-            table_name,
-            self.metadata,
-            autoload_with=self.engine,
-        )
-
-    def query_mode_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None:
-        table: Table = Table(
-            table_name,
-            self.metadata,
-            autoload_with=self.engine,
-        )
-
-
-class MySQL(RelationalDB):
-    def __init__(self) -> None:
-        super().__init__(
-            connection_string="mysql+pymysql://root:example@localhost:3307/research"
-        )
-
-    def query_groupby_time_window_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None:
-        table: Table = Table(
-            table_name,
-            self.metadata,
-            autoload_with=self.engine,
-        )
-
-    def query_mode_value(
-        self,
-        table_name: str,
-        column_name: str,
-    ) -> None:
-        table: Table = Table(
-            table_name,
-            self.metadata,
-            autoload_with=self.engine,
-        )
-
-
 class PostgreSQL(RelationalDB):
     def __init__(self) -> None:
         super().__init__(
-            connection_string="postgresql+psycopg2://admin:example@localhost:5432/research"
+            connection_string="postgresql+psycopg2://admin:example@localhost:5432/research",
+            convert_time_column_to_int=True,
         )
 
     def query_groupby_time_window_value(
@@ -111,9 +54,70 @@ class PostgreSQL(RelationalDB):
             connection.close()
 
 
+class GenericMySQL(RelationalDB):
+    def __init__(self, connection_string: str) -> None:
+        super().__init__(
+            connection_string=connection_string,
+            convert_time_column_to_int=False,
+        )
+
+    def query_groupby_time_window_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+    def query_mode_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = (
+                select(
+                    func.date_format(table.c[column_name], "%Y-%m-%d %H:00:00").label(
+                        "hour"
+                    ),
+                    func.avg(table.c[column_name]).label("average_value"),
+                )
+                .group_by("hour")
+                .order_by("hour")
+            )
+            connection.execute(query)
+            connection.close()
+
+
+class MariaDB(GenericMySQL):
+    def __init__(self) -> None:
+        super().__init__(
+            connection_string="mariadb+pymysql://root:example@localhost:3306/research",
+        )
+
+
+class MySQL(GenericMySQL):
+    def __init__(self) -> None:
+        super().__init__(
+            connection_string="mysql+pymysql://root:example@localhost:3307/research",
+        )
+
+
 class GenericSQLite3(RelationalDB):
     def __init__(self, connection_string: str) -> None:
-        super().__init__(connection_string=connection_string)
+        super().__init__(
+            connection_string=connection_string,
+            convert_time_column_to_int=False,
+        )
 
     def query_groupby_time_window_value(
         self,

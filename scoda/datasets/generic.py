@@ -55,7 +55,8 @@ class Dataset:
             sys.exit(1)
 
         data.columns = data.columns.str.replace(pat=" ", repl="_")
-        data[self.time_column] = pd.to_datetime(data[self.time_column], utc=True).apply(
-            lambda x: int(x.timestamp())
+        data[self.time_column] = pd.to_datetime(
+            data[self.time_column],
+            utc=True,
         )
         return data

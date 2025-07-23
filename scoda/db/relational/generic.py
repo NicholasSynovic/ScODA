@@ -3,15 +3,10 @@ from collections.abc import Iterable
 
 import pandas as pd
 from sqlalchemy import (
-    Column,
-    DateTime,
     Engine,
-    Float,
-    Integer,
     MetaData,
     Table,
     create_engine,
-    desc,
     func,
     select,
 )
@@ -21,8 +16,12 @@ import scoda.db
 
 
 class RelationalDB(scoda.db.DB):
-    def __init__(self, connection_string: str) -> None:
-        super().__init__()
+    def __init__(
+        self,
+        connection_string: str,
+        convert_time_column_to_int: bool = False,
+    ) -> None:
+        super().__init__(convert_time_column_to_int=convert_time_column_to_int)
         self.engine: Engine = create_engine(url=connection_string)
         self.metadata: MetaData = MetaData()
 

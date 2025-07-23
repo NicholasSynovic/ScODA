@@ -4,7 +4,8 @@ DATASET_DIR="./benchmark_datasets/LAST_TINY/Power-Provisioning-Dataset"
 BENCHMARK_RESULTS_DIR="./benchmark_results"
 ITERATIONS=1
 
-# # SQLite3 Memory
+# SQLite3 Memory
+echo "===SQLite3 Memory==="
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/sqlite3-memory_last-tiny_$ITERATIONS.sqlite3 \
@@ -12,6 +13,7 @@ scoda last \
     --db sqlite3-memory
 
 # SQLite3
+echo "===SQLite3==="
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/sqlite3_last-tiny_$ITERATIONS.sqlite3 \
@@ -19,26 +21,30 @@ scoda last \
     --db sqlite3
 rm *_last.sqlite3
 
-# # MariaDB
-# scoda last \
-#     --input-dir $DATASET_DIR \
-#     --output $BENCHMARK_RESULTS_DIR/mariadb_last-tiny_$ITERATIONS.sqlite3 \
-#     --iterations $ITERATIONS \
-#     --db mariadb
-
-# # #MySQL
-# scoda last \
-#     --input-dir $DATASET_DIR \
-#     --output $BENCHMARK_RESULTS_DIR/mysql_last-tiny_$ITERATIONS.sqlite3 \
-#     --iterations $ITERATIONS \
-#     --db mysql
 
 # PostgreSQL
+echo "===PostgreSQL==="
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/postgresql_last-tiny_$ITERATIONS.sqlite3 \
     --iterations $ITERATIONS \
     --db postgres
+
+# MySQL
+echo "===MySQL==="
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/mysql_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db mysql
+
+# MariaDB
+echo "===MariaDB==="
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/mariadb_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db mariadb
 
 # # CouchDB
 # scoda last \

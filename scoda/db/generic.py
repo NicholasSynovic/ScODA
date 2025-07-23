@@ -4,8 +4,8 @@ import scoda.datasets.generic
 
 
 class DB(ABC):
-    def __init__(self) -> None:
-        pass
+    def __init__(self, convert_time_column_to_int: bool = False) -> None:
+        self.convert_time_column_to_int: bool = convert_time_column_to_int
 
     @abstractmethod
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None: ...

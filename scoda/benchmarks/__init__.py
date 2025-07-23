@@ -22,6 +22,17 @@ def run_benchmarks(
     datasets: Iterable[scoda.datasets.generic.Dataset],
     iterations: int,
 ) -> None:
+    # Change the type of the time column
+    if test_db.convert_time_column_to_int:
+        ds: scoda.datasets.generic.Dataset
+        for ds in datasets:
+            ds.data[ds.time_column] = ds.data[ds.time_column].apply(
+                lambda x: int(x.timestamp())
+            )
+
+    # Clear existing data
+    test_db.delete()
+
     # Ingress benchmarks
     scoda_benchmarks_ingress.batch_write_all_tables(
         test_db=test_db,

@@ -15,13 +15,23 @@ class MariaDB(RelationalDB):
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
 
     def query_mode_value(
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
 
 
 class MySQL(RelationalDB):
@@ -34,13 +44,23 @@ class MySQL(RelationalDB):
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
 
     def query_mode_value(
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
 
 
 class PostgreSQL(RelationalDB):
@@ -53,13 +73,42 @@ class PostgreSQL(RelationalDB):
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = (
+                select(
+                    func.date_trunc(
+                        "hour", func.to_timestamp(table.c[column_name])
+                    ).label("hour"),
+                    func.avg(table.c[column_name]).label("average_value"),
+                )
+                .group_by("hour")
+                .order_by("hour")
+            )
+            connection.execute(query)
+            connection.close()
 
     def query_mode_value(
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = select(func.mode().within_group(table.c[column_name]))
+            connection.execute(query)
+            connection.close()
 
 
 class GenericSQLite3(RelationalDB):

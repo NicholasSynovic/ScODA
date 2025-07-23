@@ -44,6 +44,7 @@ class Dataset:
     def _create_json_data(self) -> list[dict]:
         json_data: DataFrame = self.data.copy()
         json_data["name"] = self.name
+        json_data[self.time_column] = json_data[self.time_column].apply(str)
         return json_data.to_dict(orient="records")
 
     def read(self) -> DataFrame:
@@ -54,4 +55,7 @@ class Dataset:
             sys.exit(1)
 
         data.columns = data.columns.str.replace(pat=" ", repl="_")
+        data[self.time_column] = pd.to_datetime(data[self.time_column], utc=True).apply(
+            lambda x: int(x.timestamp())
+        )
         return data

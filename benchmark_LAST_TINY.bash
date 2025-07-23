@@ -19,8 +19,6 @@ scoda last \
     --output $BENCHMARK_RESULTS_DIR/sqlite3_last-tiny_$ITERATIONS.sqlite3 \
     --iterations $ITERATIONS \
     --db sqlite3
-rm *_last.sqlite3
-
 
 # PostgreSQL
 echo "===PostgreSQL==="

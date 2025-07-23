@@ -93,10 +93,6 @@ class RelationalDB(scoda.db.DB):
     @abstractmethod
     def query_mode_value(self, table_name: str, column_name: str) -> None: ...
 
-    def recreate(self) -> None:
-        self.delete()
-        self.create()
-
     def sequential_read(self, table_name: str, rows: int) -> None:
         dfs: Iterable[pd.DataFrame] = pd.read_sql_table(
             table_name=table_name,

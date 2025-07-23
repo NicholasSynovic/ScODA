@@ -1,7 +1,4 @@
 from abc import abstractmethod
-from collections.abc import Iterable
-
-import pandas as pd
 
 import scoda.datasets.generic
 import scoda.db
@@ -10,7 +7,6 @@ import scoda.db
 class DocumentDB(scoda.db.DB):
     def __init__(
         self,
-        connection_string: str,
         convert_time_column_to_int: bool = False,
     ) -> None:
         super().__init__(convert_time_column_to_int=convert_time_column_to_int)
@@ -49,10 +45,6 @@ class DocumentDB(scoda.db.DB):
 
     @abstractmethod
     def query_mode_value(self, table_name: str, column_name: str) -> None: ...
-
-    def recreate(self) -> None:
-        self.delete()
-        self.create()
 
     @abstractmethod
     def sequential_read(self, table_name: str, rows: int) -> None: ...

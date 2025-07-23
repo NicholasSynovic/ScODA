@@ -42,7 +42,9 @@ class DB(ABC):
     @abstractmethod
     def query_mode_value(self, table_name: str, column_name: str) -> None: ...
 
-    def recreate(self) -> None: ...
+    def recreate(self) -> None:
+        self.delete()
+        self.create()
 
     @abstractmethod
     def sequential_read(self, table_name: str, rows: int) -> None: ...

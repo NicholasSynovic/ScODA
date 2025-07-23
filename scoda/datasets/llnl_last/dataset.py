@@ -1,10 +1,10 @@
 from collections.abc import Iterable
 from pathlib import Path
 
-import scoda.datasets
+import scoda.datasets.generic
 
 
-class CoriPower(scoda.datasets.Dataset):
+class CoriPower(scoda.datasets.generic.Dataset):
     """
     Dataset class for Cori Power data.
 
@@ -22,7 +22,7 @@ class CoriPower(scoda.datasets.Dataset):
         )
 
 
-class HawkPower(scoda.datasets.Dataset):
+class HawkPower(scoda.datasets.generic.Dataset):
     """
     Dataset class for Hawk Power data.
 
@@ -40,7 +40,7 @@ class HawkPower(scoda.datasets.Dataset):
         )
 
 
-class HPCGDPC(scoda.datasets.Dataset):
+class HPCGDPC(scoda.datasets.generic.Dataset):
     """
     Dataset class for HPCG DPC data.
 
@@ -58,7 +58,7 @@ class HPCGDPC(scoda.datasets.Dataset):
         )
 
 
-class HPCGSPC(scoda.datasets.Dataset):
+class HPCGSPC(scoda.datasets.generic.Dataset):
     """
     Dataset class for HPCG SPC data.
 
@@ -76,7 +76,7 @@ class HPCGSPC(scoda.datasets.Dataset):
         )
 
 
-class HPCGUC(scoda.datasets.Dataset):
+class HPCGUC(scoda.datasets.generic.Dataset):
     """
     Dataset class for HPCG UC data.
 
@@ -94,7 +94,7 @@ class HPCGUC(scoda.datasets.Dataset):
         )
 
 
-class HPLDPC(scoda.datasets.Dataset):
+class HPLDPC(scoda.datasets.generic.Dataset):
     """
     Dataset class for HPL DPC data.
 
@@ -112,7 +112,7 @@ class HPLDPC(scoda.datasets.Dataset):
         )
 
 
-class HPLSPC(scoda.datasets.Dataset):
+class HPLSPC(scoda.datasets.generic.Dataset):
     """
     Dataset class for HPL SPC data.
 
@@ -130,7 +130,7 @@ class HPLSPC(scoda.datasets.Dataset):
         )
 
 
-class HPLUC(scoda.datasets.Dataset):
+class HPLUC(scoda.datasets.generic.Dataset):
     """
     Dataset class for HPL UC data.
 
@@ -148,7 +148,7 @@ class HPLUC(scoda.datasets.Dataset):
         )
 
 
-class LumiHPCG(scoda.datasets.Dataset):
+class LumiHPCG(scoda.datasets.generic.Dataset):
     """
     Dataset class for Lumi HPCG data.
 
@@ -166,7 +166,7 @@ class LumiHPCG(scoda.datasets.Dataset):
         )
 
 
-class LumiPower(scoda.datasets.Dataset):
+class LumiPower(scoda.datasets.generic.Dataset):
     """
     Dataset class for Lumi Power data.
 
@@ -184,7 +184,7 @@ class LumiPower(scoda.datasets.Dataset):
         )
 
 
-class Marconi100Power(scoda.datasets.Dataset):
+class Marconi100Power(scoda.datasets.generic.Dataset):
     """
     Dataset class for Marconi100 Power data.
 
@@ -202,7 +202,7 @@ class Marconi100Power(scoda.datasets.Dataset):
         )
 
 
-class PerlmutterPower(scoda.datasets.Dataset):
+class PerlmutterPower(scoda.datasets.generic.Dataset):
     """
     Dataset class for Perlmutter Power data.
 
@@ -220,7 +220,7 @@ class PerlmutterPower(scoda.datasets.Dataset):
         )
 
 
-def load_llnl_last(directory: Path) -> Iterable[scoda.datasets.Dataset]:
+def load_llnl_last(directory: Path) -> Iterable[scoda.datasets.generic.Dataset]:
     return [
         CoriPower(directory=directory),
         HawkPower(directory=directory),

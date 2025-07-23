@@ -6,26 +6,26 @@ Copyright 2025 (C) Nicholas M. Synovic
 """
 
 from collections import defaultdict
+from collections.abc import Iterable
 from time import time
 
 from pandas import DataFrame
 from progress.bar import Bar
 
-import scoda.datasets as scoda_dataset
-import scoda.db as scoda_db
-import scoda.db.results as scoda_results
+import scoda.datasets.generic
+import scoda.db
 
 
 def batch_read_all_tables(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     data = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
             test_db.batch_read(table_name=ds.name)
 
@@ -51,14 +51,14 @@ def batch_read_all_tables(
 
 
 def batch_read_individual_tables(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
-    def _run(ds: scoda_dataset.Dataset) -> None:
+    def _run(ds: scoda.datasets.generic.Dataset) -> None:
         test_db.batch_read(table_name=ds.name)
 
     with Bar(
@@ -66,7 +66,7 @@ def batch_read_individual_tables(
         max=iterations,
     ) as bar:
         for _ in range(iterations):
-            dataset: scoda_dataset.Dataset
+            dataset: scoda.datasets.generic.Dataset
             for dataset in datasets:
                 start_time: float = time()
                 _run(ds=dataset)
@@ -85,15 +85,15 @@ def batch_read_individual_tables(
 
 
 def sequential_read_all_tables(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
             test_db.sequential_read(table_name=ds.name, rows=1)
 
@@ -119,14 +119,14 @@ def sequential_read_all_tables(
 
 
 def sequential_read_individual_tables(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
-    def _run(ds: scoda_dataset.Dataset) -> None:
+    def _run(ds: scoda.datasets.generic.Dataset) -> None:
         test_db.sequential_read(table_name=ds.name, rows=1)
 
     with Bar(
@@ -134,7 +134,7 @@ def sequential_read_individual_tables(
         max=iterations,
     ) as bar:
         for _ in range(iterations):
-            dataset: scoda_dataset.Dataset
+            dataset: scoda.datasets.generic.Dataset
             for dataset in datasets:
                 start_time: float = time()
                 _run(ds=dataset)

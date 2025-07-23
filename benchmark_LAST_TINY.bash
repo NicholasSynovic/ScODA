@@ -5,11 +5,11 @@ BENCHMARK_RESULTS_DIR="./benchmark_results"
 ITERATIONS=1
 
 # # SQLite3 Memory
-# scoda last \
-#     --input-dir $DATASET_DIR \
-#     --output $BENCHMARK_RESULTS_DIR/sqlite3-memory_last-tiny_$ITERATIONS.sqlite3 \
-#     --iterations $ITERATIONS \
-#     --db sqlite3-memory
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/sqlite3-memory_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db sqlite3-memory
 
 # # SQLite3
 # scoda last \
@@ -33,12 +33,12 @@ ITERATIONS=1
 #     --iterations $ITERATIONS \
 #     --db mysql
 
-# PostgreSQL
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/postgresql_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db postgres
+# # PostgreSQL
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/postgresql_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db postgres
 
 # # CouchDB
 # scoda last \

@@ -9,9 +9,12 @@ import sys
 from collections.abc import Iterable
 from typing import Any
 
-import scoda.datasets
+import scoda.datasets.anl_theta
+import scoda.datasets.anl_theta.dataset
+import scoda.datasets.generic
+import scoda.datasets.llnl_last.dataset
+import scoda.db
 import scoda.db as scoda_db
-import scoda.db.results as scoda_results
 from scoda.benchmarks import run_benchmarks
 from scoda.cli import CLI
 from scoda.utils import create_db_instance, identify_input
@@ -24,18 +27,22 @@ def main() -> int:
     arg_keys: list[str] = list(args.keys())
 
     # Create results db connection
-    results_db: scoda_results.Results = scoda_results.Results(
+    results_db: scoda.db.Results = scoda.db.Results(
         fp=args["output"][0],
     )
 
     # Load the dataset
     dataset_name: str = identify_input(key=arg_keys[0])
-    datasets: Iterable[scoda.datasets.Dataset]
+    datasets: Iterable[scoda.datasets.generic.Dataset]
     match dataset_name:
         case "last":
-            datasets = scoda.datasets.load_llnl_last(directory=args["last.input"][0])
+            datasets = scoda.datasets.llnl_last.dataset.load_llnl_last(
+                directory=args["last.input"][0]
+            )
         case "theta":
-            datasets = scoda.datasets.load_anl_theta(directory=args["theta.input"][0])
+            datasets = scoda.datasets.anl_theta.dataset.load_anl_theta(
+                directory=args["theta.input"][0]
+            )
         case _:
             sys.exit(1)
 

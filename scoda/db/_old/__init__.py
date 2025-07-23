@@ -6,7 +6,7 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 from abc import ABC, abstractmethod
 
-import scoda.datasets as scoda_datasets
+import scoda.datasets.generic
 from scoda.db.results import Results
 
 
@@ -49,7 +49,7 @@ class DB(ABC):
         self.database: str = database
 
     @abstractmethod
-    def batch_upload(self, data: scoda_datasets.Dataset) -> None:
+    def batch_upload(self, data: scoda.datasets.generic.Dataset) -> None:
         """
         Upload all documents in one pass.
 
@@ -57,7 +57,7 @@ class DB(ABC):
         uploaded in a batch to the database.
 
         Args:
-            data (scoda_datasets.Dataset): The data to be uploaded.
+            data (scoda.datasets.generic.Dataset): The data to be uploaded.
 
         """
         ...
@@ -149,7 +149,7 @@ class DB(ABC):
         ...
 
     @abstractmethod
-    def sequential_upload(self, data: scoda_datasets.Dataset) -> None:
+    def sequential_upload(self, data: scoda.datasets.generic.Dataset) -> None:
         """
         Upload documents one by one.
 
@@ -157,7 +157,7 @@ class DB(ABC):
         uploaded sequentially to the database.
 
         Args:
-            data (scoda_datasets.Dataset): The data to be uploaded.
+            data (scoda.datasets.generic.Dataset): The data to be uploaded.
 
         """
         ...

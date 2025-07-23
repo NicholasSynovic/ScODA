@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from sqlalchemy import Table, func, select
+
 from scoda.db.relational.generic import Relational
 
 
@@ -74,7 +76,34 @@ class GenericSQLite3(Relational):
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = select(func.mode(table.c[column_name]))
+            connection.execute(query)
+            connection.close()
+            # try:
+            #     connection.execute(query)
+            # except (OperationalError, ProgrammingError):
+            #     subquery = (
+            #         select(
+            #             table.c[column_name],
+            #             func.count(table.c[column_name]).label("count"),
+            #         )
+            #         .group_by(table.c[column_name])
+            #         .subquery()
+            #     )
+
+            #     query = (
+            #         select(subquery.c[column_name])
+            #         .order_by(desc(subquery.c.count))
+            #         .limit(1)
+            #     )
 
 
 class InMemorySQLite3(GenericSQLite3):

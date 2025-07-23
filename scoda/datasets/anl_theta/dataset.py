@@ -1,10 +1,10 @@
 from collections.abc import Iterator
 from pathlib import Path
 
-import scoda.datasets
+import scoda.datasets.generic
 
 
-class Theta(scoda.datasets.Dataset):
+class Theta(scoda.datasets.generic.Dataset):
     def __init__(self, fp: Path, name: str = "anl_theta_0") -> None:
         super().__init__(
             name=name,
@@ -14,7 +14,7 @@ class Theta(scoda.datasets.Dataset):
         )
 
 
-def load_anl_theta(directory: Path) -> Iterator[scoda.datasets.Dataset]:
+def load_anl_theta(directory: Path) -> Iterator[scoda.datasets.generic.Dataset]:
     fps: list[Path] = [
         Path(directory, fp).resolve() for fp in Path(directory).iterdir()
     ]

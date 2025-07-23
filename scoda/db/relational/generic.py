@@ -16,7 +16,7 @@ from sqlalchemy import (
     select,
 )
 
-import scoda.datasets
+import scoda.datasets.generic
 import scoda.db
 
 
@@ -26,7 +26,7 @@ class Relational(scoda.db.DB):
         self.engine: Engine = create_engine(url=connection_string)
         self.metadata: MetaData = MetaData()
 
-    def batch_upload(self, dataset: scoda.datasets.Dataset) -> None:
+    def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
         dataset.data.to_sql(
             name=dataset.name,
             con=self.engine,
@@ -109,7 +109,7 @@ class Relational(scoda.db.DB):
         for df in dfs:
             df.isna()
 
-    def sequential_upload(self, dataset: scoda.datasets.Dataset) -> None:
+    def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
         dataset.data.to_sql(
             name=dataset.name,
             con=self.engine,

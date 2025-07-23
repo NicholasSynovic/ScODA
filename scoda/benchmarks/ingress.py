@@ -12,25 +12,24 @@ from time import time
 from pandas import DataFrame
 from progress.bar import Bar
 
-import scoda.datasets as scoda_dataset
-import scoda.db.results as scoda_results
-from scoda.db import DB
+import scoda.datasets.generic
+import scoda.db
 
 
 def batch_write_all_tables(
-    test_db: DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     # TODO: Add different code paths for relational, time series, document, etc.
     # databases
     data = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
-            test_db.batch_upload(data=ds)
+            test_db.batch_upload(dataset=ds)
 
     with Bar(
         "Benchmarking writing all tables to the database...",
@@ -54,22 +53,22 @@ def batch_write_all_tables(
 
 
 def batch_write_individual_tables(
-    test_db: DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
-    def _run(ds: scoda_dataset.Dataset) -> None:
-        test_db.batch_upload(data=ds)
+    def _run(ds: scoda.datasets.generic.Dataset) -> None:
+        test_db.batch_upload(dataset=ds)
 
     with Bar(
         "Benchmarking writing individual tables to database...",
         max=iterations,
     ) as bar:
         for _ in range(iterations):
-            dataset: scoda_dataset.Dataset
+            dataset: scoda.datasets.generic.Dataset
             for dataset in datasets:
                 start_time: float = time()
                 _run(ds=dataset)
@@ -88,17 +87,17 @@ def batch_write_individual_tables(
 
 
 def sequential_write_all_tables(
-    test_db: DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
-            test_db.sequential_upload(data=ds)
+            test_db.sequential_upload(dataset=ds)
 
     with Bar(
         "Benchmarking writing all tables to the database one row at a time...",
@@ -122,22 +121,22 @@ def sequential_write_all_tables(
 
 
 def sequential_write_individual_tables(
-    test_db: DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     data: dict[str, list[float]] = defaultdict(list)
 
-    def _run(ds: scoda_dataset.Dataset) -> None:
-        test_db.sequential_upload(data=ds)
+    def _run(ds: scoda.datasets.generic.Dataset) -> None:
+        test_db.sequential_upload(dataset=ds)
 
     with Bar(
         "Benchmarking writing sequential row writing per table",
         max=iterations,
     ) as bar:
         for _ in range(iterations):
-            dataset: scoda_dataset.Dataset
+            dataset: scoda.datasets.generic.Dataset
             for dataset in datasets:
                 start_time: float = time()
                 _run(ds=dataset)

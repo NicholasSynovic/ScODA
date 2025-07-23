@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-import scoda.datasets
+import scoda.datasets.generic
 
 
 class DB(ABC):
@@ -8,7 +8,7 @@ class DB(ABC):
         pass
 
     @abstractmethod
-    def batch_upload(self, dataset: scoda.datasets.Dataset) -> None: ...
+    def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None: ...
 
     @abstractmethod
     def batch_read(self, table_name: str) -> None: ...
@@ -48,4 +48,4 @@ class DB(ABC):
     def sequential_read(self, table_name: str, rows: int) -> None: ...
 
     @abstractmethod
-    def sequential_upload(self, dataset: scoda.datasets.Dataset) -> None: ...
+    def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None: ...

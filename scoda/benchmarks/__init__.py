@@ -10,17 +10,16 @@ from collections.abc import Iterable
 import scoda.benchmarks.aggregation as scoda_benchmarks_aggregation
 import scoda.benchmarks.egress as scoda_benchmarks_egress
 import scoda.benchmarks.ingress as scoda_benchmarks_ingress
-import scoda.datasets as scoda_datasets
-import scoda.db as scoda_db
-import scoda.db.results as scoda_db_results
+import scoda.datasets.generic
+import scoda.db
 
 __all__: list[str] = ["run_benchmarks"]
 
 
 def run_benchmarks(
-    test_db: scoda_db.DB,
-    results_db: scoda_db_results.Results,
-    datasets: Iterable[scoda_datasets.Dataset],
+    test_db: scoda.db.DB,
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
     iterations: int,
 ) -> None:
     # Ingress benchmarks
@@ -89,12 +88,12 @@ def run_benchmarks(
         datasets=datasets,
     )
 
-    scoda_benchmarks_aggregation.query_groupby_time_window(
-        test_db=test_db,
-        iterations=iterations,
-        results_db=results_db,
-        datasets=datasets,
-    )
+    # scoda_benchmarks_aggregation.query_groupby_time_window(
+    #     test_db=test_db,
+    #     iterations=iterations,
+    #     results_db=results_db,
+    #     datasets=datasets,
+    # )
 
     scoda_benchmarks_aggregation.query_max_value(
         test_db=test_db,

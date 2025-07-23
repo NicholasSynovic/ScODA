@@ -6,27 +6,27 @@ Copyright 2025 (C) Nicholas M. Synovic
 """
 
 from collections import defaultdict
+from collections.abc import Iterable
 from time import time
 
 from pandas import DataFrame
 from progress.bar import Bar
 
-import scoda.datasets as scoda_dataset
-import scoda.db as scoda_db
-import scoda.db.results as scoda_results
+import scoda.datasets.generic
+import scoda.db
 
 
 def query_min_value(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     # FIXME: Make this benchmark functional
     data = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
             test_db.query_min_value(table_name=ds.name, column_name=ds.query_column)
 
@@ -52,16 +52,16 @@ def query_min_value(
 
 
 def query_max_value(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     # FIXME: Make this benchmark functional
     data = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
             test_db.query_max_value(
                 table_name=ds.name,
@@ -90,16 +90,16 @@ def query_max_value(
 
 
 def query_average_value(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     # FIXME: Make this benchmark functional
     data = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
             test_db.query_average_value(
                 table_name=ds.name,
@@ -128,15 +128,15 @@ def query_average_value(
 
 
 def query_mode_value(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     data = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
             test_db.query_mode_value(
                 table_name=ds.name,
@@ -165,16 +165,16 @@ def query_mode_value(
 
 
 def query_groupby_time_window(
-    test_db: scoda_db.DB,
+    test_db: scoda.db.DB,
     iterations: int,
-    results_db: scoda_results.Results,
-    datasets: Iterable[scoda_dataset.Dataset],
+    results_db: scoda.db.Results,
+    datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
     # FIXME: Make this benchmark functional
     data = defaultdict(list)
 
     def _run() -> None:
-        ds: scoda_dataset.Dataset
+        ds: scoda.datasets.generic.Dataset
         for ds in datasets:
             test_db.query_groupby_time_window_value(
                 table_name=ds.name,

@@ -9,8 +9,10 @@ import sys
 from pathlib import Path
 from time import time
 
+import scoda.db.document.generic
+import scoda.db.document.implementation
 import scoda.db.relational.generic
-import scoda.db.relational.implementation as scoda_rdbms_engines
+import scoda.db.relational.implementation
 
 
 def resolve_path(filepath: str) -> Path:
@@ -25,21 +27,25 @@ def identify_input(key: str) -> str:
 
 def create_db_instance(
     db_name: str, last_dataset: bool = True
-) -> scoda.db.relational.generic.RelationalDB:
+) -> scoda.db.relational.generic.RelationalDB | scoda.db.document.generic.DocumentDB:
     if last_dataset:
         match db_name:
             # case "db2":
             #     return scoda_rdbms_engines.DB2()
             case "mariadb":
-                return scoda_rdbms_engines.MariaDB()
+                return scoda.db.relational.implementation.MariaDB()
             case "mysql":
-                return scoda_rdbms_engines.MySQL()
+                return scoda.db.relational.implementation.MySQL()
             case "postgres":
-                return scoda_rdbms_engines.PostgreSQL()
+                return scoda.db.relational.implementation.PostgreSQL()
             case "sqlite3":
-                return scoda_rdbms_engines.SQLite3(fp=Path(f"{time()}.sqlite3"))
+                return scoda.db.relational.implementation.SQLite3(
+                    fp=Path(f"{time()}.sqlite3"),
+                )
             case "sqlite3-memory":
-                return scoda_rdbms_engines.InMemorySQLite3()
+                return scoda.db.relational.implementation.InMemorySQLite3()
+            case "couchdb":
+                return scoda.db.document.implementation.CouchDB()
             case _:
                 sys.exit(100)
 

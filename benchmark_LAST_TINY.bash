@@ -44,12 +44,13 @@ scoda last \
     --iterations $ITERATIONS \
     --db mariadb
 
-# # CouchDB
-# scoda last \
-#     --input-dir $DATASET_DIR \
-#     --output $BENCHMARK_RESULTS_DIR/couchdb_last-tiny_$ITERATIONS.sqlite3 \
-#     --iterations $ITERATIONS \
-#     --db couchdb
+# CouchDB
+echo "===CouchDB==="
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/couchdb_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db couchdb
 
 # # MongoDB
 # scoda last \

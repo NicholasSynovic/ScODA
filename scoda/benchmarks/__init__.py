@@ -31,7 +31,7 @@ def run_benchmarks(
             )
 
     # Clear existing data
-    test_db.delete()
+    test_db.recreate()
 
     # Ingress benchmarks
     scoda_benchmarks_ingress.batch_write_all_tables(

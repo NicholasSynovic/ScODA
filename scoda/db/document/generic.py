@@ -7,7 +7,7 @@ import scoda.db
 class DocumentDB(scoda.db.DB):
     def __init__(
         self,
-        convert_time_column_to_int: bool = False,
+        convert_time_column_to_int: bool = True,
     ) -> None:
         super().__init__(convert_time_column_to_int=convert_time_column_to_int)
 

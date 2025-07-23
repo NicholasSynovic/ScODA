@@ -22,6 +22,8 @@ class Dataset:
         )
 
         self.data: DataFrame = self.read()  # Unformatted data
+        self.data_size: int = self.data.shape[0]
+
         self.time_series_data: DataFrame = (
             self._create_time_series_data()
         )  # time series formatted data
@@ -45,6 +47,7 @@ class Dataset:
         json_data: DataFrame = self.data.copy()
         json_data["name"] = self.name
         json_data[self.time_column] = json_data[self.time_column].apply(str)
+        json_data["id"] = json_data.index
         return json_data.to_dict(orient="records")
 
     def read(self) -> DataFrame:

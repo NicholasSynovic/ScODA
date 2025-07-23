@@ -9,8 +9,8 @@ import sys
 from pathlib import Path
 from time import time
 
-import scoda.db.relational as scoda_rdbms
-import scoda.db.relational.engines as scoda_rdbms_engines
+import scoda.db.relational.generic
+import scoda.db.relational.implementation as scoda_rdbms_engines
 
 
 def resolve_path(filepath: str) -> Path:
@@ -23,23 +23,23 @@ def identify_input(key: str) -> str:
     return split_key[0]
 
 
-def create_db_instance(db_name: str, last_dataset: bool = True) -> scoda_rdbms.RDBMS:
+def create_db_instance(
+    db_name: str, last_dataset: bool = True
+) -> scoda.db.relational.generic.RelationalDB:
     if last_dataset:
         match db_name:
-            case "db2":
-                return scoda_rdbms_engines.DB2_LAST()
+            # case "db2":
+            #     return scoda_rdbms_engines.DB2()
             case "mariadb":
-                return scoda_rdbms_engines.MariaDB_LAST()
+                return scoda_rdbms_engines.MariaDB()
             case "mysql":
-                return scoda_rdbms_engines.MySQL_LAST()
+                return scoda_rdbms_engines.MySQL()
             case "postgres":
-                return scoda_rdbms_engines.PostgreSQL_LAST()
+                return scoda_rdbms_engines.PostgreSQL()
             case "sqlite3":
-                return scoda_rdbms_engines.SQLite3_LAST(
-                    fp=Path(f"{time()}_last.sqlite3")
-                )
+                return scoda_rdbms_engines.SQLite3(fp=Path(f"{time()}.sqlite3"))
             case "sqlite3-memory":
-                return scoda_rdbms_engines.InMemorySQLite3_LAST()
+                return scoda_rdbms_engines.InMemorySQLite3()
             case _:
                 sys.exit(100)
 

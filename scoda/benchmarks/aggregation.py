@@ -39,7 +39,7 @@ def query_min_value(
             _run()
             end_time: float = time()
             data["seconds"].append(end_time - start_time)
-            test_db.recreate()
+
             bar.next()
 
     df: DataFrame = DataFrame(data=data)
@@ -77,7 +77,7 @@ def query_max_value(
             _run()
             end_time: float = time()
             data["seconds"].append(end_time - start_time)
-            test_db.recreate()
+
             bar.next()
 
     df: DataFrame = DataFrame(data=data)
@@ -115,7 +115,7 @@ def query_average_value(
             _run()
             end_time: float = time()
             data["seconds"].append(end_time - start_time)
-            test_db.recreate()
+
             bar.next()
 
     df: DataFrame = DataFrame(data=data)
@@ -152,7 +152,7 @@ def query_mode_value(
             _run()
             end_time: float = time()
             data["seconds"].append(end_time - start_time)
-            test_db.recreate()
+
             bar.next()
 
     df: DataFrame = DataFrame(data=data)
@@ -190,7 +190,7 @@ def query_groupby_time_window(
             _run()
             end_time: float = time()
             data["seconds"].append(end_time - start_time)
-            test_db.recreate()
+
             bar.next()
 
     df: DataFrame = DataFrame(data=data)

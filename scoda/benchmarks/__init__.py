@@ -51,6 +51,10 @@ def run_benchmarks(
         datasets=datasets,
     )
 
+    # Garuentee that data is present
+    for dataset in datasets:
+        test_db.batch_upload(dataset=dataset)
+
     # Egress benchmarks
     scoda_benchmarks_egress.batch_read_all_tables(
         test_db=test_db,

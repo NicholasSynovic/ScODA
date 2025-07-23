@@ -20,13 +20,14 @@ import scoda.datasets.generic
 import scoda.db
 
 
-class Relational(scoda.db.DB):
+class RelationalDB(scoda.db.DB):
     def __init__(self, connection_string: str) -> None:
         super().__init__()
         self.engine: Engine = create_engine(url=connection_string)
         self.metadata: MetaData = MetaData()
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        print(dataset.name)
         dataset.data.to_sql(
             name=dataset.name,
             con=self.engine,

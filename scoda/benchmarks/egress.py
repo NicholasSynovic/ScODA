@@ -38,7 +38,6 @@ def batch_read_all_tables(
             _run()
             end_time: float = time()
             data["seconds"].append(end_time - start_time)
-            test_db.recreate()
             bar.next()
 
     df: DataFrame = DataFrame(data=data)
@@ -72,7 +71,7 @@ def batch_read_individual_tables(
                 _run(ds=dataset)
                 end_time: float = time()
                 data[dataset.name].append(end_time - start_time)
-            test_db.recreate()
+
             bar.next()
 
     df: DataFrame = DataFrame(data=data)
@@ -105,7 +104,7 @@ def sequential_read_all_tables(
             start_time: float = time()
             _run()
             end_time: float = time()
-            test_db.recreate()
+
             data["seconds"].append(end_time - start_time)
             bar.next()
 
@@ -140,7 +139,7 @@ def sequential_read_individual_tables(
                 _run(ds=dataset)
                 end_time: float = time()
                 data[dataset.name].append(end_time - start_time)
-            test_db.recreate()
+
             bar.next()
 
     df: DataFrame = DataFrame(data=data)

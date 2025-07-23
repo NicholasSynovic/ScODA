@@ -48,8 +48,6 @@ def main() -> int:
 
     # Create test db connection
     test_db: scoda_db.DB = create_db_instance(db_name=args["db"][0])
-    if test_db.uri is False:
-        sys.exit(2)
 
     # Run benchmarks
     run_benchmarks(

@@ -2,10 +2,10 @@ from pathlib import Path
 
 from sqlalchemy import Table, func, select
 
-from scoda.db.relational.generic import Relational
+from scoda.db.relational.generic import RelationalDB
 
 
-class MariaDB(Relational):
+class MariaDB(RelationalDB):
     def __init__(self) -> None:
         super().__init__(
             connection_string="mariadb+pymysql://root:example@localhost:3306/research",
@@ -24,7 +24,7 @@ class MariaDB(Relational):
     ) -> None: ...
 
 
-class MySQLDB(Relational):
+class MySQL(RelationalDB):
     def __init__(self) -> None:
         super().__init__(
             connection_string="mysql+pymysql://root:example@localhost:3307/research"
@@ -43,7 +43,7 @@ class MySQLDB(Relational):
     ) -> None: ...
 
 
-class PostgreSQL(Relational):
+class PostgreSQL(RelationalDB):
     def __init__(self) -> None:
         super().__init__(
             connection_string="postgresql+psycopg2://admin:example@localhost:5432/research"
@@ -62,7 +62,7 @@ class PostgreSQL(Relational):
     ) -> None: ...
 
 
-class GenericSQLite3(Relational):
+class GenericSQLite3(RelationalDB):
     def __init__(self, connection_string: str) -> None:
         super().__init__(connection_string=connection_string)
 

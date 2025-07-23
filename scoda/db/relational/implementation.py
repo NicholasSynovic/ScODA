@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from sqlalchemy import Table, func, select
+from sqlalchemy import Table, desc, func, select
 
 from scoda.db.relational.generic import RelationalDB
 
@@ -70,7 +70,26 @@ class GenericSQLite3(RelationalDB):
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        table: Table = Table(
+            table_name,
+            self.metadata,
+            autoload_with=self.engine,
+        )
+
+        with self.engine.connect() as connection:
+            query = (
+                select(
+                    func.strftime("%Y-%m-%d %H:00:00", table.c[column_name]).label(
+                        "hour"
+                    ),
+                    func.avg(table.c[column_name]).label("average_value"),
+                )
+                .group_by("hour")
+                .order_by("hour")
+            )
+            connection.execute(query)
+            connection.close()
 
     def query_mode_value(
         self,
@@ -84,26 +103,22 @@ class GenericSQLite3(RelationalDB):
         )
 
         with self.engine.connect() as connection:
-            query = select(func.mode(table.c[column_name]))
+            subquery = (
+                select(
+                    table.c[column_name],
+                    func.count(table.c[column_name]).label("count"),
+                )
+                .group_by(table.c[column_name])
+                .subquery()
+            )
+
+            query = (
+                select(subquery.c[column_name])
+                .order_by(desc(subquery.c.count))
+                .limit(1)
+            )
             connection.execute(query)
             connection.close()
-            # try:
-            #     connection.execute(query)
-            # except (OperationalError, ProgrammingError):
-            #     subquery = (
-            #         select(
-            #             table.c[column_name],
-            #             func.count(table.c[column_name]).label("count"),
-            #         )
-            #         .group_by(table.c[column_name])
-            #         .subquery()
-            #     )
-
-            #     query = (
-            #         select(subquery.c[column_name])
-            #         .order_by(desc(subquery.c.count))
-            #         .limit(1)
-            #     )
 
 
 class InMemorySQLite3(GenericSQLite3):

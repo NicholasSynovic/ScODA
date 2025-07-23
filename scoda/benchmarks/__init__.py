@@ -92,12 +92,12 @@ def run_benchmarks(
         datasets=datasets,
     )
 
-    # scoda_benchmarks_aggregation.query_groupby_time_window(
-    #     test_db=test_db,
-    #     iterations=iterations,
-    #     results_db=results_db,
-    #     datasets=datasets,
-    # )
+    scoda_benchmarks_aggregation.query_groupby_time_window(
+        test_db=test_db,
+        iterations=iterations,
+        results_db=results_db,
+        datasets=datasets,
+    )
 
     scoda_benchmarks_aggregation.query_max_value(
         test_db=test_db,

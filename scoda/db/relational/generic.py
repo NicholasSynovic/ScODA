@@ -27,7 +27,6 @@ class RelationalDB(scoda.db.DB):
         self.metadata: MetaData = MetaData()
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
-        print(dataset.name)
         dataset.data.to_sql(
             name=dataset.name,
             con=self.engine,

@@ -22,6 +22,7 @@ class Dataset:
         )
 
         self.data: DataFrame = self.read()  # Unformatted data
+        self.data = self.data.fillna(value=-1)
         self.data_size: int = self.data.shape[0]
 
         self.time_series_data: DataFrame = (

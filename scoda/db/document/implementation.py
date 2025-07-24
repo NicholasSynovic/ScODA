@@ -19,7 +19,7 @@ class CouchDB(DocumentDB):
         self.create()
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
-        resp = requests.post(
+        requests.post(
             url=f"{self.uri}/_bulk_docs",
             auth=self.auth,
             headers=self.headers,
@@ -61,7 +61,11 @@ class CouchDB(DocumentDB):
             timeout=600,
         )
 
-        pd.DataFrame(data=resp.json())["rows"][0]
+        docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
+        data: pd.DataFrame = pd.DataFrame(data=docs)
+        table: pd.DataFrame = data[data["name"] == table_name]
+        column: pd.Series = table[column_name]
+        column.mean()
 
     def query_groupby_time_window_value(
         self,
@@ -75,7 +79,11 @@ class CouchDB(DocumentDB):
             timeout=600,
         )
 
-        pd.DataFrame(data=resp.json())["rows"][0]
+        docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
+        data: pd.DataFrame = pd.DataFrame(data=docs)
+        data[column_name] = pd.to_datetime(arg=data[column_name], utc=True)
+        table: pd.DataFrame = data[data["name"] == table_name]
+        table.groupby([table[column_name].dt.hour])
 
     def query_max_value(self, table_name: str, column_name: str) -> None:
         resp: requests.Response = requests.get(
@@ -85,7 +93,11 @@ class CouchDB(DocumentDB):
             timeout=600,
         )
 
-        pd.DataFrame(data=resp.json())["rows"][0]
+        docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
+        data: pd.DataFrame = pd.DataFrame(data=docs)
+        table: pd.DataFrame = data[data["name"] == table_name]
+        column: pd.Series = table[column_name]
+        column.max()
 
     def query_min_value(self, table_name: str, column_name: str) -> None:
         resp: requests.Response = requests.get(
@@ -95,7 +107,11 @@ class CouchDB(DocumentDB):
             timeout=600,
         )
 
-        pd.DataFrame(data=resp.json())["rows"][0]
+        docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
+        data: pd.DataFrame = pd.DataFrame(data=docs)
+        table: pd.DataFrame = data[data["name"] == table_name]
+        column: pd.Series = table[column_name]
+        column.min()
 
     def query_mode_value(self, table_name: str, column_name: str) -> None:
         resp: requests.Response = requests.get(
@@ -105,7 +121,11 @@ class CouchDB(DocumentDB):
             timeout=600,
         )
 
-        pd.DataFrame(data=resp.json())["rows"][0]
+        docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
+        data: pd.DataFrame = pd.DataFrame(data=docs)
+        table: pd.DataFrame = data[data["name"] == table_name]
+        column: pd.Series = table[column_name]
+        column.mode()
 
     def sequential_read(self, table_name: str, rows: int) -> None:
         idx: int

@@ -1,4 +1,8 @@
 import pandas as pd
+import pymongo
+import pymongo.collection
+import pymongo.database
+import pymongo.errors
 import requests
 import requests.auth
 
@@ -153,14 +157,42 @@ class CouchDB(DocumentDB):
             )
 
 
-# class MongoDB(DocumentDB):
-#     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None: ...
+class MongoDB(DocumentDB):
+    def __init__(self) -> None:
+        super().__init__(convert_time_column_to_int=False)
 
-#     def batch_read(self, table_name: str) -> None: ...
+        self.uri: str = "mongodb://root:example@localhost:27017"
+        self.database_name: str = "research"
+        self.collection_name: str = "research_data"
 
-#     def create(self) -> None: ...
+        self.database_conn: pymongo.database.Database
+        self.collection_conn: pymongo.collection.Collection
+        self.client: pymongo.MongoClient = pymongo.MongoClient(
+            host=self.uri,
+            tz_aware=True,
+            connect=True,
+        )
 
-#     def delete(self) -> None: ...
+        self.create()
+
+    #     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None: ...
+
+    #     def batch_read(self, table_name: str) -> None: ...
+
+    def create(self) -> None:
+        self.database_conn = self.client[self.database_name]
+
+        try:
+            self.database_conn.create_collection(name=self.collection_name)
+        except pymongo.errors.CollectionInvalid:
+            pass
+
+    def delete(self) -> None:
+        self.database_conn.drop_collection(
+            name_or_collection=self.collection_name,
+        )
+        self.client.drop_database(name_or_database=self.database_name)
+
 
 #     def query_average_value(
 #         self,

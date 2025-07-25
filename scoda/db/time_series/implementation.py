@@ -3,6 +3,7 @@ import time
 import pandas as pd
 from influxdb_client.client.bucket_api import BucketsApi
 from influxdb_client.client.influxdb_client import InfluxDBClient
+from influxdb_client.client.query_api import QueryApi
 from influxdb_client.client.write.point import Point
 from influxdb_client.client.write_api import (
     SYNCHRONOUS,
@@ -57,7 +58,15 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
 
         time.sleep(0.1)
 
-    def batch_read(self, table_name: str) -> None: ...
+    def batch_read(self, table_name: str) -> None:
+        query = f'''
+        from(bucket: "{self.bucket}")
+        |> range(start: 0)
+        |> filter(fn: (r) => r["name"] == "{table_name}")
+        '''
+
+        query_api: QueryApi = self.write_client.query_api()
+        query_api.query_data_frame(query=query, org=self.org)
 
     def create(self) -> None:
         existing_buckets: list = self.bucket_api.find_buckets().buckets
@@ -84,21 +93,97 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        query = f'''
+        from(bucket: "{self.bucket}")
+        |> range(start: 0)
+        |> filter(fn: (r) => r["name"] == "{table_name}")
+        |> filter(fn: (r) => r["_field"] == "{column_name}")
+        |> mean()
+        '''
+
+        # Execute and fetch the average value
+        query_api = self.write_client.query_api()
+        query_api.query(query=query, org=self.org)
 
     def query_groupby_time_window_value(
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        query = f"""
+        from(bucket: "{self.bucket}")
+        |> range(start: 0)
+        |> filter(fn: (r) => r["name"] == "{table_name}")
+        |> filter(fn: (r) => r["_field"] == "{column_name}")
+        |> aggregateWindow(every: 1h, fn: identity, createEmpty: false)
+        |> group(columns: ["_time", "_value"])
+        |> count()
+        |> group(columns: ["_time"])
+        |> sort(columns: ["_value_count"], desc: true)
+        |> unique(column: "_value")
+        |> limit(n: 1)
+        """
 
-    def query_max_value(self, table_name: str, column_name: str) -> None: ...
+        # Execute and fetch the average value
+        query_api = self.write_client.query_api()
+        query_api.query(query=query, org=self.org)
 
-    def query_min_value(self, table_name: str, column_name: str) -> None: ...
+    def query_max_value(self, table_name: str, column_name: str) -> None:
+        query = f'''
+        from(bucket: "{self.bucket}")
+        |> range(start: 0)
+        |> filter(fn: (r) => r["name"] == "{table_name}")
+        |> filter(fn: (r) => r["_field"] == "{column_name}")
+        |> max()
+        '''
 
-    def query_mode_value(self, table_name: str, column_name: str) -> None: ...
+        # Execute and fetch the average value
+        query_api = self.write_client.query_api()
+        query_api.query(query=query, org=self.org)
 
-    def sequential_read(self, table_name: str, rows: int) -> None: ...
+    def query_min_value(self, table_name: str, column_name: str) -> None:
+        query = f'''
+        from(bucket: "{self.bucket}")
+        |> range(start: 0)
+        |> filter(fn: (r) => r["name"] == "{table_name}")
+        |> filter(fn: (r) => r["_field"] == "{column_name}")
+        |> min()
+        '''
+
+        # Execute and fetch the average value
+        query_api = self.write_client.query_api()
+        query_api.query(query=query, org=self.org)
+
+    def query_mode_value(self, table_name: str, column_name: str) -> None:
+        query = f'''
+        from(bucket: "{self.bucket}")
+        |> range(start: 0)
+        |> filter(fn: (r) => r["name"] == "{table_name}")
+        |> filter(fn: (r) => r["_field"] == "{column_name}")
+        |> group(columns: ["_value"])
+        |> count()
+        |> group()
+        |> sort(columns: ["_value"], desc: false)
+        |> sort(columns: ["_value"], desc: true)
+        |> limit(n: 1)
+        '''
+
+        # Execute and fetch the average value
+        query_api = self.write_client.query_api()
+        query_api.query(query=query, org=self.org)
+
+    def sequential_read(self, table_name: str, rows: int) -> None:
+        query = f'''
+        from(bucket: "{self.bucket}")
+        |> range(start: 0)
+        |> filter(fn: (r) => r["name"] == "{table_name}")
+        '''
+        query_api: QueryApi = self.write_client.query_api()
+
+        count: int = 0
+        for _ in query_api.query_stream(query=query, org=self.org):
+            count += 1
 
     def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
         for _, row in dataset.time_series_data.iterrows():

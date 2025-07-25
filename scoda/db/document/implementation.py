@@ -175,9 +175,12 @@ class MongoDB(DocumentDB):
 
         self.create()
 
-    #     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None: ...
+    def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        self.collection_conn.insert_many(dataset.json_data)
 
-    #     def batch_read(self, table_name: str) -> None: ...
+    def batch_read(self, table_name: str) -> None:
+        results = self.collection_conn.find({"name": table_name})
+        data = pd.DataFrame(results)
 
     def create(self) -> None:
         self.database_conn = self.client[self.database_name]
@@ -187,31 +190,65 @@ class MongoDB(DocumentDB):
         except pymongo.errors.CollectionInvalid:
             pass
 
+        self.collection_conn = self.database_conn[self.collection_name]
+
     def delete(self) -> None:
         self.database_conn.drop_collection(
             name_or_collection=self.collection_name,
         )
         self.client.drop_database(name_or_database=self.database_name)
 
+    def query_average_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None:
+        pipeline = [
+            {"$match": {"name": table_name}},
+            {"$group": {"_id": None, "avg": {"$avg": f"${column_name}"}}},
+        ]
+        list(self.collection_conn.aggregate(pipeline))
 
-#     def query_average_value(
-#         self,
-#         table_name: str,
-#         column_name: str,
-#     ) -> None: ...
+    def query_groupby_time_window_value(
+        self,
+        table_name: str,
+        column_name: str,
+    ) -> None:
+        docs = list(self.collection_conn.find({"name": table_name}))
+        df = pd.DataFrame(docs)
+        df[column_name] = pd.to_datetime(df[column_name], utc=True)
+        df.groupby(df[column_name].dt.floor("h"))
 
-#     def query_groupby_time_window_value(
-#         self,
-#         table_name: str,
-#         column_name: str,
-#     ) -> None: ...
+    def query_max_value(self, table_name: str, column_name: str) -> None:
+        pipeline = [
+            {"$match": {"name": table_name}},
+            {"$group": {"_id": None, "max": {"$max": f"${column_name}"}}},
+        ]
+        list(self.collection_conn.aggregate(pipeline))
 
-#     def query_max_value(self, table_name: str, column_name: str) -> None: ...
+    def query_min_value(self, table_name: str, column_name: str) -> None:
+        pipeline = [
+            {"$match": {"name": table_name}},
+            {"$group": {"_id": None, "min": {"$min": f"${column_name}"}}},
+        ]
+        list(self.collection_conn.aggregate(pipeline))
 
-#     def query_min_value(self, table_name: str, column_name: str) -> None: ...
+    def query_mode_value(self, table_name: str, column_name: str) -> None:
+        pipeline = [
+            {"$match": {"name": table_name}},
+            {"$group": {"_id": f"${column_name}", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 1},
+        ]
+        list(self.collection_conn.aggregate(pipeline))
 
-#     def query_mode_value(self, table_name: str, column_name: str) -> None: ...
+    def sequential_read(self, table_name: str, rows: int) -> None:
+        cursor = self.collection_conn.find({"name": table_name})
 
-#     def sequential_read(self, table_name: str, rows: int) -> None: ...
+        count: int = 0
+        for doc in cursor:
+            count += 1
 
-#     def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None: ...
+    def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        for doc in dataset.json_data:
+            self.collection_conn.insert_one(doc)

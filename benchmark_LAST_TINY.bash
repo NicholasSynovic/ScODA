@@ -44,20 +44,21 @@ ITERATIONS=1
 #     --iterations $ITERATIONS \
 #     --db mariadb
 
-# CouchDB
-echo "===CouchDB==="
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/couchdb_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db couchdb
-
-# # MongoDB
+# # CouchDB
+# echo "===CouchDB==="
 # scoda last \
 #     --input-dir $DATASET_DIR \
-#     --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \
+#     --output $BENCHMARK_RESULTS_DIR/couchdb_last-tiny_$ITERATIONS.sqlite3 \
 #     --iterations $ITERATIONS \
-#     --db mongodb
+#     --db couchdb
+
+# MongoDB
+echo "===MongoDB==="
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db mongodb
 
 # # InfluxDB
 # scoda last \

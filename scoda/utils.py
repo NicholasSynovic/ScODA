@@ -46,6 +46,8 @@ def create_db_instance(
                 return scoda.db.relational.implementation.InMemorySQLite3()
             case "couchdb":
                 return scoda.db.document.implementation.CouchDB()
+            case "mongodb":
+                return scoda.db.document.implementation.MongoDB()
             case _:
                 sys.exit(100)
 

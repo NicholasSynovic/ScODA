@@ -19,7 +19,7 @@ import scoda.db.time_series.generic
 class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
     def __init__(self) -> None:
         super().__init__()
-        self.token: str = "2_k8KvLd_ehKs7DiSZzHj3XhBXJZpetNMInWLBH0H3q6S7J5gEpqgFvaUFcCWp926cu3qBBRhi_BVXfnt9D3NA"
+        self.token: str = "lsJ1cR9FBJojeZ-HGzN9kAdhc1XYcagfq8MkaKAmeMJP_Ux2hOOu3n-84aSNP0EaP_kIXGdaByl19MP6938WuA=="
         self.bucket: str = "research"
         self.org: str = "research"
         self.uri: str = "http://localhost:8086"
@@ -116,12 +116,10 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         |> range(start: 0)
         |> filter(fn: (r) => r["name"] == "{table_name}")
         |> filter(fn: (r) => r["_field"] == "{column_name}")
-        |> aggregateWindow(every: 1h, fn: identity, createEmpty: false)
         |> group(columns: ["_time", "_value"])
-        |> count()
+        |> aggregateWindow(every: 1h, fn: count, createEmpty: false)
         |> group(columns: ["_time"])
-        |> sort(columns: ["_value_count"], desc: true)
-        |> unique(column: "_value")
+        |> sort(columns: ["_value"], desc: true)
         |> limit(n: 1)
         """
 

@@ -13,6 +13,8 @@ import scoda.db.document.generic
 import scoda.db.document.implementation
 import scoda.db.relational.generic
 import scoda.db.relational.implementation
+import scoda.db.time_series.generic
+import scoda.db.time_series.implementation
 
 
 def resolve_path(filepath: str) -> Path:
@@ -27,7 +29,11 @@ def identify_input(key: str) -> str:
 
 def create_db_instance(
     db_name: str, last_dataset: bool = True
-) -> scoda.db.relational.generic.RelationalDB | scoda.db.document.generic.DocumentDB:
+) -> (
+    scoda.db.relational.generic.RelationalDB
+    | scoda.db.document.generic.DocumentDB
+    | scoda.db.time_series.generic.TimeSeriesDB
+):
     if last_dataset:
         match db_name:
             # case "db2":
@@ -48,6 +54,8 @@ def create_db_instance(
                 return scoda.db.document.implementation.CouchDB()
             case "mongodb":
                 return scoda.db.document.implementation.MongoDB()
+            case "influxdb":
+                return scoda.db.time_series.implementation.InfluxDB()
             case _:
                 sys.exit(100)
 

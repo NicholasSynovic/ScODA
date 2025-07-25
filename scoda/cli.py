@@ -70,6 +70,8 @@ def _configure_dbms(parser: ArgumentParser) -> None:
             "sqlite3",
             "sqlite3-memory",
             "victoriametrics",
+            "deltalake",
+            "iceberg",
         ],
         required=True,
         help="Database to benchmark against",

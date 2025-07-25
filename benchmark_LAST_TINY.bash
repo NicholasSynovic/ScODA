@@ -68,9 +68,26 @@ ITERATIONS=1
 #     --iterations $ITERATIONS \
 #     --db influxdb
 
-# VictoriaMetrics
+# # VictoriaMetrics
+# echo "===VictoriaMetrics==="
+# scoda last \
+#     --input-dir $DATASET_DIR \
+#     --output $BENCHMARK_RESULTS_DIR/victoriametrics_last-tiny_$ITERATIONS.sqlite3 \
+#     --iterations $ITERATIONS \
+#     --db victoriametrics
+
+# Delta Lake
+echo "===Delta Lake==="
 scoda last \
     --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/victoriametrics_last-tiny_$ITERATIONS.sqlite3 \
+    --output $BENCHMARK_RESULTS_DIR/deltalake_last-tiny_$ITERATIONS.sqlite3 \
     --iterations $ITERATIONS \
-    --db victoriametrics
+    --db deltalake
+
+# Apache Iceberg
+echo "===Apache Iceberg==="
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/iceberg_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db iceberg

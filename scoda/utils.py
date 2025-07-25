@@ -11,6 +11,8 @@ from time import time
 
 import scoda.db.document.generic
 import scoda.db.document.implementation
+import scoda.db.lakehouse.generic
+import scoda.db.lakehouse.implementation
 import scoda.db.relational.generic
 import scoda.db.relational.implementation
 import scoda.db.time_series.generic
@@ -33,6 +35,7 @@ def create_db_instance(
     scoda.db.relational.generic.RelationalDB
     | scoda.db.document.generic.DocumentDB
     | scoda.db.time_series.generic.TimeSeriesDB
+    | scoda.db.lakehouse.generic.LakehouseDB
 ):
     if last_dataset:
         match db_name:
@@ -58,6 +61,10 @@ def create_db_instance(
                 return scoda.db.time_series.implementation.InfluxDB()
             case "victoriametrics":
                 return scoda.db.time_series.implementation.VictoriaMetrics()
+            case "deltalake":
+                return scoda.db.lakehouse.implementation.DeltaLake()
+            case "iceberg":
+                return scoda.db.lakehouse.implementation.IcebergDB()
             case _:
                 sys.exit(100)
 

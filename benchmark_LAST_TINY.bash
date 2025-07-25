@@ -52,20 +52,20 @@ ITERATIONS=1
 #     --iterations $ITERATIONS \
 #     --db couchdb
 
-# MongoDB
-echo "===MongoDB==="
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db mongodb
-
-# # InfluxDB
+# # MongoDB
+# echo "===MongoDB==="
 # scoda last \
 #     --input-dir $DATASET_DIR \
-#     --output $BENCHMARK_RESULTS_DIR/influxdb_last-tiny_$ITERATIONS.sqlite3 \
+#     --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \
 #     --iterations $ITERATIONS \
-#     --db influxdb
+#     --db mongodb
+
+# InfluxDB
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/influxdb_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db influxdb
 
 # # VictoriaMetrics
 # scoda last \

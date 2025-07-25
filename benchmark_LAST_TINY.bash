@@ -60,17 +60,17 @@ ITERATIONS=1
 #     --iterations $ITERATIONS \
 #     --db mongodb
 
-# InfluxDB
-echo "===InfluxDB==="
-scoda last \
-    --input-dir $DATASET_DIR \
-    --output $BENCHMARK_RESULTS_DIR/influxdb_last-tiny_$ITERATIONS.sqlite3 \
-    --iterations $ITERATIONS \
-    --db influxdb
-
-# # VictoriaMetrics
+# # InfluxDB
+# echo "===InfluxDB==="
 # scoda last \
 #     --input-dir $DATASET_DIR \
-#     --output $BENCHMARK_RESULTS_DIR/victoriametrics_last-tiny_$ITERATIONS.sqlite3 \
+#     --output $BENCHMARK_RESULTS_DIR/influxdb_last-tiny_$ITERATIONS.sqlite3 \
 #     --iterations $ITERATIONS \
-#     --db victoriametrics
+#     --db influxdb
+
+# VictoriaMetrics
+scoda last \
+    --input-dir $DATASET_DIR \
+    --output $BENCHMARK_RESULTS_DIR/victoriametrics_last-tiny_$ITERATIONS.sqlite3 \
+    --iterations $ITERATIONS \
+    --db victoriametrics

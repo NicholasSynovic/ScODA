@@ -56,6 +56,8 @@ def create_db_instance(
                 return scoda.db.document.implementation.MongoDB()
             case "influxdb":
                 return scoda.db.time_series.implementation.InfluxDB()
+            case "victoriametrics":
+                return scoda.db.time_series.implementation.VictoriaMetrics()
             case _:
                 sys.exit(100)
 

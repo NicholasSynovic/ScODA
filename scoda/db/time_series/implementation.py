@@ -1,6 +1,8 @@
 import time
+from json import dumps
 
 import pandas as pd
+import requests
 from influxdb_client.client.bucket_api import BucketsApi
 from influxdb_client.client.influxdb_client import InfluxDBClient
 from influxdb_client.client.query_api import QueryApi
@@ -212,3 +214,72 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
             time.sleep(0.1)
+
+
+class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
+    def __init__(self) -> None:
+        super().__init__()
+        self.uri: str = "http://localhost:8428"
+
+    def create(self) -> None:
+        pass  # No-op for VictoriaMetrics
+
+    def delete(self) -> None:
+        # To delete all data, use the `delete_series` API
+        requests.post(
+            f"{self.uri}/api/v1/admin/tsdb/delete_series",
+            params={"match[]": '{__name__=~".*"}'},
+        )
+
+    def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        lines = []
+        idx: pd.Timestamp
+        for idx, row in dataset.time_series_data.iterrows():
+            timestamp = int(idx.nanosecond)  # nanoseconds
+            for col in dataset.time_series_data.columns:
+                if col == dataset.time_column:
+                    continue
+                value = row[col]
+                if pd.isna(value):
+                    continue
+                # Use proper line protocol format: <measurement>,<tags> <field>=<value> <timestamp>
+                value_fmt = f"{value}i" if isinstance(value, int) else value
+                line = dumps(row.to_dict())
+                lines.append(line)
+        if lines:
+            response = requests.post(f"{self.uri}/api/v1/import", data="\n".join(lines))
+            response.raise_for_status()
+
+    def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        self.batch_upload(dataset)  # No real diff for VictoriaMetrics
+
+    def batch_read(self, table_name: str) -> None:
+        response = requests.get(f"{self.uri}/api/v1/export")
+
+    def sequential_read(self, table_name: str, rows: int) -> None:
+        self.batch_read(table_name)
+
+    def query_average_value(self, table_name: str, column_name: str) -> None:
+        query = {"query": f'avg({column_name}{{name="{table_name}"}})', "start": "-1y"}
+        requests.get(f"{self.uri}/api/v1/query", params=query)
+
+    def query_min_value(self, table_name: str, column_name: str) -> None:
+        query = {"query": f'min({column_name}{{name="{table_name}"}})', "start": "-1y"}
+        r = requests.get(f"{self.uri}/api/v1/query", params=query)
+
+    def query_max_value(self, table_name: str, column_name: str) -> None:
+        query = {"query": f'max({column_name}{{name="{table_name}"}})', "start": "-1y"}
+        r = requests.get(f"{self.uri}/api/v1/query", params=query)
+        r.raise_for_status()
+
+    def query_mode_value(self, table_name: str, column_name: str) -> None:
+        requests.get(f"{self.uri}/api/v1/export")
+
+    def query_groupby_time_window_value(
+        self, table_name: str, column_name: str
+    ) -> None:
+        query = {
+            "query": f'avg_over_time({column_name}{{name="{table_name}"}}[{"1h"}])',
+            "start": "-1y",
+        }
+        requests.get(f"{self.uri}/api/v1/query", params=query)

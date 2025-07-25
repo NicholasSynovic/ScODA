@@ -60,45 +60,6 @@ class InfluxDB(LAST):
             database="research",
         )
 
-    def create(self) -> None:
-        bucket = self.bucket_api.find_bucket_by_name(self.bucket)
-        if bucket is not None:
-            self.bucket_api.delete_bucket(bucket)
-
-        retention_seconds = 100 * 365 * 24 * 60 * 60
-
-        existing_buckets = self.bucket_api.find_buckets().buckets
-        bucket_exists = any(bucket.name == self.bucket for bucket in existing_buckets)
-
-        if not bucket_exists:
-            self.bucket_api.create_bucket(
-                bucket_name=self.bucket,
-                org=self.org,
-                retention_rules=BucketRetentionRules(
-                    type="expire", every_seconds=retention_seconds
-                ),
-            )
-
-    def recreate(self) -> None:
-        bucket = self.bucket_api.find_bucket_by_name(self.bucket)
-        self.bucket_api.delete_bucket(bucket)
-        self.create()
-
-    def batch_upload(self, data: Dataset) -> None:
-        self.batch_write_api._write_options = WriteOptions(
-            batch_size=data.time_series_data.shape[0],
-        )
-
-        self.batch_write_api.write(
-            bucket=self.bucket,
-            org=self.org,
-            record=data.time_series_data,
-            data_frame_measurement_name=data.name,
-            data_frame_tag_columns=["name"],
-        )
-
-        time.sleep(0.1)
-
     def sequential_upload(self, data: Dataset) -> None:
         for idx, row in data.time_series_data.iterrows():
             timestamp = row.name

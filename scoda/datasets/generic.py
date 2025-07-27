@@ -1,4 +1,5 @@
 import sys
+from abc import abstractmethod
 from json import dumps
 from pathlib import Path
 
@@ -34,6 +35,8 @@ class Dataset:
             dumps(x) for x in self.json_data
         ]  # List of stringified JSON objects
 
+        self.victoriametric_json: list[dict] = self._create_victoriametric_json()
+
     def _create_time_series_data(self) -> DataFrame:
         time_series_data = self.data.copy()
         time_series_data[self.time_column] = time_series_data[self.time_column].apply(
@@ -64,3 +67,6 @@ class Dataset:
             utc=True,
         )
         return data
+
+    @abstractmethod
+    def _create_victoriametric_json(self) -> list[dict]: ...

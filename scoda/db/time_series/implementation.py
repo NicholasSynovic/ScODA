@@ -232,29 +232,23 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
         )
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
-        lines = []
-        idx: pd.Timestamp
-        for idx, row in dataset.time_series_data.iterrows():
-            timestamp = int(idx.nanosecond)  # nanoseconds
-            for col in dataset.time_series_data.columns:
-                if col == dataset.time_column:
-                    continue
-                value = row[col]
-                if pd.isna(value):
-                    continue
-                # Use proper line protocol format: <measurement>,<tags> <field>=<value> <timestamp>
-                value_fmt = f"{value}i" if isinstance(value, int) else value
-                line = dumps(row.to_dict())
-                lines.append(line)
-        if lines:
-            response = requests.post(f"{self.uri}/api/v1/import", data="\n".join(lines))
-            response.raise_for_status()
+        obj: dict
+        try:
+            for obj in dataset.victoriametric_json:
+                json: str = dumps(obj=obj)
+                requests.post(f"{self.uri}/api/v1/import", data=json)
+        except TypeError:
+            print(dataset.name)
+            quit()
 
     def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
         self.batch_upload(dataset)  # No real diff for VictoriaMetrics
 
     def batch_read(self, table_name: str) -> None:
-        response = requests.get(f"{self.uri}/api/v1/export")
+        response = requests.get(
+            f"{self.uri}/api/v1/export",
+            params={"match[]": '{__name__=~".*"}'},
+        )
 
     def sequential_read(self, table_name: str, rows: int) -> None:
         self.batch_read(table_name)
@@ -273,7 +267,10 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
         r.raise_for_status()
 
     def query_mode_value(self, table_name: str, column_name: str) -> None:
-        requests.get(f"{self.uri}/api/v1/export")
+        requests.get(
+            f"{self.uri}/api/v1/export",
+            params={"match[]": '{__name__=~".*"}'},
+        )
 
     def query_groupby_time_window_value(
         self, table_name: str, column_name: str

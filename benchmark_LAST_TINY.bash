@@ -68,7 +68,7 @@ scoda last \
     --iterations $ITERATIONS \
     --db influxdb
 
-VictoriaMetrics
+# VictoriaMetrics
 echo "===VictoriaMetrics==="
 scoda last \
     --input-dir $DATASET_DIR \

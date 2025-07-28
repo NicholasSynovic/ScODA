@@ -226,20 +226,22 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
 
     def delete(self) -> None:
         # To delete all data, use the `delete_series` API
-        requests.post(
-            f"{self.uri}/api/v1/admin/tsdb/delete_series",
-            params={"match[]": '{__name__=~".*"}'},
-        )
+        try:
+            requests.post(
+                f"{self.uri}/api/v1/admin/tsdb/delete_series",
+                params={"match[]": '{__name__=~".*"}'},
+            )
+        except:
+            time.sleep(1)
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
         obj: dict
-        try:
-            for obj in dataset.victoriametric_json:
-                json: str = dumps(obj=obj)
+        for obj in dataset.victoriametric_json:
+            json: str = dumps(obj=obj)
+            try:
                 requests.post(f"{self.uri}/api/v1/import", data=json)
-        except TypeError:
-            print(dataset.name)
-            quit()
+            except:
+                time.sleep(1)
 
     def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
         self.batch_upload(dataset)  # No real diff for VictoriaMetrics

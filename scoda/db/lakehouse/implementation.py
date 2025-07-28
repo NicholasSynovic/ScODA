@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import delta
+import pyspark.sql
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 
@@ -15,15 +17,18 @@ class DeltaLake(LakehouseDB):
     ) -> None:
         super().__init__(convert_time_column_to_int=convert_time_column_to_int)
         self.base_path = Path(base_path)
-        self.spark = (
-            SparkSession.builder.appName("DeltaLakeApp")
+        builder = (
+            pyspark.sql.SparkSession.builder.appName("MyApp")
             .config("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
             .config(
                 "spark.sql.catalog.spark_catalog",
                 "org.apache.spark.sql.delta.catalog.DeltaCatalog",
             )
-            .getOrCreate()
         )
+
+        self.spark: SparkSession = delta.configure_spark_with_delta_pip(
+            builder
+        ).getOrCreate()
 
     def _table_path(self, table_name: str) -> str:
         return str(self.base_path / table_name)

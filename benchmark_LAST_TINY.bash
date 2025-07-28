@@ -2,7 +2,7 @@
 
 DATASET_DIR="./benchmark_datasets/LAST_TINY/Power-Provisioning-Dataset"
 BENCHMARK_RESULTS_DIR="./benchmark_results"
-ITERATIONS=1
+ITERATIONS=10
 
 # SQLite3 Memory
 echo "===SQLite3 Memory==="
@@ -76,7 +76,7 @@ scoda last \
     --iterations $ITERATIONS \
     --db victoriametrics
 
-Delta Lake
+# Delta Lake
 echo "===Delta Lake==="
 scoda last \
     --input-dir $DATASET_DIR \
@@ -86,6 +86,7 @@ scoda last \
 
 # Apache Iceberg
 echo "===Apache Iceberg==="
+export PYSPARK_SUBMIT_ARGS="--packages org.apache.iceberg:iceberg-spark-runtime-3.4_2.12:1.4.3 pyspark-shell"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/iceberg_last-tiny_$ITERATIONS.sqlite3 \

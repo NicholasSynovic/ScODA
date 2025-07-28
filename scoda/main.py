@@ -5,7 +5,6 @@ Copyright 2025 (C) Nicholas M. Synovic
 
 """
 
-import os
 import sys
 from collections.abc import Iterable
 from typing import Any
@@ -19,10 +18,6 @@ import scoda.db as scoda_db
 from scoda.benchmarks import run_benchmarks
 from scoda.cli import CLI
 from scoda.utils import create_db_instance, identify_input
-
-os.environ["PYSPARK_SUBMIT_ARGS"] = (
-    "--packages org.apache.iceberg:iceberg-spark-runtime-3.4_2.12:1.4.3 pyspark-shell"
-)
 
 
 def main() -> int:

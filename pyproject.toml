@@ -16,6 +16,7 @@ classifiers = [
 ]
 dependencies = [
     "cryptography>=45.0.5",
+    "delta-spark>=3.3.2",
     "ibm-db>=3.2.6",
     "ibm-db-sa>=0.4.2",
     "influxdb-client>=1.49.0",
@@ -26,7 +27,7 @@ dependencies = [
     "pydantic>=2.11.7",
     "pymongo>=4.13.2",
     "pymysql>=1.1.1",
-    "pyspark>=4.0.0,<5",
+    "pyspark==3.5.3",
     "redis>=6.2.0",
     "requests>=2.32.4",
     "seaborn>=0.13.2",

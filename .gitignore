@@ -173,3 +173,5 @@ LAST/*
 TODO.md
 *.sqlite3
 *.tar
+deltalake/*
+iceberg/*

@@ -76,7 +76,7 @@ scoda last \
     --iterations $ITERATIONS \
     --db victoriametrics
 
-# Delta Lake
+Delta Lake
 echo "===Delta Lake==="
 scoda last \
     --input-dir $DATASET_DIR \

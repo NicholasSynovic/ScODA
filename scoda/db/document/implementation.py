@@ -26,6 +26,16 @@ class CouchDB(DocumentDB):
         self.create()
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        """
+        Upload data in batch to the database.
+
+        This method iterates over a dataset and sends each record to the
+        database.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` instance.
+
+        """
         requests.post(
             url=f"{self.uri}/_bulk_docs",
             auth=self.auth,
@@ -35,6 +45,14 @@ class CouchDB(DocumentDB):
         )
 
     def batch_read(self, table_name: str) -> None:
+        """
+        Perform a batch read of all metrics from the database.
+
+        Arguments:
+            table_name: The name of the table to read from.
+
+        """
+        table_name = table_name.lower()
         json_data: str = '{"include_docs": True}'
         requests.get(
             url=f"{self.uri}/_all_docs?include_docs=true",
@@ -54,6 +72,12 @@ class CouchDB(DocumentDB):
             requests.put(url=self.uri, auth=self.auth, timeout=RESPONSE_TIMEOUT)
 
     def delete(self) -> None:
+        """
+        Delete all data from the database.
+
+        This method sends removes all stored data.
+
+        """
         requests.delete(url=self.uri, auth=self.auth, timeout=RESPONSE_TIMEOUT)
 
     def query_average_value(
@@ -61,6 +85,17 @@ class CouchDB(DocumentDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query the average value of a column in a given table.
+
+        This method retrieves the average value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the average value.
+
+        """
         resp: requests.Response = requests.get(
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
@@ -104,6 +139,17 @@ class CouchDB(DocumentDB):
         table.groupby([table[column_name].dt.hour])
 
     def query_max_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the maximum value of a column in a given table.
+
+        This method retrieves the maximum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the maximum value.
+
+        """
         resp: requests.Response = requests.get(
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
@@ -118,6 +164,17 @@ class CouchDB(DocumentDB):
         column.max()
 
     def query_min_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the minimum value of a column in a given table.
+
+        This method retrieves the minimum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the minimum value.
+
+        """
         resp: requests.Response = requests.get(
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
@@ -157,6 +214,18 @@ class CouchDB(DocumentDB):
         column.mode()
 
     def sequential_read(self, table_name: str, rows: int) -> None:
+        """
+        Perform a sequential read of records from a specified table.
+
+        This method constructs and executes a  query to read all records from
+        the specified table. It counts the number of records streamed from the
+        query result but does not return or store them.
+
+        Arguments:
+            table_name: The name of the table (i.e., measurement) to read from.
+            rows: The number of rows to read.
+
+        """
         idx: int
         for idx in range(rows):
             json_body: str = '{"selector": {"id":' + str(idx) + '}, "limit": 1}'
@@ -172,6 +241,20 @@ class CouchDB(DocumentDB):
         self,
         dataset: scoda.datasets.generic.Dataset,
     ) -> None:
+        """
+        Upload data sequentially to the database.
+
+        This method iterates over each row in a dataset and writes it
+        individually to the database with a short delay between uploads. Each
+        row is converted to a line protocol point with appropriate tags and
+        fields. Invalid or missing field values are skipped, and non-numeric
+        strings are cast to float where possible.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` containing time series data
+                    with a time index and one or more value columns.
+
+        """
         json_str: str
         for json_str in dataset.json_data_list:
             resp = requests.post(
@@ -202,11 +285,28 @@ class MongoDB(DocumentDB):
         self.create()
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        """
+        Upload data in batch to the database.
+
+        This method iterates over a dataset and sends each record to the
+        database.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` instance.
+
+        """
         self.collection_conn.insert_many(dataset.json_data)
 
     def batch_read(self, table_name: str) -> None:
+        """
+        Perform a batch read of all metrics from the database.
+
+        Arguments:
+            table_name: The name of the table to read from.
+
+        """
         results = self.collection_conn.find({"name": table_name})
-        data = pd.DataFrame(results)
+        pd.DataFrame(results)
 
     def create(self) -> None:
         self.database_conn = self.client[self.database_name]
@@ -219,6 +319,12 @@ class MongoDB(DocumentDB):
         self.collection_conn = self.database_conn[self.collection_name]
 
     def delete(self) -> None:
+        """
+        Delete all data from the database.
+
+        This method sends removes all stored data.
+
+        """
         self.database_conn.drop_collection(
             name_or_collection=self.collection_name,
         )
@@ -229,6 +335,17 @@ class MongoDB(DocumentDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query the average value of a column in a given table.
+
+        This method retrieves the average value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the average value.
+
+        """
         pipeline = [
             {"$match": {"name": table_name}},
             {"$group": {"_id": None, "avg": {"$avg": f"${column_name}"}}},
@@ -257,6 +374,17 @@ class MongoDB(DocumentDB):
         df.groupby(df[column_name].dt.floor("h"))
 
     def query_max_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the maximum value of a column in a given table.
+
+        This method retrieves the maximum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the maximum value.
+
+        """
         pipeline = [
             {"$match": {"name": table_name}},
             {"$group": {"_id": None, "max": {"$max": f"${column_name}"}}},
@@ -264,6 +392,17 @@ class MongoDB(DocumentDB):
         list(self.collection_conn.aggregate(pipeline))
 
     def query_min_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the minimum value of a column in a given table.
+
+        This method retrieves the minimum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the minimum value.
+
+        """
         pipeline = [
             {"$match": {"name": table_name}},
             {"$group": {"_id": None, "min": {"$min": f"${column_name}"}}},
@@ -291,12 +430,41 @@ class MongoDB(DocumentDB):
         list(self.collection_conn.aggregate(pipeline))
 
     def sequential_read(self, table_name: str, rows: int) -> None:
+        """
+        Perform a sequential read of records from a specified table.
+
+        This method constructs and executes a  query to read all records from
+        the specified table. It counts the number of records streamed from the
+        query result but does not return or store them.
+
+        Arguments:
+            table_name: The name of the table (i.e., measurement) to read from.
+            rows: The number of rows to read.
+
+        """
         cursor = self.collection_conn.find({"name": table_name})
 
         count: int = 0
         for doc in cursor:
             count += 1
 
-    def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+    def sequential_upload(
+        self,
+        dataset: scoda.datasets.generic.Dataset,
+    ) -> None:
+        """
+        Upload data sequentially to the database.
+
+        This method iterates over each row in a dataset and writes it
+        individually to the database with a short delay between uploads. Each
+        row is converted to a line protocol point with appropriate tags and
+        fields. Invalid or missing field values are skipped, and non-numeric
+        strings are cast to float where possible.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` containing time series data
+                    with a time index and one or more value columns.
+
+        """
         for doc in dataset.json_data:
             self.collection_conn.insert_one(doc)

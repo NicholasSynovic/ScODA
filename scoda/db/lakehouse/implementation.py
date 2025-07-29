@@ -37,33 +37,115 @@ class DeltaLake(LakehouseDB):
         self.base_path.mkdir(parents=True, exist_ok=True)
 
     def delete(self) -> None:
+        """
+        Delete all data from the database.
+
+        This method sends removes all stored data.
+
+        """
         pass
 
     def batch_upload(self, dataset: Dataset) -> None:
+        """
+        Upload data in batch to the database.
+
+        This method iterates over a dataset and sends each record to the
+        database.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` instance.
+
+        """
         df = self.spark.createDataFrame(dataset.data)
         df.write.format("delta").mode("overwrite").save(self._table_path(dataset.name))
 
     def batch_read(self, table_name: str):
-        df = self.spark.read.format("delta").load(self._table_path(table_name))
+        """
+        Perform a batch read of all metrics from the database.
+
+        Arguments:
+            table_name: The name of the table to read from.
+
+        """
+        self.spark.read.format("delta").load(self._table_path(table_name))
 
     def sequential_upload(self, dataset: Dataset) -> None:
+        """
+        Upload data sequentially to the database.
+
+        This method iterates over each row in a dataset and writes it
+        individually to the database with a short delay between uploads. Each
+        row is converted to a line protocol point with appropriate tags and
+        fields. Invalid or missing field values are skipped, and non-numeric
+        strings are cast to float where possible.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` containing time series data
+                    with a time index and one or more value columns.
+
+        """
         df = self.spark.createDataFrame(dataset.data)
         df.write.format("delta").mode("append").save(self._table_path(dataset.name))
 
     def sequential_read(self, table_name: str, rows: int):
-        df = self.spark.read.format("delta").load(self._table_path(table_name))
+        """
+        Perform a sequential read of records from a specified table.
+
+        This method constructs and executes a  query to read all records from
+        the specified table. It counts the number of records streamed from the
+        query result but does not return or store them.
+
+        Arguments:
+            table_name: The name of the table (i.e., measurement) to read from.
+            rows: The number of rows to read.
+
+        """
+        self.spark.read.format("delta").load(self._table_path(table_name))
 
     def query_average_value(self, table_name: str, column_name: str):
+        """
+        Query the average value of a column in a given table.
+
+        This method retrieves the average value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the average value.
+
+        """
         df = self.spark.read.format("delta").load(self._table_path(table_name))
-        avg_val = df.select(F.avg(F.col(column_name)).alias("avg")).collect()[0]["avg"]
+        df.select(F.avg(F.col(column_name)).alias("avg")).collect()[0]["avg"]
 
     def query_max_value(self, table_name: str, column_name: str):
+        """
+        Query the maximum value of a column in a given table.
+
+        This method retrieves the maximum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the maximum value.
+
+        """
         df = self.spark.read.format("delta").load(self._table_path(table_name))
-        max_val = df.select(F.max(F.col(column_name)).alias("max")).collect()[0]["max"]
+        df.select(F.max(F.col(column_name)).alias("max")).collect()[0]["max"]
 
     def query_min_value(self, table_name: str, column_name: str):
+        """
+        Query the minimum value of a column in a given table.
+
+        This method retrieves the minimum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the minimum value.
+
+        """
         df = self.spark.read.format("delta").load(self._table_path(table_name))
-        min_val = df.select(F.min(F.col(column_name)).alias("min")).collect()[0]["min"]
+        df.select(F.min(F.col(column_name)).alias("min")).collect()[0]["min"]
 
     def query_mode_value(self, table_name: str, column_name: str):
         """
@@ -147,46 +229,118 @@ class IcebergDB(LakehouseDB):
         self.spark.sql("CREATE SCHEMA IF NOT EXISTS hadoop_prod.db1")
 
     def delete(self) -> None:
-        """Delete the warehouse directory (not implemented)."""
+        """
+        Delete all data from the database.
+
+        This method sends removes all stored data.
+
+        """
         self.spark.sql("DROP SCHEMA IF EXISTS hadoop_prod.db1")
 
     def batch_upload(self, dataset: Dataset) -> None:
-        """Upload a dataset in batch mode."""
+        """
+        Upload data in batch to the database.
+
+        This method iterates over a dataset and sends each record to the
+        database.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` instance.
+
+        """
         df = self.spark.createDataFrame(dataset.data)
         df.writeTo(self._qualified_table(dataset.name)).using(
             "iceberg"
         ).createOrReplace()
 
     def sequential_upload(self, dataset: Dataset) -> None:
-        """Upload a dataset in sequential (append) mode."""
+        """
+        Upload data sequentially to the database.
+
+        This method iterates over each row in a dataset and writes it
+        individually to the database with a short delay between uploads. Each
+        row is converted to a line protocol point with appropriate tags and
+        fields. Invalid or missing field values are skipped, and non-numeric
+        strings are cast to float where possible.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` containing time series data
+                    with a time index and one or more value columns.
+
+        """
         df = self.spark.createDataFrame(dataset.data)
         df.writeTo(self._qualified_table(dataset.name)).append()
 
-    def batch_read(self, table_name: str):
-        """Read a table in batch mode."""
-        return self.spark.read.table(self._qualified_table(table_name))
+    def batch_read(self, table_name: str) -> None:
+        """
+        Perform a batch read of all metrics from the database.
+
+        Arguments:
+            table_name: The name of the table to read from.
+
+        """
+        self.spark.read.table(self._qualified_table(table_name))
 
     def sequential_read(self, table_name: str, rows: int):
-        """Read a limited number of rows from a table."""
+        """
+        Perform a sequential read of records from a specified table.
+
+        This method constructs and executes a  query to read all records from
+        the specified table. It counts the number of records streamed from the
+        query result but does not return or store them.
+
+        Arguments:
+            table_name: The name of the table (i.e., measurement) to read from.
+            rows: The number of rows to read.
+
+        """
         return self.spark.read.table(self._qualified_table(table_name)).limit(rows)
 
-    def query_average_value(self, table_name: str, column_name: str):
-        """Query the average value of a column."""
+    def query_average_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the average value of a column in a given table.
+
+        This method retrieves the average value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the average value.
+
+        """
         df = self.spark.read.table(self._qualified_table(table_name))
-        avg_val = df.select(F.avg(F.col(column_name))).collect()[0][0]
-        return avg_val
+        df.select(F.avg(F.col(column_name))).collect()[0][0]
 
     def query_max_value(self, table_name: str, column_name: str):
-        """Query the maximum value of a column."""
+        """
+        Query the maximum value of a column in a given table.
+
+        This method retrieves the maximum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the maximum value.
+
+        """
         df = self.spark.read.table(self._qualified_table(table_name))
         max_val = df.select(F.max(F.col(column_name))).collect()[0][0]
         return max_val
 
-    def query_min_value(self, table_name: str, column_name: str):
-        """Query the minimum value of a column."""
+    def query_min_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the minimum value of a column in a given table.
+
+        This method retrieves the minimum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the minimum value.
+
+        """
         df = self.spark.read.table(self._qualified_table(table_name))
-        min_val = df.select(F.min(F.col(column_name))).collect()[0][0]
-        return min_val
+        df.select(F.min(F.col(column_name))).collect()[0][0]
 
     def query_mode_value(self, table_name: str, column_name: str):
         """

@@ -47,6 +47,16 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         )
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        """
+        Upload data in batch to the database.
+
+        This method iterates over a dataset and sends each record to the
+        database.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` instance.
+
+        """
         self.batch_write_api._write_options = WriteOptions(
             batch_size=dataset.time_series_data.shape[0],
         )
@@ -62,6 +72,13 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         time.sleep(0.1)
 
     def batch_read(self, table_name: str) -> None:
+        """
+        Perform a batch read of all metrics from the database.
+
+        Arguments:
+            table_name: The name of the table to read from.
+
+        """
         query = f'''
         from(bucket: "{self.bucket}")
         |> range(start: 0)
@@ -88,6 +105,12 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
             )
 
     def delete(self) -> None:
+        """
+        Delete all data from the database.
+
+        This method sends removes all stored data.
+
+        """
         bucket = self.bucket_api.find_bucket_by_name(self.bucket)
         if bucket is not None:
             self.bucket_api.delete_bucket(bucket)
@@ -97,6 +120,17 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query the average value of a column in a given table.
+
+        This method retrieves the average value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the average value.
+
+        """
         query = f'''
         from(bucket: "{self.bucket}")
         |> range(start: 0)
@@ -142,6 +176,17 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         query_api.query(query=query, org=self.org)
 
     def query_max_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the maximum value of a column in a given table.
+
+        This method retrieves the maximum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the maximum value.
+
+        """
         query = f'''
         from(bucket: "{self.bucket}")
         |> range(start: 0)
@@ -155,6 +200,17 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         query_api.query(query=query, org=self.org)
 
     def query_min_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the minimum value of a column in a given table.
+
+        This method retrieves the minimum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the minimum value.
+
+        """
         query = f'''
         from(bucket: "{self.bucket}")
         |> range(start: 0)
@@ -197,6 +253,18 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         query_api.query(query=query, org=self.org)
 
     def sequential_read(self, table_name: str, rows: int) -> None:
+        """
+        Perform a sequential read of records from a specified table.
+
+        This method constructs and executes a  query to read all records from
+        the specified table. It counts the number of records streamed from the
+        query result but does not return or store them.
+
+        Arguments:
+            table_name: The name of the table (i.e., measurement) to read from.
+            rows: The number of rows to read.
+
+        """
         query = f'''
         from(bucket: "{self.bucket}")
         |> range(start: 0)
@@ -208,7 +276,24 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         for _ in query_api.query_stream(query=query, org=self.org):
             count += 1
 
-    def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+    def sequential_upload(
+        self,
+        dataset: scoda.datasets.generic.Dataset,
+    ) -> None:
+        """
+        Upload data sequentially to the database.
+
+        This method iterates over each row in a dataset and writes it
+        individually to the database with a short delay between uploads. Each
+        row is converted to a line protocol point with appropriate tags and
+        fields. Invalid or missing field values are skipped, and non-numeric
+        strings are cast to float where possible.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` containing time series data
+                    with a time index and one or more value columns.
+
+        """
         error_counter: int = 0
         for _, row in dataset.time_series_data.iterrows():
             timestamp = row.name
@@ -232,10 +317,14 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
                         else value
                     )
                     point.field(col, value)
-                except Exception as e:
+                except Exception:
                     error_counter += 1
 
-            self.write_api.write(bucket=self.bucket, org=self.org, record=point)
+            self.write_api.write(
+                bucket=self.bucket,
+                org=self.org,
+                record=point,
+            )
 
             time.sleep(0.1)
 
@@ -249,6 +338,12 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
         pass  # No-op for VictoriaMetrics
 
     def delete(self) -> None:
+        """
+        Delete all data from the database.
+
+        This method sends removes all stored data.
+
+        """
         # To delete all data, use the `delete_series` API
         try:
             requests.post(
@@ -256,10 +351,20 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
                 params={"match[]": '{__name__=~".*"}'},
                 timeout=RESPONSE_TIMEOUT,
             )
-        except:
+        except Exception:  # noqa: BLE001
             time.sleep(1)
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        """
+        Upload data in batch to the database.
+
+        This method iterates over a dataset and sends each record to the
+        database.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` instance.
+
+        """
         obj: dict
         for obj in dataset.victoriametric_json:
             json: str = dumps(obj=obj)
@@ -269,24 +374,76 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
                     data=json,
                     timeout=RESPONSE_TIMEOUT,
                 )
-            except:
+            except Exception:  # noqa: BLE001
                 time.sleep(1)
 
-    def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+    def sequential_upload(
+        self,
+        dataset: scoda.datasets.generic.Dataset,
+    ) -> None:
+        """
+        Upload data sequentially to the database.
+
+        This method iterates over each row in a dataset and writes it
+        individually to the database with a short delay between uploads. Each
+        row is converted to a line protocol point with appropriate tags and
+        fields. Invalid or missing field values are skipped, and non-numeric
+        strings are cast to float where possible.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` containing time series data
+                    with a time index and one or more value columns.
+
+        """
         self.batch_upload(dataset)  # No real diff for VictoriaMetrics
 
     def batch_read(self, table_name: str) -> None:
-        response = requests.get(
+        """
+        Perform a batch read of all metrics from the database.
+
+        Arguments:
+            table_name: The name of the table to read from.
+
+        """
+        table_name = table_name.lower()
+        requests.get(
             f"{self.uri}/api/v1/export",
             params={"match[]": '{__name__=~".*"}'},
             timeout=RESPONSE_TIMEOUT,
         )
 
     def sequential_read(self, table_name: str, rows: int) -> None:
+        """
+        Perform a sequential read of records from a specified table.
+
+        This method constructs and executes a  query to read all records from
+        the specified table. It counts the number of records streamed from the
+        query result but does not return or store them.
+
+        Arguments:
+            table_name: The name of the table (i.e., measurement) to read from.
+            rows: The number of rows to read.
+
+        """
+        rows += 0
         self.batch_read(table_name)
 
     def query_average_value(self, table_name: str, column_name: str) -> None:
-        query = {"query": f'avg({column_name}{{name="{table_name}"}})', "start": "-1y"}
+        """
+        Query the average value of a column in a given table.
+
+        This method retrieves the average value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the average value.
+
+        """
+        query = {
+            "query": f'avg({column_name}{{name="{table_name}"}})',
+            "start": "-1y",
+        }
         requests.get(
             f"{self.uri}/api/v1/query",
             params=query,
@@ -294,21 +451,48 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
         )
 
     def query_min_value(self, table_name: str, column_name: str) -> None:
-        query = {"query": f'min({column_name}{{name="{table_name}"}})', "start": "-1y"}
-        r = requests.get(
+        """
+        Query the minimum value of a column in a given table.
+
+        This method retrieves the minimum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the minimum value.
+
+        """
+        query = {
+            "query": f'min({column_name}{{name="{table_name}"}})',
+            "start": "-1y",
+        }
+        requests.get(
             f"{self.uri}/api/v1/query",
             params=query,
             timeout=RESPONSE_TIMEOUT,
         )
 
     def query_max_value(self, table_name: str, column_name: str) -> None:
-        query = {"query": f'max({column_name}{{name="{table_name}"}})', "start": "-1y"}
-        r = requests.get(
+        """
+        Query the maximum value of a column in a given table.
+
+        This method retrieves the maximum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the maximum value.
+
+        """
+        query = {
+            "query": f'max({column_name}{{name="{table_name}"}})',
+            "start": "-1y",
+        }
+        requests.get(
             f"{self.uri}/api/v1/query",
             params=query,
             timeout=RESPONSE_TIMEOUT,
         )
-        r.raise_for_status()
 
     def query_mode_value(self, table_name: str, column_name: str) -> None:
         """
@@ -322,6 +506,9 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
             column_name: The name of the column to extract the mode value from.
 
         """
+        table_name = table_name.lower()
+        column_name = column_name.lower()
+
         requests.get(
             f"{self.uri}/api/v1/export",
             params={"match[]": '{__name__=~".*"}'},

@@ -26,6 +26,16 @@ class RelationalDB(scoda.db.DB):
         self.metadata: MetaData = MetaData()
 
     def batch_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        """
+        Upload data in batch to the database.
+
+        This method iterates over a dataset and sends each record to the
+        database.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` instance.
+
+        """
         dataset.data.to_sql(
             name=dataset.name,
             con=self.engine,
@@ -34,12 +44,25 @@ class RelationalDB(scoda.db.DB):
         )
 
     def batch_read(self, table_name: str) -> None:
+        """
+        Perform a batch read of all metrics from the database.
+
+        Arguments:
+            table_name: The name of the table to read from.
+
+        """
         pd.read_sql_table(table_name=table_name, con=self.engine)
 
     def create(self) -> None:
         pass
 
     def delete(self) -> None:
+        """
+        Delete all data from the database.
+
+        This method sends removes all stored data.
+
+        """
         self.metadata.reflect(bind=self.engine)
         self.metadata.drop_all(bind=self.engine)
 
@@ -48,6 +71,17 @@ class RelationalDB(scoda.db.DB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query the average value of a column in a given table.
+
+        This method retrieves the average value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the average value.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,
@@ -79,6 +113,17 @@ class RelationalDB(scoda.db.DB):
         ...
 
     def query_max_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the maximum value of a column in a given table.
+
+        This method retrieves the maximum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the maximum value.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,
@@ -91,6 +136,17 @@ class RelationalDB(scoda.db.DB):
             connection.close()
 
     def query_min_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the minimum value of a column in a given table.
+
+        This method retrieves the minimum value of a specified column from a
+        time series table using the configured database endpoint.
+
+        Arguments:
+            table_name: The name of the table.
+            column_name: The column from which to retrieve the minimum value.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,
@@ -118,6 +174,18 @@ class RelationalDB(scoda.db.DB):
         ...
 
     def sequential_read(self, table_name: str, rows: int) -> None:
+        """
+        Perform a sequential read of records from a specified table.
+
+        This method constructs and executes a  query to read all records from
+        the specified table. It counts the number of records streamed from the
+        query result but does not return or store them.
+
+        Arguments:
+            table_name: The name of the table (i.e., measurement) to read from.
+            rows: The number of rows to read.
+
+        """
         dfs: Iterable[pd.DataFrame] = pd.read_sql_table(
             table_name=table_name,
             con=self.engine,
@@ -128,7 +196,24 @@ class RelationalDB(scoda.db.DB):
         for df in dfs:
             df.isna()
 
-    def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+    def sequential_upload(
+        self,
+        dataset: scoda.datasets.generic.Dataset,
+    ) -> None:
+        """
+        Upload data sequentially to the database.
+
+        This method iterates over each row in a dataset and writes it
+        individually to the database with a short delay between uploads. Each
+        row is converted to a line protocol point with appropriate tags and
+        fields. Invalid or missing field values are skipped, and non-numeric
+        strings are cast to float where possible.
+
+        Arguments:
+            dataset: A `scoda.datasets.generic.Dataset` containing time series data
+                    with a time index and one or more value columns.
+
+        """
         dataset.data.to_sql(
             name=dataset.name,
             con=self.engine,

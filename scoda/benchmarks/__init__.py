@@ -1,7 +1,7 @@
 """
-Database benchmarks.
+Top level benchmarks/__init__.py file.
 
-Copyright 2025 (C) Nicholas M. Synovic
+Copyright (C) 2025 Nicholas M. Synovic.
 
 """
 
@@ -13,8 +13,6 @@ import scoda.benchmarks.ingress as scoda_benchmarks_ingress
 import scoda.datasets.generic
 import scoda.db
 
-__all__: list[str] = ["run_benchmarks"]
-
 
 def run_benchmarks(
     test_db: scoda.db.DB,
@@ -22,6 +20,25 @@ def run_benchmarks(
     datasets: Iterable[scoda.datasets.generic.Dataset],
     iterations: int,
 ) -> None:
+    """
+    Run a full suite of ingress, egress, and aggregation tests on a database.
+
+    This function evaluates database performance by writing and reading multiple
+    datasets using different ingestion and egress strategies, as well as
+    executing aggregation queries. Benchmark results are recorded in the
+    specified results database for further analysis.
+
+    If the test database is configured to convert time columns to integers, all
+    datasets will be updated accordingly. Existing data in the test database is
+    cleared before benchmarking.
+
+    Arguments:
+        test_db: The database instance to run benchmarks on.
+        results_db: The database used to store benchmark results.
+        datasets: An iterable of datasets used for benchmarking.
+        iterations: The number of times to repeat each benchmark operation.
+
+    """
     # Change the type of the time column
     if test_db.convert_time_column_to_int:
         ds: scoda.datasets.generic.Dataset

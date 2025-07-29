@@ -22,8 +22,6 @@ def batch_write_all_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
-    # TODO: Add different code paths for relational, time series, document, etc.
-    # databases
     data = defaultdict(list)
 
     def _run() -> None:

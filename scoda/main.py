@@ -21,6 +21,14 @@ from scoda.utils import create_db_instance, identify_input
 
 
 def main() -> int:
+    """
+    Execute the benchmark suite using specified datasets and configurations.
+
+    This function orchestrates the benchmark process, handling command-line
+    arguments, establishing database connections, loading datasets, and running
+    benchmarks.
+
+    """
     # Handle CLI args
     cli: CLI = CLI()
     args: dict[str, Any] = cli.parse_args().__dict__

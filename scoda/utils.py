@@ -26,7 +26,7 @@ def resolve_path(filepath: str) -> Path:
     This function takes a filepath as input and returns an absolute Path object
     representing the resolved path.
 
-    Args:
+    Arguments:
         filepath: The path to resolve.
 
     Returns:

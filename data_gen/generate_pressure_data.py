@@ -1,3 +1,10 @@
+"""
+Generate water pressure data.
+
+Copyright 2025 (C) Nicholas M. Synovic
+
+"""
+
 import argparse
 
 import numpy as np

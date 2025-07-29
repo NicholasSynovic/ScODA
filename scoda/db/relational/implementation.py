@@ -17,6 +17,17 @@ class PostgreSQL(RelationalDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,
@@ -42,6 +53,17 @@ class PostgreSQL(RelationalDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,
@@ -66,6 +88,17 @@ class GenericMySQL(RelationalDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,
@@ -77,6 +110,17 @@ class GenericMySQL(RelationalDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,
@@ -124,6 +168,17 @@ class GenericSQLite3(RelationalDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,
@@ -149,6 +204,17 @@ class GenericSQLite3(RelationalDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         table: Table = Table(
             table_name,
             self.metadata,

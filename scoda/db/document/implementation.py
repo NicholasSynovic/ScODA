@@ -79,6 +79,17 @@ class CouchDB(DocumentDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
         resp: requests.Response = requests.get(
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
@@ -121,6 +132,17 @@ class CouchDB(DocumentDB):
         column.min()
 
     def query_mode_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         resp: requests.Response = requests.get(
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
@@ -218,6 +240,17 @@ class MongoDB(DocumentDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
         docs = list(self.collection_conn.find({"name": table_name}))
         df = pd.DataFrame(docs)
         df[column_name] = pd.to_datetime(df[column_name], utc=True)
@@ -238,6 +271,17 @@ class MongoDB(DocumentDB):
         list(self.collection_conn.aggregate(pipeline))
 
     def query_mode_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         pipeline = [
             {"$match": {"name": table_name}},
             {"$group": {"_id": f"${column_name}", "count": {"$sum": 1}}},

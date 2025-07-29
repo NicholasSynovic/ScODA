@@ -114,6 +114,17 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         table_name: str,
         column_name: str,
     ) -> None:
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
         query = f"""
         from(bucket: "{self.bucket}")
         |> range(start: 0)
@@ -157,6 +168,17 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         query_api.query(query=query, org=self.org)
 
     def query_mode_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         query = f'''
         from(bucket: "{self.bucket}")
         |> range(start: 0)
@@ -289,6 +311,17 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
         r.raise_for_status()
 
     def query_mode_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         requests.get(
             f"{self.uri}/api/v1/export",
             params={"match[]": '{__name__=~".*"}'},
@@ -298,6 +331,17 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
     def query_groupby_time_window_value(
         self, table_name: str, column_name: str
     ) -> None:
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
         query = {
             "query": f'avg_over_time({column_name}{{name="{table_name}"}}[{"1h"}])',
             "start": "-1y",

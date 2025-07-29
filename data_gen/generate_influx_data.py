@@ -1,10 +1,19 @@
+"""
+Generate data for InfluxDB.
+
+Copyright 2025 (C) Nicholas M. Synovic
+
+"""
+
 import argparse
 from datetime import datetime, timedelta
+from pathlib import Path
+from string import Template
 
 import numpy as np
 
 
-def simulate_status_data(
+def simulate_status_data(  # noqa: PLR0913, PLR0917
     total_seconds: int,
     lambda_idle: float,
     lambda_use: float,
@@ -17,8 +26,31 @@ def simulate_status_data(
     tag_value: str,
     unit: str,
     field_key: str,
-):
-    np.random.seed(seed)
+) -> None:
+    """
+    Simulate binary status data and write it in InfluxDB line protocol format.
+
+    This function generates time-series status data that alternates between idle (0)
+    and in-use (1) states. The duration of each state is sampled from an exponential
+    distribution parameterized by lambda values. The resulting records are written to
+    a file in InfluxDB line protocol format with nanosecond-precision timestamps.
+
+    Arguments:
+        total_seconds: Total duration of the simulation in seconds.
+        lambda_idle: Rate (1/mean seconds) for the idle state duration.
+        lambda_use: Rate (1/mean seconds) for the in-use state duration.
+        sampling_interval: Time interval between successive data samples (in seconds).
+        seed: Random seed for reproducibility.
+        output_file: Path to the file where output data will be written.
+        base_time: Base timestamp in ISO 8601 format (e.g., "2024-01-01T00:00:00").
+        measurement: Measurement name for InfluxDB.
+        tag_key: Tag key to associate with each data point.
+        tag_value: Tag value corresponding to the tag key.
+        unit: Value for the "units" tag in the line protocol.
+        field_key: Field key for the data value (e.g., "value").
+
+    """
+    rng: np.random.Generator = np.random.Generator(np.random.PCG64(seed=seed))
 
     current_time = 0
     state = 0  # 0 for idle, 1 for in-use
@@ -26,25 +58,32 @@ def simulate_status_data(
     records = []
     base_dt = datetime.fromisoformat(base_time)
 
+    line_template: Template = Template(
+        template="${measurement},${tag_key}=${tag_value},units=${unit} ${field_key}=${state}i ${ns_timestamp}}"  # noqa: E501
+    )
+
     while current_time < total_seconds:
-        duration = np.random.exponential(
-            1 / (lambda_idle if state == 0 else lambda_use)
-        )
+        duration = rng.exponential(1 / (lambda_idle if state == 0 else lambda_use))
         steps = int(min(duration, (total_seconds - current_time) / sampling_interval))
 
         for _ in range(steps):
             timestamp = base_dt + timedelta(seconds=current_time)
             ns_timestamp = int(timestamp.timestamp() * 1e9)
-            line = f"{measurement},{tag_key}={tag_value},units={unit} {field_key}={state}i {ns_timestamp}"
+            line = line_template.substitute(
+                measurement=measurement,
+                tag_key=tag_key,
+                tag_value=tag_value,
+                unit=unit,
+                field_key=field_key,
+                state=state,
+                ns_timestamp=ns_timestamp,
+            )
             records.append(line)
             current_time += sampling_interval
 
         state = 1 - state
 
-    with open(output_file, "w") as f:
-        f.write("\n".join(records))
-
-    print(f"Wrote {len(records)} records to {output_file}")
+    Path(output_file).write_text(data="\n".join(records), encoding="utf8")
 
 
 if __name__ == "__main__":

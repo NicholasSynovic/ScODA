@@ -35,7 +35,19 @@ class DocumentDB(scoda.db.DB):
         self,
         table_name: str,
         column_name: str,
-    ) -> None: ...
+    ) -> None:
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
+        ...
 
     @abstractmethod
     def query_max_value(self, table_name: str, column_name: str) -> None: ...
@@ -44,7 +56,19 @@ class DocumentDB(scoda.db.DB):
     def query_min_value(self, table_name: str, column_name: str) -> None: ...
 
     @abstractmethod
-    def query_mode_value(self, table_name: str, column_name: str) -> None: ...
+    def query_mode_value(self, table_name: str, column_name: str) -> None:
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
+        ...
 
     @abstractmethod
     def sequential_read(self, table_name: str, rows: int) -> None: ...

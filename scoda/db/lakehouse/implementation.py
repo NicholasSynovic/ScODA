@@ -66,6 +66,17 @@ class DeltaLake(LakehouseDB):
         min_val = df.select(F.min(F.col(column_name)).alias("min")).collect()[0]["min"]
 
     def query_mode_value(self, table_name: str, column_name: str):
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         df = self.spark.read.format("delta").load(self._table_path(table_name))
         mode_val = (
             df.groupBy(column_name)
@@ -76,6 +87,17 @@ class DeltaLake(LakehouseDB):
         )
 
     def query_groupby_time_window_value(self, table_name: str, column_name: str):
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
         df = self.spark.read.format("delta").load(self._table_path(table_name))
         if column_name not in df.columns:
             raise ValueError("Expected 'time' column in table for time-based grouping.")
@@ -167,7 +189,17 @@ class IcebergDB(LakehouseDB):
         return min_val
 
     def query_mode_value(self, table_name: str, column_name: str):
-        """Query the mode (most frequent value) of a column."""
+        """
+        Query the mode value from a specified table and column.
+
+        It is intended to support analysis for determining the most frequent
+        (mode) value within the specified table and column.
+
+        Arguments:
+            table_name: The name of the table to query.
+            column_name: The name of the column to extract the mode value from.
+
+        """
         df = self.spark.read.table(self._qualified_table(table_name))
         mode_val = (
             df.groupBy(column_name)
@@ -179,7 +211,18 @@ class IcebergDB(LakehouseDB):
         return mode_val
 
     def query_groupby_time_window_value(self, table_name: str, column_name: str):
-        """Query average values grouped by a time window."""
+        """
+        Query a time window value grouped by a table name and column name.
+
+        This function sends a request to group a specified column over an one
+        hour time window.
+
+        Arguments:
+            table_name: The name of the table to group by.
+            column_name: The name of the column to average over time.
+
+        """
+
         df = self.spark.read.table(self._qualified_table(table_name))
         if column_name not in df.columns:
             raise ValueError("Expected 'time' column for time window operations")

@@ -46,6 +46,8 @@ scoda last \
 
 # CouchDB
 echo "===CouchDB==="
+export COUCHDB_USERNAME="root"
+export COUCHDB_PASSWORD="example"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/couchdb_last-tiny_$ITERATIONS.sqlite3 \

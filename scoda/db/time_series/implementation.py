@@ -16,6 +16,7 @@ from influxdb_client.domain.bucket_retention_rules import BucketRetentionRules
 
 import scoda.datasets.generic
 import scoda.db.time_series.generic
+from scoda.db import RESPONSE_TIMEOUT
 
 
 class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
@@ -186,6 +187,7 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
             count += 1
 
     def sequential_upload(self, dataset: scoda.datasets.generic.Dataset) -> None:
+        error_counter: int = 0
         for _, row in dataset.time_series_data.iterrows():
             timestamp = row.name
             point = Point(dataset.name).time(timestamp)
@@ -209,7 +211,7 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
                     )
                     point.field(col, value)
                 except Exception as e:
-                    pass
+                    error_counter += 1
 
             self.write_api.write(bucket=self.bucket, org=self.org, record=point)
 
@@ -230,6 +232,7 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
             requests.post(
                 f"{self.uri}/api/v1/admin/tsdb/delete_series",
                 params={"match[]": '{__name__=~".*"}'},
+                timeout=RESPONSE_TIMEOUT,
             )
         except:
             time.sleep(1)
@@ -239,7 +242,11 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
         for obj in dataset.victoriametric_json:
             json: str = dumps(obj=obj)
             try:
-                requests.post(f"{self.uri}/api/v1/import", data=json)
+                requests.post(
+                    f"{self.uri}/api/v1/import",
+                    data=json,
+                    timeout=RESPONSE_TIMEOUT,
+                )
             except:
                 time.sleep(1)
 
@@ -250,6 +257,7 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
         response = requests.get(
             f"{self.uri}/api/v1/export",
             params={"match[]": '{__name__=~".*"}'},
+            timeout=RESPONSE_TIMEOUT,
         )
 
     def sequential_read(self, table_name: str, rows: int) -> None:
@@ -257,21 +265,34 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
 
     def query_average_value(self, table_name: str, column_name: str) -> None:
         query = {"query": f'avg({column_name}{{name="{table_name}"}})', "start": "-1y"}
-        requests.get(f"{self.uri}/api/v1/query", params=query)
+        requests.get(
+            f"{self.uri}/api/v1/query",
+            params=query,
+            timeout=RESPONSE_TIMEOUT,
+        )
 
     def query_min_value(self, table_name: str, column_name: str) -> None:
         query = {"query": f'min({column_name}{{name="{table_name}"}})', "start": "-1y"}
-        r = requests.get(f"{self.uri}/api/v1/query", params=query)
+        r = requests.get(
+            f"{self.uri}/api/v1/query",
+            params=query,
+            timeout=RESPONSE_TIMEOUT,
+        )
 
     def query_max_value(self, table_name: str, column_name: str) -> None:
         query = {"query": f'max({column_name}{{name="{table_name}"}})', "start": "-1y"}
-        r = requests.get(f"{self.uri}/api/v1/query", params=query)
+        r = requests.get(
+            f"{self.uri}/api/v1/query",
+            params=query,
+            timeout=RESPONSE_TIMEOUT,
+        )
         r.raise_for_status()
 
     def query_mode_value(self, table_name: str, column_name: str) -> None:
         requests.get(
             f"{self.uri}/api/v1/export",
             params={"match[]": '{__name__=~".*"}'},
+            timeout=RESPONSE_TIMEOUT,
         )
 
     def query_groupby_time_window_value(
@@ -281,4 +302,8 @@ class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
             "query": f'avg_over_time({column_name}{{name="{table_name}"}}[{"1h"}])',
             "start": "-1y",
         }
-        requests.get(f"{self.uri}/api/v1/query", params=query)
+        requests.get(
+            f"{self.uri}/api/v1/query",
+            params=query,
+            timeout=RESPONSE_TIMEOUT,
+        )

@@ -1,3 +1,5 @@
+import os
+
 import pandas as pd
 import pymongo
 import pymongo.collection
@@ -7,6 +9,7 @@ import requests
 import requests.auth
 
 import scoda.datasets.generic
+from scoda.db import RESPONSE_TIMEOUT
 from scoda.db.document.generic import DocumentDB
 
 
@@ -16,8 +19,8 @@ class CouchDB(DocumentDB):
         self.uri: str = "http://localhost:5984/research"
         self.headers: dict[str, str] = {"Content-Type": "application/json"}
         self.auth: requests.auth.HTTPBasicAuth = requests.auth.HTTPBasicAuth(
-            username="root",
-            password="example",
+            username=os.environ["COUCHDB_USERNAME"],
+            password=os.environ["COUCHDB_PASSWORD"],
         )
 
         self.create()
@@ -28,7 +31,7 @@ class CouchDB(DocumentDB):
             auth=self.auth,
             headers=self.headers,
             data='{"docs": ' + dataset.json_data_str + "}",
-            timeout=600,
+            timeout=RESPONSE_TIMEOUT,
         )
 
     def batch_read(self, table_name: str) -> None:
@@ -38,20 +41,20 @@ class CouchDB(DocumentDB):
             auth=self.auth,
             headers=self.headers,
             data=json_data,
-            timeout=600,
+            timeout=RESPONSE_TIMEOUT,
         )
 
     def create(self) -> None:
         resp: requests.Response = requests.get(
             url=self.uri,
             auth=self.auth,
-            timeout=600,
+            timeout=RESPONSE_TIMEOUT,
         )
         if resp.status_code != 200:
-            requests.put(url=self.uri, auth=self.auth, timeout=600)
+            requests.put(url=self.uri, auth=self.auth, timeout=RESPONSE_TIMEOUT)
 
     def delete(self) -> None:
-        requests.delete(url=self.uri, auth=self.auth, timeout=600)
+        requests.delete(url=self.uri, auth=self.auth, timeout=RESPONSE_TIMEOUT)
 
     def query_average_value(
         self,
@@ -62,7 +65,7 @@ class CouchDB(DocumentDB):
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
             headers=self.headers,
-            timeout=600,
+            timeout=RESPONSE_TIMEOUT,
         )
 
         docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
@@ -80,7 +83,7 @@ class CouchDB(DocumentDB):
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
             headers=self.headers,
-            timeout=600,
+            timeout=RESPONSE_TIMEOUT,
         )
 
         docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
@@ -94,7 +97,7 @@ class CouchDB(DocumentDB):
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
             headers=self.headers,
-            timeout=600,
+            timeout=RESPONSE_TIMEOUT,
         )
 
         docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
@@ -108,7 +111,7 @@ class CouchDB(DocumentDB):
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
             headers=self.headers,
-            timeout=600,
+            timeout=RESPONSE_TIMEOUT,
         )
 
         docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
@@ -122,7 +125,7 @@ class CouchDB(DocumentDB):
             url=f"{self.uri}/_all_docs?include_docs=true",
             auth=self.auth,
             headers=self.headers,
-            timeout=600,
+            timeout=RESPONSE_TIMEOUT,
         )
 
         docs: list[dict] = [x["doc"] for x in resp.json()["rows"]]
@@ -140,6 +143,7 @@ class CouchDB(DocumentDB):
                 auth=self.auth,
                 headers=self.headers,
                 data=json_body,
+                timeout=RESPONSE_TIMEOUT,
             )
 
     def sequential_upload(
@@ -153,7 +157,7 @@ class CouchDB(DocumentDB):
                 auth=self.auth,
                 headers=self.headers,
                 data=json_str,
-                timeout=600,
+                timeout=RESPONSE_TIMEOUT,
             )
 
 

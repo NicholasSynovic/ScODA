@@ -23,11 +23,38 @@ import scoda.db
 
 
 class RelationalDB(scoda.db.DB):
+    """
+    Abstract base class for relational database backends using SQLAlchemy.
+
+    This class provides core functionality for initializing a connection to
+    a relational database and managing metadata. Subclasses should extend
+    this class to implement database-specific behavior.
+
+    Attributes:
+        engine: SQLAlchemy Engine used for database connections.
+        metadata: SQLAlchemy MetaData object for reflecting and manipulating schema.
+
+    Args:
+        connection_string: SQLAlchemy connection string for the target database.
+        convert_time_column_to_int: Whether to convert time columns to integers.
+
+    """
+
     def __init__(
         self,
         connection_string: str,
-        convert_time_column_to_int: bool = False, # noqa: FBT001, FBT002
+        convert_time_column_to_int: bool = False,  # noqa: FBT001, FBT002
     ) -> None:
+        """
+        Initialize a relational database connection using SQLAlchemy.
+
+        Args:
+            connection_string: A SQLAlchemy-compatible connection string
+                to connect to the relational database (e.g., SQLite, MySQL, PostgreSQL).
+            convert_time_column_to_int: Whether to convert time columns to integer
+                representations for internal processing (default is False).
+
+        """
         super().__init__(convert_time_column_to_int=convert_time_column_to_int)
         self.engine: Engine = create_engine(url=connection_string)
         self.metadata: MetaData = MetaData()
@@ -60,9 +87,9 @@ class RelationalDB(scoda.db.DB):
         """
         pd.read_sql_table(table_name=table_name, con=self.engine)
 
-    def create(self) -> None:
+    def create(self) -> None:  # noqa: PLR6301
         """Create the database if it does not already exist."""
-        return None
+        return None  # noqa: RET501
 
     def delete(self) -> None:
         """

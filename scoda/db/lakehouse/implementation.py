@@ -1,3 +1,10 @@
+"""
+Implementations of lakehouse.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
 from pathlib import Path
 
 import delta
@@ -34,6 +41,7 @@ class DeltaLake(LakehouseDB):
         return str(self.base_path / table_name)
 
     def create(self) -> None:
+        """Create the database if it does not already exist."""
         self.base_path.mkdir(parents=True, exist_ok=True)
 
     def delete(self) -> None:
@@ -224,7 +232,7 @@ class IcebergDB(LakehouseDB):
         return f"{self.catalog_name}.{table_name}"
 
     def create(self) -> None:
-        """Create the warehouse directory if it doesn't exist."""
+        """Create the database if it does not already exist."""
         Path(self.warehouse_path).mkdir(parents=True, exist_ok=True)
         self.spark.sql("CREATE SCHEMA IF NOT EXISTS hadoop_prod.db1")
 

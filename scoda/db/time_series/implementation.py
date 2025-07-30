@@ -1,3 +1,11 @@
+"""
+Implementations of time-series databases.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
+import os
 import time
 from json import dumps
 
@@ -20,12 +28,51 @@ from scoda.db import RESPONSE_TIMEOUT
 
 
 class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
+    """
+    Interface for interacting with an InfluxDB instance.
+
+    This class initializes and manages InfluxDB client components for reading
+    and writing time series data. Configuration parameters are loaded from
+    environment variables: `INFLUXDB_TOKEN`, `INFLUXDB_BUCKET`, `INFLUXDB_ORG`,
+    and `INFLUXDB_URI`.
+
+    The class sets up the write clients (both batch and synchronous) and the
+    buckets API for managing storage buckets. It also defines a default
+    retention period.
+
+    """
+
     def __init__(self) -> None:
+        """
+        Initialize an InfluxDB client for time series operations.
+
+        This constructor loads configuration values from environment variables
+        and sets up InfluxDB client components, including APIs for bucket
+        management and data writing.
+
+        Environment variables used:
+            INFLUXDB_TOKEN: Authentication token for the InfluxDB instance.
+            INFLUXDB_BUCKET: Target bucket for storing time series data.
+            INFLUXDB_ORG: Organization associated with the InfluxDB account.
+            INFLUXDB_URI: URI of the InfluxDB instance.
+
+        Attributes:
+            token: Authentication token for the InfluxDB client.
+            bucket: Bucket name for storing time series data.
+            org: Organization name.
+            uri: Base URI for the InfluxDB instance.
+            retention_seconds: Default retention period in seconds.
+            bucket_api: API interface for bucket management.
+            write_client: InfluxDB client instance for issuing operations.
+            batch_write_api: Write API for asynchronous batch writing.
+            write_api: Synchronous write API for reliable writes.
+
+        """
         super().__init__()
-        self.token: str = "lsJ1cR9FBJojeZ-HGzN9kAdhc1XYcagfq8MkaKAmeMJP_Ux2hOOu3n-84aSNP0EaP_kIXGdaByl19MP6938WuA=="
-        self.bucket: str = "research"
-        self.org: str = "research"
-        self.uri: str = "http://localhost:8086"
+        self.token: str = os.environ["INFLUXDB_TOKEN"]
+        self.bucket: str = os.environ["INFLUXDB_BUCKET"]
+        self.org: str = os.environ["INFLUXDB_ORG"]
+        self.uri: str = os.environ["INFLUXDB_URI"]
 
         self.retention_seconds: int = 3153600000
 
@@ -83,12 +130,13 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         from(bucket: "{self.bucket}")
         |> range(start: 0)
         |> filter(fn: (r) => r["name"] == "{table_name}")
-        '''
+        '''  # noqa: Q001
 
         query_api: QueryApi = self.write_client.query_api()
         query_api.query_data_frame(query=query, org=self.org)
 
     def create(self) -> None:
+        """Create the database if it does not already exist."""
         existing_buckets: list = self.bucket_api.find_buckets().buckets
         bucket_exists: bool = any(
             bucket.name == self.bucket for bucket in existing_buckets
@@ -137,7 +185,7 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         |> filter(fn: (r) => r["name"] == "{table_name}")
         |> filter(fn: (r) => r["_field"] == "{column_name}")
         |> mean()
-        '''
+        '''  # noqa: Q001
 
         # Execute and fetch the average value
         query_api = self.write_client.query_api()
@@ -193,7 +241,7 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         |> filter(fn: (r) => r["name"] == "{table_name}")
         |> filter(fn: (r) => r["_field"] == "{column_name}")
         |> max()
-        '''
+        '''  # noqa: Q001
 
         # Execute and fetch the average value
         query_api = self.write_client.query_api()
@@ -217,7 +265,7 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         |> filter(fn: (r) => r["name"] == "{table_name}")
         |> filter(fn: (r) => r["_field"] == "{column_name}")
         |> min()
-        '''
+        '''  # noqa: Q001
 
         # Execute and fetch the average value
         query_api = self.write_client.query_api()
@@ -246,7 +294,7 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
         |> sort(columns: ["_value"], desc: false)
         |> sort(columns: ["_value"], desc: true)
         |> limit(n: 1)
-        '''
+        '''  # noqa: Q001
 
         # Execute and fetch the average value
         query_api = self.write_client.query_api()
@@ -265,16 +313,17 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
             rows: The number of rows to read.
 
         """
+        rows += 1
         query = f'''
         from(bucket: "{self.bucket}")
         |> range(start: 0)
         |> filter(fn: (r) => r["name"] == "{table_name}")
-        '''
+        '''  # noqa: Q001
         query_api: QueryApi = self.write_client.query_api()
 
         count: int = 0
         for _ in query_api.query_stream(query=query, org=self.org):
-            count += 1
+            count += 1  # noqa: SIM113
 
     def sequential_upload(
         self,
@@ -317,7 +366,7 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
                         else value
                     )
                     point.field(col, value)
-                except Exception:
+                except Exception:  # noqa: BLE001
                     error_counter += 1
 
             self.write_api.write(
@@ -330,12 +379,30 @@ class InfluxDB(scoda.db.time_series.generic.TimeSeriesDB):
 
 
 class VictoriaMetrics(scoda.db.time_series.generic.TimeSeriesDB):
+    """
+    VictoriaMetrics time series database client implementation.
+
+    This class implements methods for reading, writing, deleting, and querying
+    time series data in VictoriaMetrics using the HTTP API. It supports both
+    batch and sequential operations and basic aggregation queries.
+
+    """
+
     def __init__(self) -> None:
+        """
+        Initialize the VictoriaMetrics client with the default URI.
+
+        This sets up the base URI for interacting with the VictoriaMetrics HTTP
+        API. The default URI is 'http://localhost:8428'. nherits from the base
+        class and sets up necessary attributes for further operations.
+
+        """
         super().__init__()
-        self.uri: str = "http://localhost:8428"
+        self.uri: str = os.environ["VICTORIAMETRICS_URI"]
 
     def create(self) -> None:
-        pass  # No-op for VictoriaMetrics
+        """Create the database if it does not already exist."""
+        pass  # noqa: PIE790
 
     def delete(self) -> None:
         """

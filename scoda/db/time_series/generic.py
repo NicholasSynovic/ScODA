@@ -1,3 +1,10 @@
+"""
+Generic time-series database.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
 from abc import abstractmethod
 
 import scoda.datasets.generic
@@ -5,10 +12,32 @@ import scoda.db
 
 
 class TimeSeriesDB(scoda.db.DB):
+    """
+    Abstract base class for time series databases.
+
+    This class extends the generic `scoda.db.DB` interface with optional time
+    column preprocessing for time series data. Subclasses are expected to
+    implement concrete methods for reading, writing, and querying time series
+    data.
+
+    """
+
     def __init__(
         self,
-        convert_time_column_to_int: bool = True,
+        convert_time_column_to_int: bool = True,  # noqa: FBT001, FBT002
     ) -> None:
+        """
+        Initialize the time series database interface.
+
+        This constructor sets an option to convert time columns to integer epoch
+        values (seconds since Unix epoch), which is useful for databases that do
+        not support native timestamp types.
+
+        Arguments:
+            convert_time_column_to_int: Whether to convert time columns to
+                integers during preprocessing. Defaults to True.
+
+        """
         super().__init__(convert_time_column_to_int=convert_time_column_to_int)
 
     @abstractmethod
@@ -37,7 +66,9 @@ class TimeSeriesDB(scoda.db.DB):
         ...
 
     @abstractmethod
-    def create(self) -> None: ...
+    def create(self) -> None:
+        """Create the database if it does not already exist."""
+        ...
 
     @abstractmethod
     def delete(self) -> None:

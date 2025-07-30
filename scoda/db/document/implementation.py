@@ -1,3 +1,10 @@
+"""
+Implementations of document databases.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
 import os
 
 import pandas as pd
@@ -63,6 +70,7 @@ class CouchDB(DocumentDB):
         )
 
     def create(self) -> None:
+        """Create the database if it does not already exist."""
         resp: requests.Response = requests.get(
             url=self.uri,
             auth=self.auth,
@@ -309,6 +317,7 @@ class MongoDB(DocumentDB):
         pd.DataFrame(results)
 
     def create(self) -> None:
+        """Create the database if it does not already exist."""
         self.database_conn = self.client[self.database_name]
 
         try:

@@ -33,7 +33,9 @@ class DB(ABC):
         ...
 
     @abstractmethod
-    def create(self) -> None: ...
+    def create(self) -> None:
+        """Create the database if it does not already exist."""
+        ...
 
     @abstractmethod
     def delete(self) -> None:

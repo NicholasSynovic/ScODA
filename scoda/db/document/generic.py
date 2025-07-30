@@ -1,3 +1,10 @@
+"""
+Generic document database.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
 from abc import abstractmethod
 
 import scoda.datasets.generic
@@ -37,7 +44,9 @@ class DocumentDB(scoda.db.DB):
         ...
 
     @abstractmethod
-    def create(self) -> None: ...
+    def create(self) -> None:
+        """Create the database if it does not already exist."""
+        ...
 
     @abstractmethod
     def delete(self) -> None:

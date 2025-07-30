@@ -1,3 +1,10 @@
+"""
+Implementations of relational databases.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
 from pathlib import Path
 
 from sqlalchemy import Table, desc, func, select

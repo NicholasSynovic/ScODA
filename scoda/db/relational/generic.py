@@ -1,3 +1,10 @@
+"""
+Generic relational database.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
 from abc import abstractmethod
 from collections.abc import Iterable
 
@@ -54,6 +61,7 @@ class RelationalDB(scoda.db.DB):
         pd.read_sql_table(table_name=table_name, con=self.engine)
 
     def create(self) -> None:
+        """Create the database if it does not already exist."""
         pass
 
     def delete(self) -> None:

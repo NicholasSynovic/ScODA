@@ -64,6 +64,10 @@ scoda last \
 
 # InfluxDB
 echo "===InfluxDB==="
+export INFLUXDB_TOKEN="lsJ1cR9FBJojeZ-HGzN9kAdhc1XYcagfq8MkaKAmeMJP_Ux2hOOu3n-84aSNP0EaP_kIXGdaByl19MP6938WuA=="
+export INFLUXDB_BUCKET="research"
+export INFLUXDB_ORG="research"
+export INFLUXDB_URI="http://localhost:8086"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/influxdb_last-tiny_$ITERATIONS.sqlite3 \
@@ -72,6 +76,7 @@ scoda last \
 
 # VictoriaMetrics
 echo "===VictoriaMetrics==="
+export VICTORIAMETRICS_URI="http://localhost:8428"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/victoriametrics_last-tiny_$ITERATIONS.sqlite3 \

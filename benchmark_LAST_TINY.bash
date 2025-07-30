@@ -22,6 +22,10 @@ scoda last \
 
 # PostgreSQL
 echo "===PostgreSQL==="
+export POSTGRESQL_USERNAME="admin"
+export POSTGRESQL_PASSWORD="example"
+export POSTGRESQL_URI="localhost:5432"
+export POSTGRESQL_DATABASE="research"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/postgresql_last-tiny_$ITERATIONS.sqlite3 \
@@ -30,6 +34,10 @@ scoda last \
 
 # MySQL
 echo "===MySQL==="
+export MYSQL_USERNAME="root"
+export MYSQL_PASSWORD="example"
+export MYSQL_URI="localhost:3307"
+export MYSQL_DATABASE="research"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/mysql_last-tiny_$ITERATIONS.sqlite3 \
@@ -38,6 +46,10 @@ scoda last \
 
 # MariaDB
 echo "===MariaDB==="
+export MARIADB_USERNAME="root"
+export MARIADB_PASSWORD="example"
+export MARIADB_URI="localhost:3306"
+export MARIADB_DATABASE="research"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/mariadb_last-tiny_$ITERATIONS.sqlite3 \

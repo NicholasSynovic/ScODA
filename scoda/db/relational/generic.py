@@ -26,7 +26,7 @@ class RelationalDB(scoda.db.DB):
     def __init__(
         self,
         connection_string: str,
-        convert_time_column_to_int: bool = False,
+        convert_time_column_to_int: bool = False, # noqa: FBT001, FBT002
     ) -> None:
         super().__init__(convert_time_column_to_int=convert_time_column_to_int)
         self.engine: Engine = create_engine(url=connection_string)
@@ -62,7 +62,7 @@ class RelationalDB(scoda.db.DB):
 
     def create(self) -> None:
         """Create the database if it does not already exist."""
-        pass
+        return None
 
     def delete(self) -> None:
         """

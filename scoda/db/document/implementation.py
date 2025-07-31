@@ -21,9 +21,30 @@ from scoda.db.document.generic import DocumentDB
 
 
 class CouchDB(DocumentDB):
+    """
+    Manage connections and operations for a CouchDB database.
+
+    This class provides an interface for connecting to a CouchDB instance,
+    handling authentication, and preparing for database operations. It
+    extends `DocumentDB` and is configured for specific time column handling.
+
+    """
+
     def __init__(self) -> None:
+        """
+        Initialize the CouchDB client for database operations.
+
+        This constructor sets up the connection URI, headers, and basic
+        authentication for a CouchDB instance. It inherits from `DocumentDB` and
+        configures it to not convert time columns to integers. Authentication
+        credentials are retrieved from environment variables.
+
+        """
         super().__init__(convert_time_column_to_int=False)
-        self.uri: str = "http://localhost:5984/research"
+        uri: str = os.environ["COUCHDB_URI"]
+        database: str = os.environ["COUCHDB_DATABASE"]
+
+        self.uri: str = f"http://{uri}/{database}"
         self.headers: dict[str, str] = {"Content-Type": "application/json"}
         self.auth: requests.auth.HTTPBasicAuth = requests.auth.HTTPBasicAuth(
             username=os.environ["COUCHDB_USERNAME"],
@@ -76,7 +97,7 @@ class CouchDB(DocumentDB):
             auth=self.auth,
             timeout=RESPONSE_TIMEOUT,
         )
-        if resp.status_code != 200:
+        if resp.status_code != 200:  # noqa: PLR2004
             requests.put(url=self.uri, auth=self.auth, timeout=RESPONSE_TIMEOUT)
 
     def delete(self) -> None:
@@ -234,6 +255,7 @@ class CouchDB(DocumentDB):
             rows: The number of rows to read.
 
         """
+        table_name = table_name.lower()
         idx: int
         for idx in range(rows):
             json_body: str = '{"selector": {"id":' + str(idx) + '}, "limit": 1}'
@@ -265,7 +287,7 @@ class CouchDB(DocumentDB):
         """
         json_str: str
         for json_str in dataset.json_data_list:
-            resp = requests.post(
+            requests.post(
                 url=self.uri,
                 auth=self.auth,
                 headers=self.headers,
@@ -275,12 +297,34 @@ class CouchDB(DocumentDB):
 
 
 class MongoDB(DocumentDB):
-    def __init__(self) -> None:
-        super().__init__(convert_time_column_to_int=False)
+    """
+    Manage connections and operations for a MongoDB database.
 
-        self.uri: str = "mongodb://root:example@localhost:27017"
-        self.database_name: str = "research"
-        self.collection_name: str = "research_data"
+    This class provides an interface for connecting to a MongoDB instance,
+    managing database and collection connections, and performing operations
+    on the 'research_data' collection within the 'research' database. It
+    extends `DocumentDB` and is configured for specific time column handling.
+
+    """
+
+    def __init__(self) -> None:
+        """
+        Initialize the MongoDB client for database operations.
+
+        This constructor sets up the connection parameters for a MongoDB
+        instance, establishes a client connection, and initializes database and
+        collection connections. It inherits from `DocumentDB` and configures it
+        to not convert time columns to integers.
+
+        """
+        super().__init__(convert_time_column_to_int=False)
+        username: str = os.environ["MONGODB_USERNAME"]
+        password: str = os.environ["MONGODB_PASSWORD"]
+        uri: str = os.environ["MONGODB_URI"]
+
+        self.uri: str = f"mongodb://{username}:{password}@{uri}"
+        self.database_name: str = os.environ["MONGODB_DATABASE"]
+        self.collection_name: str = os.environ["MONGODB_COLLECTION"]
 
         self.database_conn: pymongo.database.Database
         self.collection_conn: pymongo.collection.Collection
@@ -320,7 +364,7 @@ class MongoDB(DocumentDB):
         """Create the database if it does not already exist."""
         self.database_conn = self.client[self.database_name]
 
-        try:
+        try:  # noqa: SIM105
             self.database_conn.create_collection(name=self.collection_name)
         except pymongo.errors.CollectionInvalid:
             pass
@@ -451,11 +495,12 @@ class MongoDB(DocumentDB):
             rows: The number of rows to read.
 
         """
+        rows += 1
         cursor = self.collection_conn.find({"name": table_name})
 
         count: int = 0
-        for doc in cursor:
-            count += 1
+        for _ in cursor:
+            count += 1  # noqa: SIM113
 
     def sequential_upload(
         self,

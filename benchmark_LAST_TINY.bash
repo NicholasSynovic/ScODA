@@ -60,6 +60,8 @@ scoda last \
 echo "===CouchDB==="
 export COUCHDB_USERNAME="root"
 export COUCHDB_PASSWORD="example"
+export COUCHDB_URI="localhost:5984"
+export COUCHDB_DATABASE="research"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/couchdb_last-tiny_$ITERATIONS.sqlite3 \
@@ -68,6 +70,11 @@ scoda last \
 
 # MongoDB
 echo "===MongoDB==="
+export MONOGDB_USERNAME="root"
+export MONOGDB_PASSWORD="example"
+export MONGODB_URI="localhost:27017"
+export MONGODB_DATABASE="research"
+export MONGODB_COLLECTION="research_data"
 scoda last \
     --input-dir $DATASET_DIR \
     --output $BENCHMARK_RESULTS_DIR/mongodb_last-tiny_$ITERATIONS.sqlite3 \

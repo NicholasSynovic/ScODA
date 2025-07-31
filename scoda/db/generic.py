@@ -1,10 +1,43 @@
+"""
+Generic database implementation.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
 from abc import ABC, abstractmethod
 
 import scoda.datasets.generic
 
 
 class DB(ABC):
-    def __init__(self, convert_time_column_to_int: bool = False) -> None:
+    """
+    Initialize the database interface.
+
+    Args:
+        convert_time_column_to_int (bool, optional): Whether to automatically
+        convert time-based columns to integer representations when processing
+        datasets. This is useful for databases or engines that do not natively
+        support high-precision datetime formats or benefit from integer-based
+        indexing. Defaults to False.
+
+    """
+
+    def __init__(
+        self,
+        convert_time_column_to_int: bool = False,  # noqa: FBT001, FBT002
+    ) -> None:
+        """
+        Initialize the base database interface.
+
+        Args:
+            convert_time_column_to_int (bool, optional): Whether to convert
+                time-based
+            columns to integer representations (e.g., UNIX timestamps). This may
+                be useful for systems or databases that handle integer time
+                values more efficiently. Defaults to False.
+
+        """
         self.convert_time_column_to_int: bool = convert_time_column_to_int
 
     @abstractmethod
@@ -131,6 +164,13 @@ class DB(ABC):
         ...
 
     def recreate(self) -> None:
+        """
+        Recreate the database.
+
+        This is a utility method intended to reset the database to a clean
+        state.
+
+        """
         self.delete()
         self.create()
 

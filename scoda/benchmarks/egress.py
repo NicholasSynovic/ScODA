@@ -22,6 +22,21 @@ def batch_read_all_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark the batch reading of all tables from the database.
+
+    This function measures the total time taken to batch read all provided
+    tables from the test database over a specified number of iterations.
+    The results are then saved to a SQL table in the results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects whose names correspond to
+            tables to read.
+
+    """
     data = defaultdict(list)
 
     def _run() -> None:
@@ -55,6 +70,22 @@ def batch_read_individual_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark the batch reading of individual tables from the database.
+
+    This function measures the time taken to batch read each individual
+    table from the test database over a specified number of iterations.
+    The results for each table are then saved to a SQL table in the results
+    database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects whose names correspond to
+            tables to read.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(ds: scoda.datasets.generic.Dataset) -> None:
@@ -89,6 +120,22 @@ def sequential_read_all_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark the sequential reading of all tables from the database.
+
+    This function measures the total time taken to sequentially read
+    (row by row) all provided tables from the test database over a specified
+    number of iterations. The results are then saved to a SQL table in the
+    results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects whose names correspond to
+            tables to read.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run() -> None:
@@ -123,6 +170,22 @@ def sequential_read_individual_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark the sequential reading of individual tables from the database.
+
+    This function measures the time taken to sequentially read (row by row)
+    each individual table from the test database over a specified number of
+    iterations. The results for each table are then saved to a SQL table in the
+    results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects whose names correspond to
+            tables to read.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(ds: scoda.datasets.generic.Dataset) -> None:

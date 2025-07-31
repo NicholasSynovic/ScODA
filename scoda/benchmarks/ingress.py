@@ -22,6 +22,20 @@ def batch_write_all_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark the batch writing of all datasets to the database.
+
+    This function measures the total time taken to batch upload all provided
+    datasets to the test database over a specified number of iterations.
+    The results are then saved to a SQL table in the results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects to upload.
+
+    """
     data = defaultdict(list)
 
     def _run() -> None:
@@ -56,6 +70,21 @@ def batch_write_individual_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark the batch writing of individual datasets to the database.
+
+    This function measures the time taken to batch upload each individual
+    dataset to the test database over a specified number of iterations.
+    The results for each dataset are then saved to a SQL table in the results
+    database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects to upload.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(ds: scoda.datasets.generic.Dataset) -> None:
@@ -90,6 +119,21 @@ def sequential_write_all_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark the sequential writing of all datasets to the database.
+
+    This function measures the total time taken to sequentially upload all
+    provided datasets to the test database (row by row) over a specified number
+    of iterations. The results are then saved to a SQL table in the results
+    database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects to upload.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run() -> None:
@@ -124,6 +168,21 @@ def sequential_write_individual_tables(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark the sequential writing of individual datasets to the database.
+
+    This function measures the time taken to sequentially upload each individual
+    dataset to the test database (row by row) over a specified number of
+    iterations. The results for each dataset are then saved to a SQL table in
+    the results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects to upload.
+
+    """
     data: dict[str, list[float]] = defaultdict(list)
 
     def _run(ds: scoda.datasets.generic.Dataset) -> None:

@@ -22,7 +22,23 @@ def query_min_value(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
-    # FIXME: Make this benchmark functional
+    """
+    Benchmark querying the minimum value for a specific column per table.
+
+    This function measures the time taken to query the minimum value of a
+    specified column for each dataset's corresponding table in the test database.
+    The benchmark runs for a given number of iterations, and the results are
+    saved to a SQL table in the results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects, where each dataset's name
+            corresponds to a table and its `query_column` specifies the column
+            to query.
+
+    """
     data = defaultdict(list)
 
     def _run() -> None:
@@ -57,7 +73,23 @@ def query_max_value(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
-    # FIXME: Make this benchmark functional
+    """
+    Benchmark querying the maximum value for a specific column per table.
+
+    This function measures the time taken to query the maximum value of a
+    specified column for each dataset's corresponding table in the test
+    database. The benchmark runs for a given number of iterations, and the
+    results are saved to a SQL table in the results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects, where each dataset's name
+            corresponds to a table and its `query_column` specifies the column
+            to query.
+
+    """
     data = defaultdict(list)
 
     def _run() -> None:
@@ -95,7 +127,23 @@ def query_average_value(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
-    # FIXME: Make this benchmark functional
+    """
+    Benchmark querying the average value for a specific column per table.
+
+    This function measures the time taken to query the average value of a
+    specified column for each dataset's corresponding table in the test database.
+    The benchmark runs for a given number of iterations, and the results are
+    saved to a SQL table in the results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects, where each dataset's name
+            corresponds to a table and its `query_column` specifies the
+            column to query.
+
+    """
     data = defaultdict(list)
 
     def _run() -> None:
@@ -133,6 +181,23 @@ def query_mode_value(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
+    """
+    Benchmark querying the mode value for a specific column per table.
+
+    This function measures the time taken to query the mode value of a
+    specified column for each dataset's corresponding table in the test
+    database. The benchmark runs for a given number of iterations, and the
+    results are saved to a SQL table in the results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects, where each dataset's name
+            corresponds to a table and its `query_column` specifies the column
+            to query.
+
+    """
     data = defaultdict(list)
 
     def _run() -> None:
@@ -170,7 +235,23 @@ def query_groupby_time_window(
     results_db: scoda.db.Results,
     datasets: Iterable[scoda.datasets.generic.Dataset],
 ) -> None:
-    # FIXME: Make this benchmark functional
+    """
+    Benchmark querying data grouped by time windows per table.
+
+    This function measures the time taken to query data grouped by time windows
+    for each dataset's corresponding table in the test database. The benchmark
+    runs for a given number of iterations, and the results are saved to a
+    SQL table in the results database.
+
+    Arguments:
+        test_db: The database instance to benchmark against.
+        iterations: The number of times to run the benchmark.
+        results_db: The database instance to store the benchmark results.
+        datasets: An iterable of dataset objects, where each dataset's name
+            corresponds to a table and its `time_column` specifies the column
+            for grouping.
+
+    """
     data = defaultdict(list)
 
     def _run() -> None:

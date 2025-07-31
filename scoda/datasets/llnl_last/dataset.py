@@ -1,30 +1,14 @@
+"""
+Dataset implementations.
+
+Copyright (C) 2025 Nicholas M. Synovic.
+
+"""
+
 from collections.abc import Iterable
 from pathlib import Path
 
-import pandas as pd
-
 import scoda.datasets.generic
-
-
-def simple_vm_json(
-    query_column: str, name: str, time_column: str, df: pd.DataFrame
-) -> list[dict]:
-    data: list[dict] = []
-    tags: dict = {"name": name}
-
-    row: pd.Series
-    for _, row in df.iterrows():
-        data.append(
-            {
-                "metric": {
-                    "tags": tags,
-                },
-                "timestamps": [int(row[time_column].timestamp())],
-                "values": [row[query_column]],
-            }
-        )
-
-    return data
 
 
 class CoriPower(scoda.datasets.generic.Dataset):
@@ -42,14 +26,6 @@ class CoriPower(scoda.datasets.generic.Dataset):
             fp=fp,
             time_column="timestamp_secs",
             query_column="measured_kW",
-        )
-
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
         )
 
 
@@ -70,14 +46,6 @@ class HawkPower(scoda.datasets.generic.Dataset):
             query_column="measured_kW",
         )
 
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
-        )
-
 
 class HPCGDPC(scoda.datasets.generic.Dataset):
     """
@@ -94,14 +62,6 @@ class HPCGDPC(scoda.datasets.generic.Dataset):
             fp=fp,
             time_column="Time",
             query_column="Node_r9c1t1n1",
-        )
-
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
         )
 
 
@@ -122,14 +82,6 @@ class HPCGSPC(scoda.datasets.generic.Dataset):
             query_column="Node_r6c3t1n1",
         )
 
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
-        )
-
 
 class HPCGUC(scoda.datasets.generic.Dataset):
     """
@@ -146,14 +98,6 @@ class HPCGUC(scoda.datasets.generic.Dataset):
             fp=fp,
             time_column="Time",
             query_column="Node_r7c3t1n1",
-        )
-
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
         )
 
 
@@ -174,14 +118,6 @@ class HPLDPC(scoda.datasets.generic.Dataset):
             query_column="Node_r10c1t1n1",
         )
 
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
-        )
-
 
 class HPLSPC(scoda.datasets.generic.Dataset):
     """
@@ -198,14 +134,6 @@ class HPLSPC(scoda.datasets.generic.Dataset):
             fp=fp,
             time_column="Time",
             query_column="Node_r14c3t1n1",
-        )
-
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
         )
 
 
@@ -226,14 +154,6 @@ class HPLUC(scoda.datasets.generic.Dataset):
             query_column="Node_r14c3t1n1",
         )
 
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
-        )
-
 
 class LumiHPCG(scoda.datasets.generic.Dataset):
     """
@@ -250,14 +170,6 @@ class LumiHPCG(scoda.datasets.generic.Dataset):
             fp=fp,
             time_column="timestamp_secs",
             query_column="measured_kW",
-        )
-
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
         )
 
 
@@ -278,14 +190,6 @@ class LumiPower(scoda.datasets.generic.Dataset):
             query_column="measured_kW",
         )
 
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
-        )
-
 
 class Marconi100Power(scoda.datasets.generic.Dataset):
     """
@@ -302,14 +206,6 @@ class Marconi100Power(scoda.datasets.generic.Dataset):
             fp=fp,
             time_column="timestamp_secs",
             query_column="measured_kW",
-        )
-
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
         )
 
 
@@ -330,16 +226,23 @@ class PerlmutterPower(scoda.datasets.generic.Dataset):
             query_column="measured_kW",
         )
 
-    def _create_victoriametric_json(self) -> list[dict]:
-        return simple_vm_json(
-            query_column=self.query_column,
-            name=self.name,
-            time_column=self.time_column,
-            df=self.data,
-        )
-
 
 def load_llnl_last(directory: Path) -> Iterable[scoda.datasets.generic.Dataset]:
+    """
+    Load a collection of LLNL LAST datasets.
+
+    This function instantiates and returns a list of various datasets
+    related to LLNL's LAST project, each initialized with the provided
+    directory.
+
+    Arguments:
+        directory: The base directory where the dataset files are located.
+
+    Returns:
+        An iterable (list) of `scoda.datasets.generic.Dataset` instances,
+        each representing a specific LLNL LAST dataset.
+
+    """
     return [
         CoriPower(directory=directory),
         HawkPower(directory=directory),

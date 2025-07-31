@@ -12,10 +12,35 @@ import scoda.db
 
 
 class LakehouseDB(scoda.db.DB):
+    """
+    Abstract base class for Lakehouse database interfaces.
+
+    This class serves as a common foundation for database systems built on lakehouse
+    architectures (e.g., Delta Lake, Apache Iceberg), providing optional configuration
+    for converting time columns to integers.
+
+    Attributes:
+        convert_time_column_to_int (bool): Whether to convert time columns to integers
+            for performance or compatibility reasons.
+
+    """
+
     def __init__(
         self,
-        convert_time_column_to_int: bool = True,
+        convert_time_column_to_int: bool = True,  # noqa: FBT001, FBT002
     ) -> None:
+        """
+        Initialize the LakehouseDB instance.
+
+        The flag is used to ensure time-based data can be uniformly handled across
+        various lakehouse implementations, particularly when working with distributed
+        compute frameworks that benefit from integer time formats.
+
+        Args:
+            convert_time_column_to_int (bool, optional): Whether to convert time
+                columns to integers during processing. Defaults to True.
+
+        """
         super().__init__(convert_time_column_to_int=convert_time_column_to_int)
 
     @abstractmethod

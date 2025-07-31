@@ -12,10 +12,32 @@ import scoda.db
 
 
 class DocumentDB(scoda.db.DB):
+    """
+    Provide a base class for document-oriented database interactions.
+
+    This class serves as a foundational component for various document database
+    implementations, handling common initialization and configuration,
+    particularly concerning time column conversions. It extends `scoda.db.DB`.
+
+    """
+
     def __init__(
         self,
-        convert_time_column_to_int: bool = True,
+        convert_time_column_to_int: bool = True,  # noqa: FBT001, FBT002
     ) -> None:
+        """
+        Initialize the DocumentDB instance.
+
+        This constructor sets up the base document database functionality,
+        specifically controlling whether time columns should be converted to
+        integers. It passes this configuration directly to the superclass
+        constructor.
+
+        Arguments:
+            convert_time_column_to_int: A boolean indicating whether to convert
+                time columns to integers. Defaults to True.
+
+        """
         super().__init__(convert_time_column_to_int=convert_time_column_to_int)
 
     @abstractmethod
